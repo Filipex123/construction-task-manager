@@ -1,0 +1,1522 @@
+﻿<!DOCTYPE html>
+<!--
+BeyondAdmin - Responsive Admin Dashboard Template build with Twitter Bootstrap 3.3.7
+Version: 1.6.1
+Purchase: http://wrapbootstrap.com
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Head -->
+<head>
+    <meta charset="utf-8" />
+    <title>Form Layouts</title>
+
+    <meta name="description" content="form layouts" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+    <!--Basic Styles-->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link id="bootstrap-rtl-link" href="" rel="stylesheet" />
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="assets/css/weather-icons.min.css" rel="stylesheet" />
+
+    <!--Fonts-->
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300" rel="stylesheet" type="text/css">
+
+    <!--Beyond styles-->
+    <link id="beyond-link" href="assets/css/beyond.min.css" rel="stylesheet" />
+    <link href="assets/css/demo.min.css" rel="stylesheet" />
+    <link href="assets/css/typicons.min.css" rel="stylesheet" />
+    <link href="assets/css/animate.min.css" rel="stylesheet" />
+    <link id="skin-link" href="" rel="stylesheet" type="text/css" />
+
+    <!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
+    <script src="assets/js/skins.min.js"></script>
+	
+	<script src="assets/js/react/react.js"></script>
+    <script src="assets/js/react/react-dom.js"></script>
+    <script src="assets/js/react/browser.min.js"></script>
+</head>
+<!-- /Head -->
+<!-- Body -->
+<body>
+    <div id="content">
+	</div>
+	
+	<script type="text/babel">
+	var NavbarBrand = React.createClass({
+		render: function() {
+			return (
+			  <div className="navbar-header pull-left">
+                    <a href="#" className="navbar-brand">
+                        <small>
+                            <img src="assets/img/logo.png" alt="" />
+                        </small>
+                    </a>
+                </div>
+			);
+		 }
+	});
+	
+	var SideBar = React.createClass({
+		handleClick: function (e) {
+			var b = $("#sidebar").hasClass("menu-compact");
+			if (!$('#sidebar').is(':visible'))
+            $("#sidebar").toggleClass("hide");
+			$("#sidebar").toggleClass("menu-compact");
+			$(".sidebar-collapse").toggleClass("active");
+			b = $("#sidebar").hasClass("menu-compact");
+
+			if ($(".sidebar-menu").closest("div").hasClass("slimScrollDiv")) {
+				$(".sidebar-menu").slimScroll({ destroy: true });
+				$(".sidebar-menu").attr('style', '');
+			}
+			if (b) {
+				$(".open > .submenu").removeClass("open");
+			} else {
+				if ($('.page-sidebar').hasClass('sidebar-fixed')) {
+					var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+					$('.sidebar-menu').slimscroll({
+						height: 'auto',
+						position: position,
+						size: '3px',
+						color: themeprimary
+					});
+				}
+			}	
+		},
+		render: function() {
+			return (
+			  <div className="sidebar-collapse" id="sidebar-collapse" onClick={this.handleClick}>
+                    <i className="collapse-icon fa fa-bars"></i>
+                </div>
+			);
+		 }
+	});
+	
+	var AccountItem = React.createClass({
+		render: function() {
+			return (
+			  <li>
+                  <a href="#">
+                   <div className="clearfix">
+					   <div className="notification-icon">
+						<i className="fa fa-phone bg-themeprimary white"></i>
+					   </div>
+					   <div className="notification-body">
+						<span className="title">{this.props.title}</span>
+						<span className="description">{this.props.desc}</span>
+					   </div>
+					   <div className="notification-extra">
+						 <i className="fa fa-clock-o themeprimary"></i>
+						 <span className="description">{this.props.extra}</span>
+						</div>
+                   </div>
+                  </a>
+              </li>
+			);
+		 }
+	});
+	
+	var MessageItem = React.createClass({
+		render: function() {
+			return (
+			  <li>
+				<a href="#">
+                    <img src="assets/img/avatars/divyia.jpg" className="message-avatar" alt="Divyia Austin" />
+                    <div className="message">
+                        <span className="message-sender">
+							{this.props.sender}
+                        </span>
+                        <span className="message-time">
+							{this.props.time}
+                        </span>
+                        <span className="message-subject">
+							{this.props.subject}
+                        </span>
+                        <span className="message-body">
+							{this.props.body}
+                        </span>
+                    </div>
+                </a>
+              </li>
+			);
+		 }
+	});
+	
+	var TaskItem = React.createClass({
+		render: function() {
+			return (
+			  <li>
+                <a href="#">
+                    <div className="clearfix">
+                        <span className="pull-left">{this.props.title}</span>
+                        <span className="pull-right">{this.props.percent}</span>
+                    </div>
+                    <div className="progress progress-xs">
+						<div style={{width:'65%'}} className="progress-bar"></div>
+                    </div>
+                </a>
+              </li>
+			);
+		 }
+	});
+	
+	var NavbarHeaderRight = React.createClass({
+		chatClick: function (e) {
+			$('.page-chatbar').toggleClass('open');
+			$("#chat-link").toggleClass('open');
+		},
+		createCookie: function (e) {
+			alert("hello");
+			if (100) {
+				var date = new Date();
+				date.setTime(date.getTime() + (100 * 24 * 60 * 60 * 1000));
+				var expires = "; expires=" + date.toGMTString();
+			}
+			else var expires = "";
+			document.cookie = e + expires + "; path=/";
+		},
+		readCookie: function (e) {
+			alert("hello");
+			var nameEq = e + "=";
+			var ca = document.cookie.split(';');
+			for (var i = 0; i < ca.length; i++) {
+				var c = ca[i];
+				while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+				if (c.indexOf(nameEq) == 0) return c.substring(nameEq.length, c.length);
+			}
+			return null;
+		},
+
+		setCookiesForFixedSettings :function () {
+			alert("hello");
+			createCookie("navbar-fixed-top"+ "=" + $('#checkbox_fixednavbar').is(':checked'));
+			createCookie("sidebar-fixed" + "=" + $('#checkbox_fixedsidebar').is(':checked'));
+			createCookie("breadcrumbs-fixed"+"="+ $('#checkbox_fixedbreadcrumbs').is(':checked'));
+			createCookie("page-header-fixed"+"="+ $('#checkbox_fixedheader').is(':checked'));
+
+			var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+			if ($('#checkbox_fixedsidebar').is(':checked')) {
+				if (!$('.page-sidebar').hasClass('menu-compact')) {
+					//Slim Scrolling for Sidebar Menu in fix state
+					$('.sidebar-menu').slimscroll({
+						position: position,
+						size: '3px',
+						color: themeprimary,
+						height: $(window).height() - 90,
+					});
+				}
+			} else {
+				if ($(".sidebar-menu").closest("div").hasClass("slimScrollDiv")) {
+					$(".sidebar-menu").slimScroll({ destroy: true });
+					$(".sidebar-menu").attr('style', '');
+				}
+			}
+		},
+		initiateSettings: function (e) {
+			
+			if (readCookie("navbar-fixed-top") != null) {
+				if (readCookie("navbar-fixed-top") == "true") {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').addClass('navbar-fixed-top');
+				}
+			}
+
+			if (readCookie("sidebar-fixed") != null) {
+				if (readCookie("sidebar-fixed") == "true") {
+					$('#checkbox_fixedsidebar').prop('checked', true);
+					$('.page-sidebar').addClass('sidebar-fixed');
+
+					if (!$(".page-sidebar").hasClass("menu-compact")) {
+						var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+						$('.sidebar-menu').slimscroll({
+							height: $(window).height() - 90,
+							position: position,
+							size: '3px',
+							color: themeprimary
+						});
+					}
+				}
+			}
+			if (readCookie("breadcrumbs-fixed") != null) {
+				if (readCookie("breadcrumbs-fixed") == "true") {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', true);
+					$('.page-breadcrumbs').addClass('breadcrumbs-fixed');
+				}
+			}
+			if (readCookie("page-header-fixed") != null) {
+				if (readCookie("page-header-fixed") == "true") {
+					$('#checkbox_fixedheader').prop('checked', true);
+					$('.page-header').addClass('page-header-fixed');
+				}
+			}
+
+			$('#checkbox_fixednavbar').change(function () {
+				$('.navbar').toggleClass('navbar-fixed-top');
+				if (($('#checkbox_fixedsidebar').is(":checked"))) {
+					$('#checkbox_fixedsidebar').prop('checked', false);
+					$('.page-sidebar').toggleClass('sidebar-fixed');
+				}
+
+				if (($('#checkbox_fixedbreadcrumbs').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', false);
+					$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				}
+
+				if (($('#checkbox_fixedheader').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedheader').prop('checked', false);
+					$('.page-header').toggleClass('page-header-fixed');
+				}
+				setCookiesForFixedSettings();
+			});
+
+			$('#checkbox_fixedsidebar').change(function () {
+				$('.page-sidebar').toggleClass('sidebar-fixed');
+				if (!($('#checkbox_fixednavbar').is(":checked"))) {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').toggleClass('navbar-fixed-top');
+				}
+				if (($('#checkbox_fixedbreadcrumbs').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', false);
+					$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				}
+				if (($('#checkbox_fixedheader').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedheader').prop('checked', false);
+					$('.page-header').toggleClass('page-header-fixed');
+				}
+				setCookiesForFixedSettings();
+			});
+			$('#checkbox_fixedbreadcrumbs').change(function () {
+				$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				if (!($('#checkbox_fixedsidebar').is(":checked"))) {
+					$('#checkbox_fixedsidebar').prop('checked', true);
+					$('.page-sidebar').toggleClass('sidebar-fixed');
+				}
+				if (!($('#checkbox_fixednavbar').is(":checked"))) {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').toggleClass('navbar-fixed-top');
+				}
+				if (($('#checkbox_fixedheader').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedheader').prop('checked', false);
+					$('.page-header').toggleClass('page-header-fixed');
+				}
+				setCookiesForFixedSettings();
+			});
+			$('#checkbox_fixedheader').change(function () {
+				$('.page-header').toggleClass('page-header-fixed');
+				if (!($('#checkbox_fixedbreadcrumbs').is(":checked"))) {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', true);
+					$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				}
+				if (!($('#checkbox_fixedsidebar').is(":checked"))) {
+					$('#checkbox_fixedsidebar').prop('checked', true);
+					$('.page-sidebar').toggleClass('sidebar-fixed');
+				}
+				if (!($('#checkbox_fixednavbar').is(":checked"))) {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').toggleClass('navbar-fixed-top');
+				}
+				setCookiesForFixedSettings();
+			});
+		},
+		settingsClick: function (e) {
+			$('.navbar-account').toggleClass('setting-open');
+		},
+		componentDidMount: function() {
+			this.initiateSettings();
+		},
+		render: function() {
+			return (
+			  <div className="navbar-header pull-right">
+                    <div className="navbar-account">
+                        <ul className="account-area">
+                            <li>
+                                <a className=" dropdown-toggle" data-toggle="dropdown" title="Notifications" href="#">
+                                    <i className="icon fa fa-warning"></i>
+                                </a>
+                                <ul className="pull-right dropdown-menu dropdown-arrow dropdown-notifications">
+                                    <AccountItem title="Skype meeting with Patty" desc="01:00 pm" extra="office" />
+									<AccountItem title="Uncharted break" desc="03:30 pm - 05:15 pm" extra="" />
+									<AccountItem title="Kate birthday party" desc="08:30 pm" extra="at home" />
+									<AccountItem title="Dinner with friends" desc="10:30 pm" extra="" />
+                                    <li className="dropdown-footer ">
+                                        <span>
+                                            Today, March 28
+                                        </span>
+                                        <span className="pull-right">
+                                            10°c
+                                            <i className="wi wi-cloudy"></i>
+                                        </span>
+                                    </li>
+                                </ul>
+                                
+                            </li>
+                            <li>
+                                <a className="dropdown-toggle" data-toggle="dropdown" title="Mails" href="#">
+                                    <i className="icon fa fa-envelope"></i>
+                                    <span className="badge">3</span>
+                                </a>
+                                <ul className="pull-right dropdown-menu dropdown-arrow dropdown-messages">
+                                    <MessageItem sender="Divyia Austin" time="2 minutes ago" subject="Here's the recipe for apple pie" body="to identify the sending application when the senders image is shown for the main icon" />
+									<MessageItem sender="Bing.com" time="Yesterday" subject="Bing Newsletter: The January Issue‏" body="Discover new music just in time for the Grammy® Awards." />
+									<MessageItem sender="Nicolas" time="Friday, September 22" subject="New 4K Cameras" body="The 4K revolution has come over the horizon and is reaching the general populous" />
+                                </ul>
+                                
+                            </li>
+                            <li>
+                                <a className="dropdown-toggle" data-toggle="dropdown" title="Tasks" href="#">
+                                    <i className="icon fa fa-tasks"></i>
+                                    <span className="badge">4</span>
+                                </a>
+                                <ul className="pull-right dropdown-menu dropdown-tasks dropdown-arrow ">
+                                    <li className="dropdown-header bordered-darkorange">
+                                        <i className="fa fa-tasks"></i>
+                                        4 Tasks In Progress
+                                    </li>
+                                    <TaskItem title="Account Creation" percent="65%" />
+									<TaskItem title="Profile Data" percent="35%" />
+									<TaskItem title="Updating Resume" percent="75%" />
+									<TaskItem title="Adding Contacts" percent="10%" />
+                                    <li className="dropdown-footer">
+                                        <a href="#">
+                                            See All Tasks
+                                        </a>
+                                        <button className="btn btn-xs btn-default shiny darkorange icon-only pull-right"><i className="fa fa-check"></i></button>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a className="wave in" id="chat-link" title="Chat" href="#" onClick={this.chatClick}>
+                                    <i className="icon glyphicon glyphicon-comment"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a className="login-area dropdown-toggle" data-toggle="dropdown">
+                                    <div className="avatar" title="View your public profile">
+                                        <img src="assets/img/avatars/adam-jansen.jpg" />
+                                    </div>
+                                    <section>
+                                        <h2><span className="profile"><span>David Stevenson</span></span></h2>
+                                    </section>
+                                </a>
+                                
+                                <ul className="pull-right dropdown-menu dropdown-arrow dropdown-login-area">
+                                    <li className="username"><a>David Stevenson</a></li>
+                                    <li className="email"><a>David.Stevenson@live.com</a></li>
+                                    
+                                    <li>
+                                        <div className="avatar-area">
+                                            <img src="assets/img/avatars/adam-jansen.jpg" className="avatar" />
+                                            <span className="caption">Change Photo</span>
+                                        </div>
+                                    </li>
+                                    
+                                    <li className="edit">
+                                        <a href="profile.html" className="pull-left">Profile</a>
+                                        <a href="#" className="pull-right">Setting</a>
+                                    </li>
+                                    
+                                    <li className="theme-area">
+                                        <ul className="colorpicker" id="skin-changer">
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#5DB2FF'}} rel="assets/css/skins/blue.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#2dc3e8'}} rel="assets/css/skins/azure.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#03B3B2'}} rel="assets/css/skins/teal.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#53a93f'}} rel="assets/css/skins/green.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#FF8F32'}} rel="assets/css/skins/orange.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#cc324b'}} rel="assets/css/skins/pink.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#AC193D'}} rel="assets/css/skins/darkred.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#8C0095'}} rel="assets/css/skins/purple.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#0072C6'}} rel="assets/css/skins/darkblue.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#585858'}} rel="assets/css/skins/gray.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#474544'}} rel="assets/css/skins/black.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#001940'}} rel="assets/css/skins/deepblue.min.css"></a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <li className="dropdown-footer">
+                                        <a href="login.html">
+                                            Sign out
+                                        </a>
+                                    </li>
+                                </ul>
+                                
+                            </li>
+                            
+                        </ul>
+						<div className="setting">
+                            <a id="btn-setting" title="Setting" href="#" onClick={this.settingsClick}>
+                                <i className="icon glyphicon glyphicon-cog"></i>
+                            </a>
+                        </div>
+						<div className="setting-container">
+                            <label>
+                                <input type="checkbox" id="checkbox_fixednavbar" />
+                                <span className="text">Fixed Navbar</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="checkbox_fixedsidebar" />
+                                <span className="text">Fixed SideBar</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="checkbox_fixedbreadcrumbs" />
+                                <span className="text">Fixed BreadCrumbs</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="checkbox_fixedheader" />
+                                <span className="text">Fixed Header</span>
+                            </label>
+                        </div>
+                        
+                    </div>
+                </div>
+			);
+		 }
+	});
+	
+	var Navbar = React.createClass({
+		render: function() {
+			return (
+				<div className="navbar">
+					<div className="navbar-inner">
+						<div className="navbar-container">
+							<NavbarBrand />
+							<SideBar />
+							<NavbarHeaderRight />
+						</div>
+					</div>
+				</div>
+			);
+		 }
+	});
+	
+	var MenuItemIcon = React.createClass({
+		render: function() {
+			return (
+				<a href={this.props.href}>
+					<i className="menu-icon fa fa-th"></i>
+                    <span className="menu-text">{this.props.text}</span>
+                </a>
+			);
+		 }
+	});
+	
+	var MenuItem = React.createClass({
+		render: function() {
+			return (
+				<a href={this.props.href}>
+                    <span className="menu-text">{this.props.text}</span>
+                </a>
+			);
+		 }
+	});
+	
+	var ParentMenuIcon = React.createClass({
+		render: function() {
+			return (
+				<a href="#" className="menu-dropdown">
+                    <i className="menu-icon fa fa-desktop"></i>
+                    <span className="menu-text">{this.props.text}</span>
+                    <i className="menu-expand"></i>
+                </a>
+			);
+		 }
+	});
+	
+	var ParentMenu = React.createClass({
+		render: function() {
+			return (
+				<a href="#" className="menu-dropdown">
+                    <span className="menu-text">{this.props.text}</span>
+                    <i className="menu-expand"></i>
+                </a>
+			);
+		 }
+	});
+	
+	var PageSidebar = React.createClass({
+		bodyClickHandler: function (e) {
+			var b = $("#sidebar").hasClass("menu-compact");
+			var menuLink = $(e.target).closest("a");
+			if (!menuLink || menuLink.length == 0)
+				return;
+			if (!menuLink.hasClass("menu-dropdown")) {
+				if (b && menuLink.get(0).parentNode.parentNode == this) {
+					var menuText = menuLink.find(".menu-text").get(0);
+					if (e.target != menuText && !$.contains(menuText, e.target)) {
+						return false;
+					}
+				}
+				return;
+			}
+			var submenu = menuLink.next().get(0);
+			if (!$(submenu).is(":visible")) {
+				var c = $(submenu.parentNode).closest("ul");
+				if (b && c.hasClass("sidebar-menu"))
+					return;
+				c.find("> .open > .submenu")
+					.each(function () {
+						if (this != submenu && !$(this.parentNode).hasClass("active"))
+							$(this).slideUp(200).parent().removeClass("open");
+					});
+			}
+			if (b && $(submenu.parentNode.parentNode).hasClass("sidebar-menu"))
+				return false;
+			$(submenu).slideToggle(200).parent().toggleClass("open");
+			return false;
+		},
+		render: function() {
+			return (
+				<div className="page-sidebar" id="sidebar">
+                
+                <div className="sidebar-header-wrapper">
+					<input type="text" className="searchinput" />
+                    <i className="searchicon fa fa-search"></i>
+                    <div className="searchhelper">Search Reports, Charts, Emails or Notifications</div>
+                </div>
+                
+                <ul className="nav sidebar-menu" onClick={this.bodyClickHandler}>
+                    
+                    <li>
+                        <MenuItemIcon href="index.html" text="Dashboard" />
+                    </li>
+                    
+                    <li>
+                        <MenuItemIcon href="databoxes.html" text="Data Boxes" />
+                    </li>
+                    
+                    <li>
+                        <MenuItemIcon href="widgets.html" text="Widgets" />
+                    </li>
+                    
+                    <li>
+						<ParentMenuIcon text="Elements" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="elements.html" text="Basic Elements" />
+                            </li>
+                            <li>
+								<ParentMenu text="Icons" />
+
+                                <ul className="submenu">
+                                    <li>
+										<MenuItemIcon href="font-awesome.html" text="Font Awesome" />
+                                    </li>
+                                    <li>
+										<MenuItemIcon href="glyph-icons.html" text="Glyph Icons" />
+                                    </li>
+                                    <li>
+										<MenuItemIcon href="typicon.html" text="Typicons" />
+                                    </li>
+                                    <li>
+										<MenuItemIcon href="weather-icons.html" text="Weather Icons" />
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+								<MenuItem href="tabs.html" text="Tabs & Accordions" />
+                            </li>
+                            <li>
+								<MenuItem href="alerts.html" text="Alerts & Tooltips" />
+                            </li>
+                            <li>
+								<MenuItem href="modals.html" text="Modals & Wells" />
+                            </li>
+                            <li>
+								<MenuItem href="buttons.html" text="Buttons" />
+                            </li>
+                            <li>
+								<MenuItem href="nestable-list.html" text="Nestable List" />
+                            </li>
+                            <li>
+								<MenuItem href="treeview.html" text="Treeview" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text="Tables" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="tables-simple.html" text="Simple & Responsive" />
+                            </li>
+                            <li>
+								<MenuItem href="tables-data.html" text="Data Tables" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li className="active open">
+						<ParentMenuIcon text="Forms" />
+
+                        <ul className="submenu">
+                            <li className="active">
+								<MenuItem href="form-layouts.html" text="Form Layouts" />
+                            </li>
+
+                            <li>
+								<MenuItem href="form-inputs.html" text="Form Inputs" />
+                            </li>
+
+                            <li>
+								<MenuItem href="form-pickers.html" text="Data Pickers" />
+                            </li>
+                            <li>
+								<MenuItem href="form-wizard.html" text="Wizard" />
+                            </li>
+                            <li>
+								<MenuItem href="form-validation.html" text="Validation" />
+                            </li>
+                            <li>
+								<MenuItem href="form-editors.html" text="Editors" />
+                            </li>
+                            <li>
+								<MenuItem href="form-inputmask.html" text="Input Mask" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text="Charts" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="flot.html" text="Flot Charts" />
+                            </li>
+
+                            <li>
+								<MenuItem href="morris.html" text="Morris Charts" />
+                            </li>
+                            <li>
+								<MenuItem href="sparkline.html" text="Sparkline Charts" />
+                            </li>
+                            <li>
+								<MenuItem href="easypiecharts.html" text="Easy Pie Charts" />
+                            </li>
+                            <li>
+								<MenuItem href="chartjs.html" text="ChartJS" />
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+						<MenuItemIcon href="profile.html" text="Profile" />
+                    </li>
+	
+                    <li>
+						<ParentMenuIcon text="Mail" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="inbox.html" text="Inbox" />
+                            </li>
+
+                            <li>
+								<MenuItem href="message-view.html" text="View Message" />
+                            </li>
+                            <li>
+								<MenuItem href="message-compose.html" text="Compose Message" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<MenuItemIcon href="calendar.html" text="Calendar" />
+                    </li>
+
+                    <li>
+						<ParentMenuIcon text="Pages" />
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="timeline.html" text="Timeline" />
+                            </li>
+                            <li>
+								<MenuItem href="pricing.html" text="Pricing Tables" />
+                            </li>
+
+                            <li>
+								<MenuItem href="invoice.html" text="Invoice" />
+                            </li>
+
+                            <li>
+								<MenuItem href="login.html" text="Login" />
+                            </li>
+                            <li>
+								<MenuItem href="register.html" text="Register" />
+                            </li>
+                            <li>
+								<MenuItem href="lock.html" text="Lock Screen" />
+                            </li>
+                            <li>
+								<MenuItem href="typography.html" text="Typography" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text="More Pages" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="error-404.html" text="Error 404" />
+                            </li>
+
+                            <li>
+								<MenuItem href="error-500.html" text="Error 500" />
+                            </li>
+                            <li>
+								<MenuItem href="blank.html" text="Blank Page" />
+                            </li>
+                            <li>
+								<MenuItem href="grid.html" text="Grid" />
+                            </li>
+                            <li>
+								<ParentMenu text="Multi Level Menu" />
+                                
+                                <ul className="submenu">
+                                    <li>
+										<MenuItemIcon href="#" text="Level 3" />
+                                    </li>
+
+                                    <li>
+										<ParentMenuIcon text="Level 4" />
+
+                                        <ul className="submenu">
+                                            <li>
+												<MenuItemIcon href="#" text="Some Item" />
+                                            </li>
+
+                                            <li>
+												<MenuItemIcon href="#" text="Another Item" />
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </li>
+
+                    <li>
+						<ParentMenuIcon text="Right to Left" />
+                        <ul className="submenu">
+                            <li>
+                                <a>
+                                    <span className="menu-text">RTL</span>
+                                    <label className="pull-right margin-top-10">
+                                        <input id="rtl-changer" className="checkbox-slider slider-icon colored-primary" type="checkbox" />
+                                        <span className="text"></span>
+                                    </label>
+                                </a>
+                            </li>
+                            <li>
+								<MenuItem href="index-rtl-ar.html" text="Arabic Layout" />
+                            </li>
+
+                            <li>
+								<MenuItem href="index-rtl-fa.html" text="Persian Layout" />
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li>
+						<MenuItemIcon href="versions.html" text="BeyondAdmin Versions" />
+                    </li>
+                </ul>
+            </div>
+			);
+		 }
+	});
+	
+	var Contact = React.createClass({
+		handleClick: function(e) {
+			$('.page-chatbar .chatbar-contacts').hide();
+			$('.page-chatbar .chatbar-messages').show();
+		},
+		render: function() {
+			return (
+				<li className="contact" onClick={this.handleClick}>
+                    <div className="contact-avatar">
+                        <img src="assets/img/avatars/John-Smith.jpg" />
+                    </div>
+                    <div className="contact-info">
+                        <div className="contact-name">{this.props.name}</div>
+                        <div className="contact-status">
+							<div className="online"></div>
+                            <div className="status">{this.props.status}</div>
+                        </div>
+                        <div className="last-chat-time">
+							{this.props.last}
+                        </div>
+                    </div>
+                </li>
+			);
+		 }
+	});
+	
+	var ContactList = React.createClass({
+		componentDidMount: function() {
+			var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+			var additionalHeight = 0;
+			if ($(window).width() < 531)
+				additionalHeight = 45;
+			$('.chatbar-contacts .contacts-list').slimscroll({
+				position: position,
+				size: '4px',
+				color: themeprimary,
+				height: $(window).height() - (86 + additionalHeight),
+			});
+		},
+		render: function() {
+			return (
+				<ul className="contacts-list">
+					<Contact name="Divyia Philips" status="online" last="last week" />
+					<Contact name="Adam Johnson" status="left 4 mins ago" last="today" />
+					<Contact name="John Smith" status="online" last="1:57 am" />
+					<Contact name="Osvaldus Valutis" status="online" last="today" />
+					<Contact name="Javi Jimenez" status="online" last="today" />
+					<Contact name="Stephanie Walter" status="online" last="yesterday" />
+					<Contact name="Sergey Azovskiy" status="offline since oct 24" last="22 oct" />
+					<Contact name="Lee Munroe" status="online" last="today" />
+					<Contact name="Divyia Philips" status="online" last="last week" />
+                </ul>
+			);
+		 }
+	});
+	
+	var ContactSearch = React.createClass({
+		render: function() {
+			return (
+				<div className="contacts-search">
+                    <input type="text" className="searchinput" placeholder="Search Contacts" />
+                    <i className="searchicon fa fa-search"></i>
+                    <div className="searchhelper">Search Your Contacts and Chat History</div>
+                </div>
+			);
+		 }
+	});
+	
+	var ChatContact = React.createClass({
+		render: function() {
+			return (
+				<div className="chatbar-contacts">
+					<ContactSearch />
+					<ContactList />
+				</div>
+			);
+		 }
+	});
+	
+	var ChatMessage = React.createClass({
+		render: function() {
+			return (
+				<li className="message">
+                    <div className="message-info">
+                        <div className="bullet"></div>
+                        <div className="contact-name">{this.props.sender}</div>
+                        <div className="message-time">{this.props.time}</div>
+                    </div>
+                    <div className="message-body">
+						{this.props.text}
+                    </div>
+                </li>
+			);
+		 }
+	});
+	
+	var ChatReply = React.createClass({
+		render: function() {
+			return (
+				<li className="message reply">
+                    <div className="message-info">
+                        <div className="bullet"></div>
+                        <div className="contact-name">{this.props.sender}</div>
+                        <div className="message-time">{this.props.time}</div>
+                    </div>
+                    <div className="message-body">
+						{this.props.text}
+                    </div>
+                </li>
+			);
+		 }
+	});
+	
+	var ChatList = React.createClass({
+		componentDidMount: function() {
+			var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+			var additionalHeight = 0;
+			if ($(window).width() < 531)
+				additionalHeight = 45;
+			$('.chatbar-messages .messages-list').slimscroll({
+				position: position,
+				size: '4px',
+				color: themeprimary,
+				height: $(window).height() - (250 + additionalHeight),
+			});
+		},
+		render: function() {
+			return (
+				<ul className="messages-list">
+					<ChatMessage sender="Me" time="10:14 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatReply sender="Divyia" time="10:15 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+                    <ChatMessage sender="Me" time="10:14 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatReply sender="Divyia" time="10:15 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatMessage sender="Me" time="10:14 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatReply sender="Divyia" time="10:15 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+                 </ul>
+			);
+		 }
+	});
+	
+	var ChatSend = React.createClass({
+		render: function() {
+			return (
+				<div className="send-message">
+                    <span className="input-icon icon-right">
+                        <textarea rows="4" className="form-control" placeholder="Type your message"></textarea>
+                        <i className="fa fa-camera themeprimary"></i>
+                    </span>
+                </div>
+			);
+		 }
+	});
+	
+	var ChatBarContact = React.createClass({
+		handleClick: function(e) {
+			$('.page-chatbar .chatbar-contacts').show();
+			$('.page-chatbar .chatbar-messages').hide();
+		},
+		render: function() {
+			return (
+				<div className="messages-contact">
+                    <div className="contact-avatar">
+                        <img src="assets/img/avatars/divyia.jpg" />
+                    </div>
+                    <div className="contact-info">
+                        <div className="contact-name">{this.props.name}</div>
+                        <div className="contact-status">
+                            <div className="online"></div>
+                            <div className="status">{this.props.status}</div>
+                        </div>
+                        <div className="last-chat-time">
+							{this.props.time}
+                        </div>
+                        <div className="back" onClick={this.handleClick}>
+                            <i className="fa fa-arrow-circle-left"></i>
+                        </div>
+                    </div>
+                </div>
+			);
+		 }
+	});
+	
+	var ChatBarMessage = React.createClass({
+		render: function() {
+			return (
+				<div className="chatbar-messages" style={{display: 'none'}}>
+					<ChatBarContact name="Divyia Philips" status="online" time="a moment ago" />
+					<ChatList />
+					<ChatSend />
+				</div>
+			);
+		 }
+	});
+	
+	var ChatBar = React.createClass({
+		render: function() {
+			return (
+				<div id="chatbar" className="page-chatbar">
+					<ChatContact />
+					<ChatBarMessage />
+				</div>
+			);
+		 }
+	});
+	
+	var FirstRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+					<div className="col-lg-6 col-sm-6 col-xs-12">
+						<div className="widget">
+							<div className="widget-header bordered-bottom bordered-blue">
+								<span className="widget-caption">Basic Form</span>
+							</div>
+							<div className="widget-body">
+								<div>
+									<form role="form">
+										<div className="form-group">
+											<label for="exampleInputEmail1">Email address</label>
+											<input type="email" className="form-control" id="exampleInputEmail1" placeholder="Enter email"/>
+										</div>
+										<div className="form-group">
+											<label for="exampleInputPassword1">Password</label>
+											<input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"/>
+										</div>
+										<div className="form-group">
+											<div className="checkbox">
+												<label>
+													<input type="checkbox"/>
+													<span className="text">Remember me next time.</span>
+												</label>
+											</div>
+										</div>
+										<button type="submit" className="btn btn-blue">Submit</button>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div className="col-lg-6 col-sm-6 col-xs-12">
+						<div className="widget">
+							<div className="widget-header bordered-bottom bordered-lightred">
+								<span className="widget-caption">Horizontal Form</span>
+							</div>
+							<div className="widget-body">
+								<div id="horizontal-form">
+									<form className="form-horizontal" role="form">
+										<div className="form-group">
+											<label for="inputEmail3" className="col-sm-2 control-label no-padding-right">Email</label>
+											<div className="col-sm-10">
+												<input type="email" className="form-control" id="inputEmail3" placeholder="Email"/>
+												<p className="help-block">Example block-level help text here.</p>
+											</div>
+										</div>
+										<div className="form-group">
+											<label for="inputPassword3" className="col-sm-2 control-label no-padding-right">Password</label>
+											<div className="col-sm-10">
+												<input type="password" className="form-control" id="inputPassword3" placeholder="Password"/>
+											</div>
+										</div>
+										<div className="form-group">
+											<div className="col-sm-offset-2 col-sm-10">
+												<div className="checkbox">
+													<label>
+														<input type="checkbox"/>
+														<span className="text">Remember me next time.</span>
+													</label>
+												</div>
+											</div>
+										</div>
+										<div className="form-group">
+											<div className="col-sm-offset-2 col-sm-10">
+												<button type="submit" className="btn btn-default">Sign in</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	
+	var SecondRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+					<div className="col-lg-12 col-sm-12 col-xs-12">
+						<div className="widget">
+							<div className="widget-header bordered-left bordered-darkorange">
+								<span className="widget-caption">Inline Form</span>
+							</div>
+							<div className="widget-body bordered-left bordered-warning">
+								<form className="form-inline" role="form">
+									<div className="form-group">
+										<label className="sr-only" for="exampleInputEmail2">Email address</label>
+										<input type="email" className="form-control" id="exampleInputEmail2" placeholder="Enter email"/>
+									</div>
+									<div className="form-group">
+										<label className="sr-only" for="exampleInputPassword2">Password</label>
+										<input type="password" className="form-control" id="exampleInputPassword2" placeholder="Password"/>
+									</div>
+									<div className="checkbox">
+										<label>
+											<input type="checkbox"/>
+											<span className="text">Remember me</span>
+										</label>
+									</div>
+									<button type="submit" className="btn btn-default">Sign in</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	var ThirdRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+					<div className="col-lg-6 col-sm-6 col-xs-12">
+						<div className="widget">
+							<div className="widget-header bordered-bottom bordered-palegreen">
+								<span className="widget-caption">Bordered Form</span>
+							</div>
+							<div className="widget-body">
+								<div>
+									<form className="form-horizontal form-bordered" role="form">
+										<div className="form-group">
+											<label for="inputEmail3" className="col-sm-2 control-label no-padding-right">Email</label>
+											<div className="col-sm-10">
+												<input type="email" className="form-control" id="inputEmail3" placeholder="Email"/>
+											</div>
+										</div>
+										<div className="form-group">
+											<label for="inputPassword3" className="col-sm-2 control-label no-padding-right">Password</label>
+											<div className="col-sm-10">
+												<input type="password" className="form-control" id="inputPassword3" placeholder="Password"/>
+											</div>
+										</div>
+										<div className="form-group">
+											<div className="col-sm-offset-2 col-sm-10">
+												<button type="submit" className="btn btn-palegreen">Sign in</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div className="col-lg-6 col-sm-6 col-xs-12">
+						<div className="widget">
+							<div className="widget-header bordered-bottom bordered-pink">
+								<span className="widget-caption">Form Without Labels</span>
+							</div>
+							<div className="widget-body">
+								<div id="horizontal-form">
+									<form className="form-horizontal" role="form">
+										<div className="row">
+											<div className="col-md-6">
+												<input type="email" name="to" placeholder="To" className="form-control"/>
+												<div className="horizontal-space"></div>
+											</div>
+											<div className="col-md-6">
+												<input type="text" name="subject" placeholder="Subject" className="form-control"/>
+												<div className="horizontal-space"></div>
+											</div>
+										</div>
+										<textarea className="form-control" rows="3" placeholder="Content"></textarea>
+										<div className="horizontal-space"></div>
+										<div>
+											<button type="submit" className="btn btn-default">Send</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	var FourthRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+					<div className="col-lg-12 col-sm-12 col-xs-12">
+						<h5 className="row-title before-magenta"><i className="fa fa-edit magenta"></i>Form Examples</h5>
+						<div className="row">
+							<div className="col-lg-6 col-sm-6 col-xs-12">
+								<div className="widget flat radius-bordered">
+									<div className="widget-header bg-blue">
+										<span className="widget-caption">Registration Form</span>
+									</div>
+									<div className="widget-body">
+										<div id="registration-form">
+											<form role="form">
+												<div className="form-title">
+													User Information
+												</div>
+												<div className="form-group">
+													<span className="input-icon icon-right">
+														<input type="text" className="form-control" id="userameInput" placeholder="Username"/>
+														<i className="glyphicon glyphicon-user circular"></i>
+													</span>
+												</div>
+												<div className="form-group">
+													<span className="input-icon icon-right">
+														<input type="text" className="form-control" id="emailInput" placeholder="Email Address"/>
+														<i className="fa fa-envelope-o circular"></i>
+													</span>
+												</div>
+												<div className="form-group">
+													<span className="input-icon icon-right">
+														<input type="text" className="form-control" id="passwordInput" placeholder="Password"/>
+														<i className="fa fa-lock circular"></i>
+													</span>
+												</div>
+												<div className="form-group">
+													<span className="input-icon icon-right">
+														<input type="text" className="form-control" id="confirmPasswordInput" placeholder="Confirm Password"/>
+														<i className="fa fa-lock circular"></i>
+													</span>
+												</div>
+												<div className="form-title">
+													Personal Information
+												</div>
+												<div className="row">
+													<div className="col-sm-6">
+														<div className="form-group">
+															<span className="input-icon icon-right">
+																<input type="text" className="form-control" placeholder="Name"/>
+																<i className="fa fa-user"></i>
+															</span>
+														</div>
+													</div>
+													<div className="col-sm-6">
+														<div className="form-group">
+															<span className="input-icon icon-right">
+																<input type="text" className="form-control" placeholder="Family"/>
+																<i className="fa fa-user"></i>
+															</span>
+														</div>
+													</div>
+												</div>
+												<div className="row">
+													<div className="col-sm-6">
+														<div className="form-group">
+															<span className="input-icon icon-right">
+																<input type="text" className="form-control" placeholder="Phone"/>
+																<i className="glyphicon glyphicon-earphone"></i>
+															</span>
+														</div>
+													</div>
+													<div className="col-sm-6">
+														<div className="form-group">
+															<span className="input-icon icon-right">
+																<input type="text" className="form-control" placeholder="Mobile"/>
+																<i className="glyphicon glyphicon-phone"></i>
+															</span>
+														</div>
+													</div>
+												</div>
+												<hr className="wide" />
+												<div className="row">
+													<div className="col-sm-6">
+														<div className="form-group">
+															<span className="input-icon icon-right">
+																<input className="form-control date-picker" id="id-date-picker-1" type="text" data-date-format="dd-mm-yyyy" placeholder="Birth Date"/>
+																<i className="fa fa-calendar"></i>
+															</span>
+														</div>
+													</div>
+													<div className="col-sm-6">
+														<div className="form-group">
+															<span className="input-icon icon-right">
+																<input type="text" className="form-control" placeholder="Birth Place"/>
+																<i className="fa fa-globe"></i>
+															</span>
+														</div>
+													</div>
+												</div>
+												<div className="form-group">
+													<div className="checkbox">
+														<label>
+															<input type="checkbox" className="colored-blue"/>
+															<span className="text">Auto Sign In After Registration</span>
+														</label>
+													</div>
+												</div>
+												<button type="submit" className="btn btn-blue">Register</button>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div className="col-lg-6 col-sm-6 col-xs-12">
+								<div className="widget flat radius-bordered">
+									<div className="widget-header bg-danger">
+										<span className="widget-caption">Contact Form</span>
+									</div>
+									<div className="widget-body">
+										<div id="registration-form">
+											<form role="form">
+												<div className="form-title">
+													Contact Us
+												</div>
+												<div className="row">
+													<div className="col-sm-6">
+														<div className="form-group">
+															<label for="exampleInputEmail2">Email address</label>
+															<span className="input-icon icon-right">
+																<input type="text" className="form-control" id="exampleInputEmail2" placeholder="Enter Email"/>
+																<i className="fa fa-envelope blue"></i>
+															</span>
+														</div>
+													</div>
+													<div className="col-sm-6">
+														<div className="form-group">
+															<label for="exampleInputName2">Name</label>
+															<span className="input-icon icon-right">
+																<input type="text" className="form-control" id="exampleInputName2" placeholder="Name"/>
+																<i className="glyphicon glyphicon-user palegreen"></i>
+															</span>
+														</div>
+													</div>
+												</div>
+												<div className="row">
+													<div className="col-sm-12">
+														<div className="form-group">
+															<label for="exampleInputEmail2">Message</label>
+															<span className="input-icon icon-right">
+																<textarea className="form-control" rows="10"></textarea>
+																<i className="glyphicon glyphicon-briefcase darkorange"></i>
+															</span>
+															<p className="help-block">Your message will be in this text area.</p>
+														</div>
+
+													</div>
+												</div>
+												<div className="form-group">
+													<div className="checkbox">
+														<label>
+															<input type="checkbox" className="colored-danger"/>
+															<span className="text">Notify me through E-mail</span>
+														</label>
+													</div>
+												</div>
+												<button type="submit" className="btn btn-danger">Submit</button>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	var PageContent = React.createClass({
+		fullScreenClick: function(e) {
+			var element = document.documentElement;
+			if (!$('body').hasClass("full-screen")) {
+				$('body').addClass("full-screen");
+				$('#fullscreen-toggler').addClass("active");
+					if (element.requestFullscreen) {
+						element.requestFullscreen();
+					} else if (element.mozRequestFullScreen) {
+						element.mozRequestFullScreen();
+					} else if (element.webkitRequestFullscreen) {
+						element.webkitRequestFullscreen();
+					} else if (element.msRequestFullscreen) {
+						element.msRequestFullscreen();
+					}
+			} else {
+				$('body').removeClass("full-screen");
+				$('#fullscreen-toggler').removeClass("active");
+				if (document.exitFullscreen) {
+					document.exitFullscreen();
+				} else if (document.mozCancelFullScreen) {
+					document.mozCancelFullScreen();
+				} else if (document.webkitExitFullscreen) {
+					document.webkitExitFullscreen();
+				}
+			}
+		},
+		sideBarClick: function(e) {
+			$("#sidebar").toggleClass("hide");
+			$(".sidebar-toggler").toggleClass("active");
+			return false;
+		},
+		render: function() {
+			return (
+				<div className="page-content">
+
+					<div className="page-breadcrumbs">
+						<ul className="breadcrumb">
+							<li>
+								<i className="fa fa-home"></i>
+								<a href="#">Home</a>
+							</li>
+							<li>
+								<a href="#">Form Elements</a>
+							</li>
+							<li className="active">Form Layouts</li>
+						</ul>
+					</div>
+
+					<div className="page-header position-relative">
+						<div className="header-title">
+							<h1>
+								Forms
+								<small>
+									<i className="fa fa-angle-right"></i>
+									Layouts
+								</small>
+							</h1>
+						</div>
+
+						<div className="header-buttons">
+							<a className="sidebar-toggler" href="#" onClick={this.sideBarClick}>
+								<i className="fa fa-arrows-h"></i>
+							</a>
+							<a className="refresh" id="refresh-toggler" href="">
+								<i className="glyphicon glyphicon-refresh"></i>
+							</a>
+							<a className="fullscreen" id="fullscreen-toggler" href="#" onClick={this.fullScreenClick}>
+								<i className="glyphicon glyphicon-fullscreen"></i>
+							</a>
+						</div>
+
+					</div>
+
+					<div className="page-body">
+						<FirstRow />
+						<SecondRow />
+						<ThirdRow />
+						<FourthRow />
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	var WholePage = React.createClass({
+		render: function() {
+			return (
+				<div>
+					<div className="loading-container">
+						<div className="loader"></div>
+					</div>
+					<Navbar />
+					<div className="main-container container-fluid">
+						<div className="page-container">
+							<PageSidebar />
+							<ChatBar />
+							<PageContent />
+						</div>
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	
+	ReactDOM.render(
+		<WholePage />,
+		document.getElementById('content')
+		);
+	</script>
+    <!--Basic Scripts-->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!--Beyond Scripts-->
+    <script src="assets/js/beyond.min.js"></script>
+
+    <!--Page Related Scripts-->
+    
+</body>
+<!--  /Body -->
+</html>

@@ -1,0 +1,1620 @@
+﻿<!DOCTYPE html>
+<!--
+BeyondAdmin - Responsive Admin Dashboard Template build with Twitter Bootstrap 3.3.7
+Version: 1.6.1
+Purchase: http://wrapbootstrap.com
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Head -->
+<head>
+    <meta charset="utf-8" />
+    <title>Buttons</title>
+
+    <meta name="description" content="buttons" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+    <!--Basic Styles-->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link id="bootstrap-rtl-link" href="" rel="stylesheet" />
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="assets/css/weather-icons.min.css" rel="stylesheet" />
+
+    <!--Fonts-->
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300" rel="stylesheet" type="text/css">
+
+    <!--Beyond styles-->
+    <link id="beyond-link" href="assets/css/beyond.min.css" rel="stylesheet" />
+    <link href="assets/css/demo.min.css" rel="stylesheet" />
+    <link href="assets/css/typicons.min.css" rel="stylesheet" />
+    <link href="assets/css/animate.min.css" rel="stylesheet" />
+    <link id="skin-link" href="" rel="stylesheet" type="text/css" />
+
+    <!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
+    <script src="assets/js/skins.min.js"></script>
+	
+	<script src="assets/js/react/react.js"></script>
+    <script src="assets/js/react/react-dom.js"></script>
+    <script src="assets/js/react/browser.min.js"></script>
+</head>
+<!-- /Head -->
+<!-- Body -->
+<body>
+	
+	<div id="content">
+	</div>
+	
+	<script type="text/babel">
+	var NavbarBrand = React.createClass({
+		render: function() {
+			return (
+			  <div className="navbar-header pull-left">
+                    <a href="#" className="navbar-brand">
+                        <small>
+                            <img src="assets/img/logo.png" alt="" />
+                        </small>
+                    </a>
+                </div>
+			);
+		 }
+	});
+	
+	var SideBar = React.createClass({
+		handleClick: function (e) {
+			var b = $("#sidebar").hasClass("menu-compact");
+			if (!$('#sidebar').is(':visible'))
+            $("#sidebar").toggleClass("hide");
+			$("#sidebar").toggleClass("menu-compact");
+			$(".sidebar-collapse").toggleClass("active");
+			b = $("#sidebar").hasClass("menu-compact");
+
+			if ($(".sidebar-menu").closest("div").hasClass("slimScrollDiv")) {
+				$(".sidebar-menu").slimScroll({ destroy: true });
+				$(".sidebar-menu").attr('style', '');
+			}
+			if (b) {
+				$(".open > .submenu").removeClass("open");
+			} else {
+				if ($('.page-sidebar').hasClass('sidebar-fixed')) {
+					var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+					$('.sidebar-menu').slimscroll({
+						height: 'auto',
+						position: position,
+						size: '3px',
+						color: themeprimary
+					});
+				}
+			}	
+		},
+		render: function() {
+			return (
+			  <div className="sidebar-collapse" id="sidebar-collapse" onClick={this.handleClick}>
+                    <i className="collapse-icon fa fa-bars"></i>
+                </div>
+			);
+		 }
+	});
+	
+	var AccountItem = React.createClass({
+		render: function() {
+			return (
+			  <li>
+                  <a href="#">
+                   <div className="clearfix">
+					   <div className="notification-icon">
+						<i className="fa fa-phone bg-themeprimary white"></i>
+					   </div>
+					   <div className="notification-body">
+						<span className="title">{this.props.title}</span>
+						<span className="description">{this.props.desc}</span>
+					   </div>
+					   <div className="notification-extra">
+						 <i className="fa fa-clock-o themeprimary"></i>
+						 <span className="description">{this.props.extra}</span>
+						</div>
+                   </div>
+                  </a>
+              </li>
+			);
+		 }
+	});
+	
+	var MessageItem = React.createClass({
+		render: function() {
+			return (
+			  <li>
+				<a href="#">
+                    <img src="assets/img/avatars/divyia.jpg" className="message-avatar" alt="Divyia Austin" />
+                    <div className="message">
+                        <span className="message-sender">
+							{this.props.sender}
+                        </span>
+                        <span className="message-time">
+							{this.props.time}
+                        </span>
+                        <span className="message-subject">
+							{this.props.subject}
+                        </span>
+                        <span className="message-body">
+							{this.props.body}
+                        </span>
+                    </div>
+                </a>
+              </li>
+			);
+		 }
+	});
+	
+	var TaskItem = React.createClass({
+		render: function() {
+			return (
+			  <li>
+                <a href="#">
+                    <div className="clearfix">
+                        <span className="pull-left">{this.props.title}</span>
+                        <span className="pull-right">{this.props.percent}</span>
+                    </div>
+                    <div className="progress progress-xs">
+						<div style={{width:'65%'}} className="progress-bar"></div>
+                    </div>
+                </a>
+              </li>
+			);
+		 }
+	});
+	
+	var NavbarHeaderRight = React.createClass({
+		chatClick: function (e) {
+			$('.page-chatbar').toggleClass('open');
+			$("#chat-link").toggleClass('open');
+		},
+		createCookie: function (e) {
+			alert("hello");
+			if (100) {
+				var date = new Date();
+				date.setTime(date.getTime() + (100 * 24 * 60 * 60 * 1000));
+				var expires = "; expires=" + date.toGMTString();
+			}
+			else var expires = "";
+			document.cookie = e + expires + "; path=/";
+		},
+		readCookie: function (e) {
+			alert("hello");
+			var nameEq = e + "=";
+			var ca = document.cookie.split(';');
+			for (var i = 0; i < ca.length; i++) {
+				var c = ca[i];
+				while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+				if (c.indexOf(nameEq) == 0) return c.substring(nameEq.length, c.length);
+			}
+			return null;
+		},
+
+		setCookiesForFixedSettings :function () {
+			alert("hello");
+			createCookie("navbar-fixed-top"+ "=" + $('#checkbox_fixednavbar').is(':checked'));
+			createCookie("sidebar-fixed" + "=" + $('#checkbox_fixedsidebar').is(':checked'));
+			createCookie("breadcrumbs-fixed"+"="+ $('#checkbox_fixedbreadcrumbs').is(':checked'));
+			createCookie("page-header-fixed"+"="+ $('#checkbox_fixedheader').is(':checked'));
+
+			var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+			if ($('#checkbox_fixedsidebar').is(':checked')) {
+				if (!$('.page-sidebar').hasClass('menu-compact')) {
+					//Slim Scrolling for Sidebar Menu in fix state
+					$('.sidebar-menu').slimscroll({
+						position: position,
+						size: '3px',
+						color: themeprimary,
+						height: $(window).height() - 90,
+					});
+				}
+			} else {
+				if ($(".sidebar-menu").closest("div").hasClass("slimScrollDiv")) {
+					$(".sidebar-menu").slimScroll({ destroy: true });
+					$(".sidebar-menu").attr('style', '');
+				}
+			}
+		},
+		initiateSettings: function (e) {
+			
+			if (readCookie("navbar-fixed-top") != null) {
+				if (readCookie("navbar-fixed-top") == "true") {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').addClass('navbar-fixed-top');
+				}
+			}
+
+			if (readCookie("sidebar-fixed") != null) {
+				if (readCookie("sidebar-fixed") == "true") {
+					$('#checkbox_fixedsidebar').prop('checked', true);
+					$('.page-sidebar').addClass('sidebar-fixed');
+
+					if (!$(".page-sidebar").hasClass("menu-compact")) {
+						var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+						$('.sidebar-menu').slimscroll({
+							height: $(window).height() - 90,
+							position: position,
+							size: '3px',
+							color: themeprimary
+						});
+					}
+				}
+			}
+			if (readCookie("breadcrumbs-fixed") != null) {
+				if (readCookie("breadcrumbs-fixed") == "true") {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', true);
+					$('.page-breadcrumbs').addClass('breadcrumbs-fixed');
+				}
+			}
+			if (readCookie("page-header-fixed") != null) {
+				if (readCookie("page-header-fixed") == "true") {
+					$('#checkbox_fixedheader').prop('checked', true);
+					$('.page-header').addClass('page-header-fixed');
+				}
+			}
+
+			$('#checkbox_fixednavbar').change(function () {
+				$('.navbar').toggleClass('navbar-fixed-top');
+				if (($('#checkbox_fixedsidebar').is(":checked"))) {
+					$('#checkbox_fixedsidebar').prop('checked', false);
+					$('.page-sidebar').toggleClass('sidebar-fixed');
+				}
+
+				if (($('#checkbox_fixedbreadcrumbs').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', false);
+					$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				}
+
+				if (($('#checkbox_fixedheader').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedheader').prop('checked', false);
+					$('.page-header').toggleClass('page-header-fixed');
+				}
+				setCookiesForFixedSettings();
+			});
+
+			$('#checkbox_fixedsidebar').change(function () {
+				$('.page-sidebar').toggleClass('sidebar-fixed');
+				if (!($('#checkbox_fixednavbar').is(":checked"))) {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').toggleClass('navbar-fixed-top');
+				}
+				if (($('#checkbox_fixedbreadcrumbs').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', false);
+					$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				}
+				if (($('#checkbox_fixedheader').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedheader').prop('checked', false);
+					$('.page-header').toggleClass('page-header-fixed');
+				}
+				setCookiesForFixedSettings();
+			});
+			$('#checkbox_fixedbreadcrumbs').change(function () {
+				$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				if (!($('#checkbox_fixedsidebar').is(":checked"))) {
+					$('#checkbox_fixedsidebar').prop('checked', true);
+					$('.page-sidebar').toggleClass('sidebar-fixed');
+				}
+				if (!($('#checkbox_fixednavbar').is(":checked"))) {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').toggleClass('navbar-fixed-top');
+				}
+				if (($('#checkbox_fixedheader').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedheader').prop('checked', false);
+					$('.page-header').toggleClass('page-header-fixed');
+				}
+				setCookiesForFixedSettings();
+			});
+			$('#checkbox_fixedheader').change(function () {
+				$('.page-header').toggleClass('page-header-fixed');
+				if (!($('#checkbox_fixedbreadcrumbs').is(":checked"))) {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', true);
+					$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				}
+				if (!($('#checkbox_fixedsidebar').is(":checked"))) {
+					$('#checkbox_fixedsidebar').prop('checked', true);
+					$('.page-sidebar').toggleClass('sidebar-fixed');
+				}
+				if (!($('#checkbox_fixednavbar').is(":checked"))) {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').toggleClass('navbar-fixed-top');
+				}
+				setCookiesForFixedSettings();
+			});
+		},
+		settingsClick: function (e) {
+			$('.navbar-account').toggleClass('setting-open');
+		},
+		componentDidMount: function() {
+			this.initiateSettings();
+		},
+		render: function() {
+			return (
+			  <div className="navbar-header pull-right">
+                    <div className="navbar-account">
+                        <ul className="account-area">
+                            <li>
+                                <a className=" dropdown-toggle" data-toggle="dropdown" title="Notifications" href="#">
+                                    <i className="icon fa fa-warning"></i>
+                                </a>
+                                <ul className="pull-right dropdown-menu dropdown-arrow dropdown-notifications">
+                                    <AccountItem title="Skype meeting with Patty" desc="01:00 pm" extra="office" />
+									<AccountItem title="Uncharted break" desc="03:30 pm - 05:15 pm" extra="" />
+									<AccountItem title="Kate birthday party" desc="08:30 pm" extra="at home" />
+									<AccountItem title="Dinner with friends" desc="10:30 pm" extra="" />
+                                    <li className="dropdown-footer ">
+                                        <span>
+                                            Today, March 28
+                                        </span>
+                                        <span className="pull-right">
+                                            10°c
+                                            <i className="wi wi-cloudy"></i>
+                                        </span>
+                                    </li>
+                                </ul>
+                                
+                            </li>
+                            <li>
+                                <a className="dropdown-toggle" data-toggle="dropdown" title="Mails" href="#">
+                                    <i className="icon fa fa-envelope"></i>
+                                    <span className="badge">3</span>
+                                </a>
+                                <ul className="pull-right dropdown-menu dropdown-arrow dropdown-messages">
+                                    <MessageItem sender="Divyia Austin" time="2 minutes ago" subject="Here's the recipe for apple pie" body="to identify the sending application when the senders image is shown for the main icon" />
+									<MessageItem sender="Bing.com" time="Yesterday" subject="Bing Newsletter: The January Issue‏" body="Discover new music just in time for the Grammy® Awards." />
+									<MessageItem sender="Nicolas" time="Friday, September 22" subject="New 4K Cameras" body="The 4K revolution has come over the horizon and is reaching the general populous" />
+                                </ul>
+                                
+                            </li>
+                            <li>
+                                <a className="dropdown-toggle" data-toggle="dropdown" title="Tasks" href="#">
+                                    <i className="icon fa fa-tasks"></i>
+                                    <span className="badge">4</span>
+                                </a>
+                                <ul className="pull-right dropdown-menu dropdown-tasks dropdown-arrow ">
+                                    <li className="dropdown-header bordered-darkorange">
+                                        <i className="fa fa-tasks"></i>
+                                        4 Tasks In Progress
+                                    </li>
+                                    <TaskItem title="Account Creation" percent="65%" />
+									<TaskItem title="Profile Data" percent="35%" />
+									<TaskItem title="Updating Resume" percent="75%" />
+									<TaskItem title="Adding Contacts" percent="10%" />
+                                    <li className="dropdown-footer">
+                                        <a href="#">
+                                            See All Tasks
+                                        </a>
+                                        <button className="btn btn-xs btn-default shiny darkorange icon-only pull-right"><i className="fa fa-check"></i></button>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a className="wave in" id="chat-link" title="Chat" href="#" onClick={this.chatClick}>
+                                    <i className="icon glyphicon glyphicon-comment"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a className="login-area dropdown-toggle" data-toggle="dropdown">
+                                    <div className="avatar" title="View your public profile">
+                                        <img src="assets/img/avatars/adam-jansen.jpg" />
+                                    </div>
+                                    <section>
+                                        <h2><span className="profile"><span>David Stevenson</span></span></h2>
+                                    </section>
+                                </a>
+                                
+                                <ul className="pull-right dropdown-menu dropdown-arrow dropdown-login-area">
+                                    <li className="username"><a>David Stevenson</a></li>
+                                    <li className="email"><a>David.Stevenson@live.com</a></li>
+                                    
+                                    <li>
+                                        <div className="avatar-area">
+                                            <img src="assets/img/avatars/adam-jansen.jpg" className="avatar" />
+                                            <span className="caption">Change Photo</span>
+                                        </div>
+                                    </li>
+                                    
+                                    <li className="edit">
+                                        <a href="profile.html" className="pull-left">Profile</a>
+                                        <a href="#" className="pull-right">Setting</a>
+                                    </li>
+                                    
+                                    <li className="theme-area">
+                                        <ul className="colorpicker" id="skin-changer">
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#5DB2FF'}} rel="assets/css/skins/blue.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#2dc3e8'}} rel="assets/css/skins/azure.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#03B3B2'}} rel="assets/css/skins/teal.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#53a93f'}} rel="assets/css/skins/green.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#FF8F32'}} rel="assets/css/skins/orange.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#cc324b'}} rel="assets/css/skins/pink.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#AC193D'}} rel="assets/css/skins/darkred.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#8C0095'}} rel="assets/css/skins/purple.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#0072C6'}} rel="assets/css/skins/darkblue.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#585858'}} rel="assets/css/skins/gray.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#474544'}} rel="assets/css/skins/black.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#001940'}} rel="assets/css/skins/deepblue.min.css"></a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <li className="dropdown-footer">
+                                        <a href="login.html">
+                                            Sign out
+                                        </a>
+                                    </li>
+                                </ul>
+                                
+                            </li>
+                            
+                        </ul>
+						<div className="setting">
+                            <a id="btn-setting" title="Setting" href="#" onClick={this.settingsClick}>
+                                <i className="icon glyphicon glyphicon-cog"></i>
+                            </a>
+                        </div>
+						<div className="setting-container">
+                            <label>
+                                <input type="checkbox" id="checkbox_fixednavbar" />
+                                <span className="text">Fixed Navbar</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="checkbox_fixedsidebar" />
+                                <span className="text">Fixed SideBar</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="checkbox_fixedbreadcrumbs" />
+                                <span className="text">Fixed BreadCrumbs</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="checkbox_fixedheader" />
+                                <span className="text">Fixed Header</span>
+                            </label>
+                        </div>
+                        
+                    </div>
+                </div>
+			);
+		 }
+	});
+	
+	var Navbar = React.createClass({
+		render: function() {
+			return (
+				<div className="navbar">
+					<div className="navbar-inner">
+						<div className="navbar-container">
+							<NavbarBrand />
+							<SideBar />
+							<NavbarHeaderRight />
+						</div>
+					</div>
+				</div>
+			);
+		 }
+	});
+	
+	var MenuItemIcon = React.createClass({
+		render: function() {
+			return (
+				<a href={this.props.href}>
+					<i className="menu-icon fa fa-th"></i>
+                    <span className="menu-text">{this.props.text}</span>
+                </a>
+			);
+		 }
+	});
+	
+	var MenuItem = React.createClass({
+		render: function() {
+			return (
+				<a href={this.props.href}>
+                    <span className="menu-text">{this.props.text}</span>
+                </a>
+			);
+		 }
+	});
+	
+	var ParentMenuIcon = React.createClass({
+		render: function() {
+			return (
+				<a href="#" className="menu-dropdown">
+                    <i className="menu-icon fa fa-desktop"></i>
+                    <span className="menu-text">{this.props.text}</span>
+                    <i className="menu-expand"></i>
+                </a>
+			);
+		 }
+	});
+	
+	var ParentMenu = React.createClass({
+		render: function() {
+			return (
+				<a href="#" className="menu-dropdown">
+                    <span className="menu-text">{this.props.text}</span>
+                    <i className="menu-expand"></i>
+                </a>
+			);
+		 }
+	});
+	
+	var PageSidebar = React.createClass({
+		bodyClickHandler: function (e) {
+			var b = $("#sidebar").hasClass("menu-compact");
+			var menuLink = $(e.target).closest("a");
+			if (!menuLink || menuLink.length == 0)
+				return;
+			if (!menuLink.hasClass("menu-dropdown")) {
+				if (b && menuLink.get(0).parentNode.parentNode == this) {
+					var menuText = menuLink.find(".menu-text").get(0);
+					if (e.target != menuText && !$.contains(menuText, e.target)) {
+						return false;
+					}
+				}
+				return;
+			}
+			var submenu = menuLink.next().get(0);
+			if (!$(submenu).is(":visible")) {
+				var c = $(submenu.parentNode).closest("ul");
+				if (b && c.hasClass("sidebar-menu"))
+					return;
+				c.find("> .open > .submenu")
+					.each(function () {
+						if (this != submenu && !$(this.parentNode).hasClass("active"))
+							$(this).slideUp(200).parent().removeClass("open");
+					});
+			}
+			if (b && $(submenu.parentNode.parentNode).hasClass("sidebar-menu"))
+				return false;
+			$(submenu).slideToggle(200).parent().toggleClass("open");
+			return false;
+		},
+		render: function() {
+			return (
+				<div className="page-sidebar" id="sidebar">
+                
+                <div className="sidebar-header-wrapper">
+					<input type="text" className="searchinput" />
+                    <i className="searchicon fa fa-search"></i>
+                    <div className="searchhelper">Search Reports, Charts, Emails or Notifications</div>
+                </div>
+                
+                <ul className="nav sidebar-menu" onClick={this.bodyClickHandler}>
+                    
+                    <li>
+                        <MenuItemIcon href="index.html" text="Dashboard" />
+                    </li>
+                    
+                    <li>
+                        <MenuItemIcon href="databoxes.html" text="Data Boxes" />
+                    </li>
+                    
+                    <li>
+                        <MenuItemIcon href="widgets.html" text="Widgets" />
+                    </li>
+                    
+                    <li className="active open">
+						<ParentMenuIcon text="Elements" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="elements.html" text="Basic Elements" />
+                            </li>
+                            <li>
+								<ParentMenu text="Icons" />
+
+                                <ul className="submenu">
+                                    <li>
+										<MenuItemIcon href="font-awesome.html" text="Font Awesome" />
+                                    </li>
+                                    <li>
+										<MenuItemIcon href="glyph-icons.html" text="Glyph Icons" />
+                                    </li>
+                                    <li>
+										<MenuItemIcon href="typicon.html" text="Typicons" />
+                                    </li>
+                                    <li>
+										<MenuItemIcon href="weather-icons.html" text="Weather Icons" />
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+								<MenuItem href="tabs.html" text="Tabs & Accordions" />
+                            </li>
+                            <li>
+								<MenuItem href="alerts.html" text="Alerts & Tooltips" />
+                            </li>
+                            <li>
+								<MenuItem href="modals.html" text="Modals & Wells" />
+                            </li>
+                            <li className="active">
+								<MenuItem href="buttons.html" text="Buttons" />
+                            </li>
+                            <li>
+								<MenuItem href="nestable-list.html" text="Nestable List" />
+                            </li>
+                            <li>
+								<MenuItem href="treeview.html" text="Treeview" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text="Tables" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="tables-simple.html" text="Simple & Responsive" />
+                            </li>
+                            <li>
+								<MenuItem href="tables-data.html" text="Data Tables" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text="Forms" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="form-layouts.html" text="Form Layouts" />
+                            </li>
+
+                            <li>
+								<MenuItem href="form-inputs.html" text="Form Inputs" />
+                            </li>
+
+                            <li>
+								<MenuItem href="form-pickers.html" text="Data Pickers" />
+                            </li>
+                            <li>
+								<MenuItem href="form-wizard.html" text="Wizard" />
+                            </li>
+                            <li>
+								<MenuItem href="form-validation.html" text="Validation" />
+                            </li>
+                            <li>
+								<MenuItem href="form-editors.html" text="Editors" />
+                            </li>
+                            <li>
+								<MenuItem href="form-inputmask.html" text="Input Mask" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text="Charts" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="flot.html" text="Flot Charts" />
+                            </li>
+
+                            <li>
+								<MenuItem href="morris.html" text="Morris Charts" />
+                            </li>
+                            <li>
+								<MenuItem href="sparkline.html" text="Sparkline Charts" />
+                            </li>
+                            <li>
+								<MenuItem href="easypiecharts.html" text="Easy Pie Charts" />
+                            </li>
+                            <li>
+								<MenuItem href="chartjs.html" text="ChartJS" />
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+						<MenuItemIcon href="profile.html" text="Profile" />
+                    </li>
+	
+                    <li>
+						<ParentMenuIcon text="Mail" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="inbox.html" text="Inbox" />
+                            </li>
+
+                            <li>
+								<MenuItem href="message-view.html" text="View Message" />
+                            </li>
+                            <li>
+								<MenuItem href="message-compose.html" text="Compose Message" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<MenuItemIcon href="calendar.html" text="Calendar" />
+                    </li>
+
+                    <li>
+						<ParentMenuIcon text="Pages" />
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="timeline.html" text="Timeline" />
+                            </li>
+                            <li>
+								<MenuItem href="pricing.html" text="Pricing Tables" />
+                            </li>
+
+                            <li>
+								<MenuItem href="invoice.html" text="Invoice" />
+                            </li>
+
+                            <li>
+								<MenuItem href="login.html" text="Login" />
+                            </li>
+                            <li>
+								<MenuItem href="register.html" text="Register" />
+                            </li>
+                            <li>
+								<MenuItem href="lock.html" text="Lock Screen" />
+                            </li>
+                            <li>
+								<MenuItem href="typography.html" text="Typography" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text="More Pages" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="error-404.html" text="Error 404" />
+                            </li>
+
+                            <li>
+								<MenuItem href="error-500.html" text="Error 500" />
+                            </li>
+                            <li>
+								<MenuItem href="blank.html" text="Blank Page" />
+                            </li>
+                            <li>
+								<MenuItem href="grid.html" text="Grid" />
+                            </li>
+                            <li>
+								<ParentMenu text="Multi Level Menu" />
+                                
+                                <ul className="submenu">
+                                    <li>
+										<MenuItemIcon href="#" text="Level 3" />
+                                    </li>
+
+                                    <li>
+										<ParentMenuIcon text="Level 4" />
+
+                                        <ul className="submenu">
+                                            <li>
+												<MenuItemIcon href="#" text="Some Item" />
+                                            </li>
+
+                                            <li>
+												<MenuItemIcon href="#" text="Another Item" />
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </li>
+
+                    <li>
+						<ParentMenuIcon text="Right to Left" />
+                        <ul className="submenu">
+                            <li>
+                                <a>
+                                    <span className="menu-text">RTL</span>
+                                    <label className="pull-right margin-top-10">
+                                        <input id="rtl-changer" className="checkbox-slider slider-icon colored-primary" type="checkbox" />
+                                        <span className="text"></span>
+                                    </label>
+                                </a>
+                            </li>
+                            <li>
+								<MenuItem href="index-rtl-ar.html" text="Arabic Layout" />
+                            </li>
+
+                            <li>
+								<MenuItem href="index-rtl-fa.html" text="Persian Layout" />
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li>
+						<MenuItemIcon href="versions.html" text="BeyondAdmin Versions" />
+                    </li>
+                </ul>
+            </div>
+			);
+		 }
+	});
+	
+	var Contact = React.createClass({
+		handleClick: function(e) {
+			$('.page-chatbar .chatbar-contacts').hide();
+			$('.page-chatbar .chatbar-messages').show();
+		},
+		render: function() {
+			return (
+				<li className="contact" onClick={this.handleClick}>
+                    <div className="contact-avatar">
+                        <img src="assets/img/avatars/John-Smith.jpg" />
+                    </div>
+                    <div className="contact-info">
+                        <div className="contact-name">{this.props.name}</div>
+                        <div className="contact-status">
+							<div className="online"></div>
+                            <div className="status">{this.props.status}</div>
+                        </div>
+                        <div className="last-chat-time">
+							{this.props.last}
+                        </div>
+                    </div>
+                </li>
+			);
+		 }
+	});
+	
+	var ContactList = React.createClass({
+		componentDidMount: function() {
+			var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+			var additionalHeight = 0;
+			if ($(window).width() < 531)
+				additionalHeight = 45;
+			$('.chatbar-contacts .contacts-list').slimscroll({
+				position: position,
+				size: '4px',
+				color: themeprimary,
+				height: $(window).height() - (86 + additionalHeight),
+			});
+		},
+		render: function() {
+			return (
+				<ul className="contacts-list">
+					<Contact name="Divyia Philips" status="online" last="last week" />
+					<Contact name="Adam Johnson" status="left 4 mins ago" last="today" />
+					<Contact name="John Smith" status="online" last="1:57 am" />
+					<Contact name="Osvaldus Valutis" status="online" last="today" />
+					<Contact name="Javi Jimenez" status="online" last="today" />
+					<Contact name="Stephanie Walter" status="online" last="yesterday" />
+					<Contact name="Sergey Azovskiy" status="offline since oct 24" last="22 oct" />
+					<Contact name="Lee Munroe" status="online" last="today" />
+					<Contact name="Divyia Philips" status="online" last="last week" />
+                </ul>
+			);
+		 }
+	});
+	
+	var ContactSearch = React.createClass({
+		render: function() {
+			return (
+				<div className="contacts-search">
+                    <input type="text" className="searchinput" placeholder="Search Contacts" />
+                    <i className="searchicon fa fa-search"></i>
+                    <div className="searchhelper">Search Your Contacts and Chat History</div>
+                </div>
+			);
+		 }
+	});
+	
+	var ChatContact = React.createClass({
+		render: function() {
+			return (
+				<div className="chatbar-contacts">
+					<ContactSearch />
+					<ContactList />
+				</div>
+			);
+		 }
+	});
+	
+	var ChatMessage = React.createClass({
+		render: function() {
+			return (
+				<li className="message">
+                    <div className="message-info">
+                        <div className="bullet"></div>
+                        <div className="contact-name">{this.props.sender}</div>
+                        <div className="message-time">{this.props.time}</div>
+                    </div>
+                    <div className="message-body">
+						{this.props.text}
+                    </div>
+                </li>
+			);
+		 }
+	});
+	
+	var ChatReply = React.createClass({
+		render: function() {
+			return (
+				<li className="message reply">
+                    <div className="message-info">
+                        <div className="bullet"></div>
+                        <div className="contact-name">{this.props.sender}</div>
+                        <div className="message-time">{this.props.time}</div>
+                    </div>
+                    <div className="message-body">
+						{this.props.text}
+                    </div>
+                </li>
+			);
+		 }
+	});
+	
+	var ChatList = React.createClass({
+		componentDidMount: function() {
+			var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+			var additionalHeight = 0;
+			if ($(window).width() < 531)
+				additionalHeight = 45;
+			$('.chatbar-messages .messages-list').slimscroll({
+				position: position,
+				size: '4px',
+				color: themeprimary,
+				height: $(window).height() - (250 + additionalHeight),
+			});
+		},
+		render: function() {
+			return (
+				<ul className="messages-list">
+					<ChatMessage sender="Me" time="10:14 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatReply sender="Divyia" time="10:15 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+                    <ChatMessage sender="Me" time="10:14 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatReply sender="Divyia" time="10:15 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatMessage sender="Me" time="10:14 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatReply sender="Divyia" time="10:15 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+                 </ul>
+			);
+		 }
+	});
+	
+	var ChatSend = React.createClass({
+		render: function() {
+			return (
+				<div className="send-message">
+                    <span className="input-icon icon-right">
+                        <textarea rows="4" className="form-control" placeholder="Type your message"></textarea>
+                        <i className="fa fa-camera themeprimary"></i>
+                    </span>
+                </div>
+			);
+		 }
+	});
+	
+	var ChatBarContact = React.createClass({
+		handleClick: function(e) {
+			$('.page-chatbar .chatbar-contacts').show();
+			$('.page-chatbar .chatbar-messages').hide();
+		},
+		render: function() {
+			return (
+				<div className="messages-contact">
+                    <div className="contact-avatar">
+                        <img src="assets/img/avatars/divyia.jpg" />
+                    </div>
+                    <div className="contact-info">
+                        <div className="contact-name">{this.props.name}</div>
+                        <div className="contact-status">
+                            <div className="online"></div>
+                            <div className="status">{this.props.status}</div>
+                        </div>
+                        <div className="last-chat-time">
+							{this.props.time}
+                        </div>
+                        <div className="back" onClick={this.handleClick}>
+                            <i className="fa fa-arrow-circle-left"></i>
+                        </div>
+                    </div>
+                </div>
+			);
+		 }
+	});
+	
+	var ChatBarMessage = React.createClass({
+		render: function() {
+			return (
+				<div className="chatbar-messages" style={{display: 'none'}}>
+					<ChatBarContact name="Divyia Philips" status="online" time="a moment ago" />
+					<ChatList />
+					<ChatSend />
+				</div>
+			);
+		 }
+	});
+	
+	var ChatBar = React.createClass({
+		render: function() {
+			return (
+				<div id="chatbar" className="page-chatbar">
+					<ChatContact />
+					<ChatBarMessage />
+				</div>
+			);
+		 }
+	});
+	
+	var BasicButton = React.createClass({
+		render: function() {
+			return (
+				<a href="javascript:void(0);" className={this.props.classname}>{this.props.name}</a>
+			);
+		}
+	})
+	
+	var FirstRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+                    <div className="col-lg-12 col-sm-12 col-xs-12">
+						<div className="well with-header with-footer">
+							<div className="header bordered-blue">Basic Buttons</div>
+                            <div className="buttons-preview">
+								<BasicButton classname="btn btn-link" name="Link" />
+								<BasicButton classname="btn btn-default" name="Default" />
+								<BasicButton classname="btn btn-primary" name="Primary" />
+								<BasicButton classname="btn btn-info" name="Info" />
+								<BasicButton classname="btn btn-success" name="Success" />
+								<BasicButton classname="btn btn-warning" name="Warning" />
+								<BasicButton classname="btn btn-danger" name="Danger" />
+                            </div>
+                            <div className="footer"><code>.btn .btn-default, .btn-primary, ...</code></div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	
+	var SecondRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+                    <div className="col-lg-12 col-sm-12 col-xs-12">
+                        <div className="well with-header  with-footer">
+                            <div className="header bordered-blue">Colered Buttons</div>
+                            <div className="buttons-preview">
+								<BasicButton classname="btn btn-blue" name="Blue" />
+								<BasicButton classname="btn btn-sky" name="Sky" />
+								<BasicButton classname="btn btn-azure" name="Azure" />
+								<BasicButton classname="btn btn-palegreen" name="Pale Green" />
+								<BasicButton classname="btn btn-yellow" name="Yellow" />
+								<BasicButton classname="btn btn-darkorange" name="Dark Orange" />
+								<BasicButton classname="btn btn-magenta" name="Magenta" />
+								<BasicButton classname="btn btn-purple" name="Purple" />
+								<BasicButton classname="btn btn-maroon" name="Maroon" />
+                            </div>
+                            <div className="footer"><code>.btn .btn-blue, .btn-purple, ...</code></div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	
+	var ThirdRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+                    <div className="col-lg-12 col-sm-12 col-xs-12">
+                        <div className="well with-header  with-footer">
+                            <div className="header bordered-blue">Shiny Buttons</div>
+                            <div className="buttons-preview">
+								<BasicButton classname="btn btn-default shiny" name="Default" />
+								<BasicButton classname="btn btn-primary shiny" name="Primary" />
+								<BasicButton classname="btn btn-info shiny" name="Info" />
+								<BasicButton classname="btn btn-success shiny" name="Success" />
+								<BasicButton classname="btn btn-warning shiny" name="Warning" />
+								<BasicButton classname="btn btn-danger shiny" name="Danger" />
+								<BasicButton classname="btn btn-blue shiny" name="Blue" />
+								<BasicButton classname="btn btn-sky shiny" name="Sky" />
+								<BasicButton classname="btn btn-azure shiny" name="Azure" />
+								<BasicButton classname="btn btn-palegreen shiny" name="Pale Green" />
+								<BasicButton classname="btn btn-yellow shiny" name="Yellow" />
+								<BasicButton classname="btn btn-darkorange shiny" name="Dark Orange" />
+								<BasicButton classname="btn btn-magenta shiny" name="Magenta" />
+								<BasicButton classname="btn btn-purple shiny" name="Purple" />
+								<BasicButton classname="btn btn-maroon shiny" name="Maroon" />
+                            </div>
+                            <div className="footer"><code>.btn .btn-blue .shiny, .btn-purple .shiny, ...</code></div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var CircleButton = React.createClass({
+		render: function() {
+			return (
+				<a href="javascript:void(0);" className={this.props.classname}><i className={this.props.icon}></i></a>
+			);
+		}
+	});
+	
+	var FourthRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+                    <div className="col-lg-6 col-sm-6 col-xs-12">
+                        <div className="well with-header  with-footer">
+                            <div className="header bordered-blue">Sized Buttons</div>
+                            <div className="buttons-preview">
+								<BasicButton classname="btn btn-blue btn-lg" name="Large" />
+								<BasicButton classname="btn btn-yellow" name="Default" />
+								<BasicButton classname="btn btn-darkorange btn-sm" name="Small" />
+								<BasicButton classname="btn btn-palegreen btn-xs" name="Mini" />
+                            </div>
+                            <div className="footer"><code>.btn .btn-lg, .btn-sm, .btn-xs</code></div>
+                        </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-6 col-xs-12">
+                        <div className="well with-header  with-footer">
+                            <div className="header bordered-blue">Circle Buttons</div>
+                            <div className="buttons-preview">
+								<CircleButton classname="btn btn-warning  btn-circle btn-lg" icon="glyphicon glyphicon-camera" />
+								<CircleButton classname="btn btn-info  btn-circle" icon="glyphicon glyphicon-retweet" />
+								<CircleButton classname="btn btn-danger btn-circle btn-sm" icon="glyphicon glyphicon-list" />
+								<CircleButton classname="btn btn-default  btn-circle btn-xs" icon="glyphicon glyphicon-ok" />
+                            </div>
+                            <div className="footer"><code>.btn .btn-circle</code></div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var LabeledButton = React.createClass({
+		render: function() {
+			return (
+				<a className={this.props.classname} href="javascript:void(0);">{this.props.before} <i className={this.props.icon}></i> {this.props.after}</a>
+			);
+		}
+	});
+	
+	var FifthRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+                    <div className="col-lg-6 col-sm-6 col-xs-12">
+                        <div className="well with-header with-footer">
+                            <div className="header bordered-blue">Buttons With Icon</div>
+                            <div className="buttons-preview">
+								<LabeledButton classname="btn btn-default purple" before="" icon="fa fa-plus" after="Add" />
+								<LabeledButton classname="btn btn-primary" before="" icon="fa fa-cart" after="Buy" />
+								<LabeledButton classname="btn btn-danger" before="" icon="fa fa-times" after="Delete" />
+								<LabeledButton classname="btn btn-success" before="Ok" icon="fa fa-check right" after="" />
+								<LabeledButton classname="btn btn-info" before="Info" icon="fa fa-warning right" after="" />
+                            </div>
+                            <div className="footer"><code> i class="fa fa-times" </code></div>
+                        </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-6 col-xs-12">
+                        <div className="well with-header with-footer">
+                            <div className="header bordered-blue">Labeled Buttons</div>
+                            <div className="buttons-preview">
+								<LabeledButton classname="btn btn-labeled btn-palegreen" before="" icon="btn-label glyphicon glyphicon-ok" after="Success" />
+								<LabeledButton classname="btn btn-labeled btn-darkorange" before="" icon="btn-label glyphicon glyphicon-remove" after="Error" />
+								<LabeledButton classname="btn btn-labeled btn-yellow" before="" icon="btn-label fa fa-warning" after="Warning" />
+								<LabeledButton classname="btn btn-labeled btn-blue" before="" icon="btn-label fa fa-exclamation" after="Info" />
+                            </div>
+                            <div className="footer"><code>.btn .btn-labeled</code></div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var DropDownButton = React.createClass({
+		render: function() {
+			return (
+				<div className={this.props.class0}>
+                    <a className={this.props.class1} href="javascript:void(0);">{this.props.name}</a>
+                    <a className={this.props.class2} data-toggle="dropdown" href="javascript:void(0);"><i className={this.props.class3}></i></a>
+                    <ul className={this.props.class4}>
+                        <li>
+                            <a href="javascript:void(0);">Action</a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">Another action</a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">Something else here</a>
+                        </li>
+                        <li className="divider"></li>
+                        <li>
+                            <a href="javascript:void(0);">Separated link</a>
+                        </li>
+                    </ul>
+                </div>
+			);
+		}
+	});
+	
+	var DropButton = React.createClass({
+		render: function() {
+			return (
+				<div className="btn-group">
+                    <a className={this.props.class0} data-toggle="dropdown">
+                        Action <i className="fa fa-angle-down"></i>
+                    </a>
+                    <ul className={this.props.class1}>
+                        <li>
+                            <a href="javascript:void(0);">Action</a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">Another action</a>
+                        </li>
+                        <li>
+							<a href="javascript:void(0);">Something else here</a>
+                        </li>
+                        <li className="divider"></li>
+                        <li>
+							<a href="javascript:void(0);">Separated link</a>
+                        </li>
+                    </ul>
+                </div>
+			);
+		}
+	});
+	
+	var SixthRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+                    <div className="col-lg-6 col-sm-6 col-xs-12">
+                        <div className="well with-header with-footer">
+                            <div className="header bordered-blue">Icon Buttons</div>
+                            <div className="buttons-preview">
+								<CircleButton classname="btn btn-default btn-lg shiny icon-only blue" icon="fa fa-plus" />
+								<CircleButton classname="btn btn-default shiny icon-only yellow" icon="fa fa-lock" />
+								<CircleButton classname="btn btn-default btn-sm shiny icon-only danger" icon="fa fa-times" />
+								<CircleButton classname="btn btn-default btn-xs shiny icon-only success" icon="fa fa-cog" />
+								<hr className="wide" />
+								<CircleButton classname="btn btn-blue btn-lg icon-only white" icon="fa fa-plus" />
+								<CircleButton classname="btn btn-yellow icon-only white" icon="fa fa-lock" />
+								<CircleButton classname="btn btn-danger btn-sm icon-only white" icon="fa fa-times" />
+								<CircleButton classname="btn btn-success btn-xs icon-only white" icon="fa fa-cog" />
+                            </div>
+                            <div className="footer"><code>.btn .icon-only</code></div>
+                        </div>
+                        <div className="well with-header with-footer">
+                            <div className="header bordered-blue">Block Buttons</div>
+                            <div className="clearfix">
+								<BasicButton classname="btn btn-yellow btn-block shiny" name="Link" />
+                                <button className="btn btn-warning btn-block">Button</button>
+                                <input type="button" className="btn btn-darkorange btn-block" value="Input" />
+                                <input type="submit" className="btn btn-danger btn-block" value="Submit" />
+                            </div>
+                            <div className="footer"><code>.btn .btn-block</code></div>
+                        </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-6 col-xs-12">
+                        <div className="well with-header with-footer">
+                            <div className="header bordered-blue">DropDown Buttons</div>
+                            <div className="buttons-preview">
+								<DropDownButton class0="btn-group" class1="btn btn-default shiny" class2="btn btn-default  dropdown-toggle shiny" class3="fa fa-angle-down" class4="dropdown-menu" name="Default" />
+								<DropDownButton class0="btn-group" class1="btn btn-primary shiny" class2="btn btn-primary dropdown-toggle shiny" class3="fa fa-angle-down" class4="dropdown-menu dropdown-primary" name="Primary" />
+								<DropDownButton class0="btn-group" class1="btn btn-danger shiny" class2="btn btn-danger dropdown-toggle shiny" class3="fa fa-angle-down" class4="dropdown-menu dropdown-danger" name="Danger" />
+								<DropDownButton class0="btn-group" class1="btn btn-warning shiny" class2="btn btn-warning dropdown-toggle shiny" class3="fa fa-angle-down" class4="dropdown-menu dropdown-warning" name="Warning" />
+								<hr className="wide" />
+								<DropDownButton class0="btn-group" class1="btn btn-lg btn-default" class2="btn btn-lg btn-default dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu" name="Large" />
+								<DropDownButton class0="btn-group" class1="btn btn-blue" class2="btn btn-blue dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-blue" name="Default" />
+								<DropDownButton class0="btn-group" class1="btn btn-sm btn-darkorange" class2="btn btn-sm btn-darkorange dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-darkorange" name="Small" />
+								<DropDownButton class0="btn-group" class1="btn btn-xs btn-yellow" class2="btn btn-xs btn-yellow dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-yellow" name="mini" />
+								<hr className="wide" />
+								<DropDownButton class0="btn-group dropup" class1="btn btn-default shiny" class2="btn btn-default dropdown-toggle shiny" class3="fa fa-angle-up" class4="dropdown-menu" name="Drop Up" />
+								<DropDownButton class0="btn-group dropup" class1="btn btn-sky shiny" class2="btn btn-sky dropdown-toggle shiny" class3="fa fa-angle-up" class4="dropdown-menu dropdown-sky" name="Drop Up" />
+								<DropDownButton class0="btn-group dropup" class1="btn btn-magenta shiny" class2="btn btn-magenta dropdown-toggle shiny" class3="fa fa-angle-up" class4="dropdown-menu dropdown-magenta" name="Drop Up" />
+								<DropDownButton class0="btn-group dropup" class1="btn btn-purple shiny" class2="btn btn-purple dropdown-toggle shiny" class3="fa fa-angle-up" class4="dropdown-menu dropdown-purple" name="Drop Up" />
+								<hr className="wide" />
+								<DropButton class0="btn btn-default dropdown-toggle" class1="dropdown-menu" />
+								<DropButton class0="btn btn-azure dropdown-toggle" class1="dropdown-menu dropdown-azure" />
+								<DropButton class0="btn btn-maroon dropdown-toggle" class1="dropdown-menu dropdown-maroon" />
+								<hr className="wide" />
+								<DropDownButton class0="btn-group" class1="btn btn-success" class2="btn btn-palegreen dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-palegreen" name="Combined" />
+								<DropDownButton class0="btn-group" class1="btn btn-danger" class2="btn btn-warning dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-warning" name="Combined" />
+								<DropDownButton class0="btn-group" class1="btn btn-maroon" class2="btn btn-magenta dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-magenta" name="Combined" />
+								<DropDownButton class0="btn-group" class1="btn btn-azure" class2="btn btn-blue dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-blue" name="Combined" />
+								<DropDownButton class0="btn-group" class1="btn btn-success" class2="btn btn-darkorange dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-darkorange" name="Combined" />
+								<DropDownButton class0="btn-group" class1="btn btn-darkorange whitesmoke" class2="btn btn-danger dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-danger" name="Combined" />
+								<DropDownButton class0="btn-group" class1="btn btn-blue whitesmoke" class2="btn btn-palegreen dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-palegreen" name="Combined" />
+								<DropDownButton class0="btn-group" class1="btn btn-palegreen whitesmoke" class2="btn btn-yellow dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-yellow" name="Combined" />
+								<DropDownButton class0="btn-group" class1="btn btn-magenta whitesmoke" class2="btn btn-maroon dropdown-toggle" class3="fa fa-angle-down" class4="dropdown-menu dropdown-maroon" name="Combined" />
+                            </div>
+                            <div className="footer"><code></code></div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var GroupButton = React.createClass({
+		render: function() {
+			return (
+				<button type="button" className={this.props.classname}>{this.props.name}</button>
+			);
+		}
+	});
+	
+	var GroupIcon = React.createClass({
+		render: function() {
+			return (
+				<button type="button" className={this.props.class0} data-toggle={this.props.toggle}>{this.props.before} <i className={this.props.class1}></i> {this.props.after}</button>
+			);
+		}
+	});
+	
+	var GroupButtons = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-6 col-sm-6 col-xs-12">
+                    <div className="well with-header with-footer">
+                        <div className="header bordered-blue">Button Groups</div>
+                        <div className="buttons-preview">
+							<div className="btn-toolbar">
+                                <div className="btn-group">
+									<GroupButton classname="btn btn-default" name="1" />
+									<GroupButton classname="btn btn-default" name="2" />
+									<GroupButton classname="btn btn-default" name="3" />
+									<GroupButton classname="btn btn-default" name="4" />
+                                </div>
+                                <div className="btn-group">
+									<GroupButton classname="btn btn-default" name="5" />
+									<GroupButton classname="btn btn-default" name="6" />
+									<GroupButton classname="btn btn-default" name="7" />
+                                </div>
+                                <div className="btn-group">
+									<GroupButton classname="btn btn-default" name="8" />
+                                </div>
+                            </div>
+                            <hr className="wide" />
+                            <div className="btn-group">
+								<GroupIcon class0="btn btn-default" class1="fa fa-align-left" toggle="" before="" after="" />
+								<GroupIcon class0="btn btn-default" class1="fa fa-align-center" toggle="" before="" after="" />
+								<GroupIcon class0="btn btn-default" class1="fa fa-align-right" toggle="" before="" after="" />
+								<GroupIcon class0="btn btn-default" class1="fa fa-align-justify" toggle="" before="" after="" />
+                            </div>
+                            <hr className="wide" />
+                            <div className="btn-group">
+								<GroupIcon class0="btn btn-default" class1="fa fa-user" toggle="" before="" after="Profile" />
+								<GroupIcon class0="btn btn-default" class1="fa fa-cogs" toggle="" before="" after="Settings" />
+								<GroupIcon class0="btn btn-default" class1="fa fa-bullhorn" toggle="" before="" after="Feeds" />
+                                <div className="btn-group">
+									<GroupIcon class0="btn btn-default dropdown-toggle" class1="fa fa-angle-down" toggle="dropdown" before="More" after="" />
+                                    <ul className="dropdown-menu">
+										<li>
+											<a href="#">Dropdown link</a>
+                                        </li>
+                                        <li>
+											<a href="#">Dropdown link</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <hr className="wide" />
+                        <div className="btn-group-vertical">
+							<GroupButton classname="btn btn-default" name="Button" />
+                            <div className="btn-group">
+								<GroupIcon class0="btn btn-default dropdown-toggle" class1="fa fa-angle-down" toggle="dropdown" before="Dropdown" after="" id="btnGroupVerticalDrop1" />
+                                <ul className="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop1">
+									<li>
+										<a href="#">Dropdown link</a>
+                                    </li>
+                                    <li>
+										<a href="#">Dropdown link</a>
+                                    </li>
+                                </ul>
+                             </div>
+							<GroupButton classname="btn btn-default" name="Button" />
+							<GroupButton classname="btn btn-default" name="Button" />
+                            <div className="btn-group">
+								<GroupIcon class0="btn btn-default dropdown-toggle" class1="fa fa-angle-down" toggle="dropdown" before="Dropdown" after="" id="btnGroupVerticalDrop2" />
+                                <ul className="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop2">
+									<li>
+										<a href="#">Dropdown link</a>
+                                    </li>
+                                    <li>
+										<a href="#">Dropdown link</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="btn-group-vertical" style={{paddingLeft:'4px'}}>
+							<CircleButton classname="btn btn-default" icon="fa fa-align-left" />
+							<CircleButton classname="btn btn-default" icon="fa fa-align-center" />
+							<CircleButton classname="btn btn-default" icon="fa fa-align-right" />
+							<CircleButton classname="btn btn-default" icon="fa fa-align-justify" />
+                        </div>
+                        <div className="btn-group-vertical" style={{paddingLeft:'4px'}}>
+							<GroupButton classname="btn btn-default" name="Top" />
+							<GroupButton classname="btn btn-default" name="Middle" />
+							<GroupButton classname="btn btn-default" name="Bottom" />
+                        </div>
+                        <div className="footer"><code>.btn .btn-group .btn-group-vertical</code></div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var MiscButtons = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-6 col-sm-6 col-xs-12">
+                    <div className="well with-header with-footer">
+                        <div className="header bordered-blue">Justified Buttons</div>
+                        <div className="buttons-preview">
+                            <div className="btn-group btn-group-justified">
+								<BasicButton classname="btn btn-default" name="Left" />
+								<BasicButton classname="btn btn-default" name="Middle" />
+								<BasicButton classname="btn btn-default" name="Right" />
+                            </div>
+                            <div className="btn-group btn-group btn-group-justified">
+								<BasicButton classname="btn btn-palegreen" name="Good" />
+								<BasicButton classname="btn btn-warning" name="Bad" />
+								<BasicButton classname="btn btn-danger" name="Ugly" />
+                            </div>
+                        </div>
+                        <div className="footer"><code>.btn-group .btn-group-justified</code></div>
+                    </div>
+                    <div className="well with-header with-footer">
+                        <div className="header bordered-blue">Active Buttons</div>
+                        <div className="buttons-preview">
+							<GroupButton classname="btn btn-blue active" name="Active button" />
+							<GroupButton classname="btn btn-darkorange active" name="Active Button" />
+                        </div>
+                        <div className="footer"><code>.btn .active"</code></div>
+                    </div>
+                    <div className="well with-header with-footer">
+                        <div className="header bordered-blue">Disabled Buttons</div>
+                        <div className="buttons-preview">
+							<GroupButton classname="btn btn-yellow disabled" name="Primary button" />
+							<GroupButton classname="btn btn-palegreen disabled" name="Button" />
+                        </div>
+                        <div className="footer"><code>disabled="disabled"</code></div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var SeventhRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+					<GroupButtons />
+					<MiscButtons />
+				</div>
+			);
+		}
+	});
+	
+	var PageContent = React.createClass({
+		fullScreenClick: function(e) {
+			var element = document.documentElement;
+			if (!$('body').hasClass("full-screen")) {
+				$('body').addClass("full-screen");
+				$('#fullscreen-toggler').addClass("active");
+					if (element.requestFullscreen) {
+						element.requestFullscreen();
+					} else if (element.mozRequestFullScreen) {
+						element.mozRequestFullScreen();
+					} else if (element.webkitRequestFullscreen) {
+						element.webkitRequestFullscreen();
+					} else if (element.msRequestFullscreen) {
+						element.msRequestFullscreen();
+					}
+			} else {
+				$('body').removeClass("full-screen");
+				$('#fullscreen-toggler').removeClass("active");
+				if (document.exitFullscreen) {
+					document.exitFullscreen();
+				} else if (document.mozCancelFullScreen) {
+					document.mozCancelFullScreen();
+				} else if (document.webkitExitFullscreen) {
+					document.webkitExitFullscreen();
+				}
+			}
+		},
+		sideBarClick: function(e) {
+			$("#sidebar").toggleClass("hide");
+			$(".sidebar-toggler").toggleClass("active");
+			return false;
+		},
+		render: function() {
+			return (
+				<div className="page-content">
+
+					<div className="page-breadcrumbs">
+						<ul className="breadcrumb">
+							<li>
+								<i className="fa fa-home"></i>
+								<a href="#">Home</a>
+							</li>
+							<li className="active">Dashboard</li>
+						</ul>
+					</div>
+
+					<div className="page-header position-relative">
+						<div className="header-title">
+							<h1>
+								Dashboard
+							</h1>
+						</div>
+
+						<div className="header-buttons">
+							<a className="sidebar-toggler" href="#" onClick={this.sideBarClick}>
+								<i className="fa fa-arrows-h"></i>
+							</a>
+							<a className="refresh" id="refresh-toggler" href="">
+								<i className="glyphicon glyphicon-refresh"></i>
+							</a>
+							<a className="fullscreen" id="fullscreen-toggler" href="#" onClick={this.fullScreenClick}>
+								<i className="glyphicon glyphicon-fullscreen"></i>
+							</a>
+						</div>
+
+					</div>
+
+					<div className="page-body">
+						<FirstRow />
+						<SecondRow />
+						<ThirdRow />
+						<FourthRow />
+						<FifthRow />
+						<SixthRow />
+						<SeventhRow />
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	var WholePage = React.createClass({
+		render: function() {
+			return (
+				<div>
+					<div className="loading-container">
+						<div className="loader"></div>
+					</div>
+					<Navbar />
+					<div className="main-container container-fluid">
+						<div className="page-container">
+							<PageSidebar />
+							<ChatBar />
+							<PageContent />
+						</div>
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	
+	ReactDOM.render(
+		<WholePage />,
+		document.getElementById('content')
+		);
+	</script>
+	
+    <!--Basic Scripts-->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!--Beyond Scripts-->
+    <script src="assets/js/beyond.min.js"></script>
+
+    <!--Page Related Scripts-->
+    
+</body>
+<!--  /Body -->
+</html>

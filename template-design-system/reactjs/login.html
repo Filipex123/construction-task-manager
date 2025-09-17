@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<!--
+BeyondAdmin - Responsive Admin Dashboard Template build with Twitter Bootstrap 3.3.7
+Version: 1.6.1
+Purchase: http://wrapbootstrap.com
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--Head-->
+<head>
+    <meta charset="utf-8" />
+    <title>Login Page</title>
+
+    <meta name="description" content="login page" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+    <!--Basic Styles-->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link id="bootstrap-rtl-link" href="" rel="stylesheet" />
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet" />
+
+    <!--Fonts-->
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300" rel="stylesheet" type="text/css">
+
+    <!--Beyond styles-->
+    <link id="beyond-link" href="assets/css/beyond.min.css" rel="stylesheet" />
+    <link href="assets/css/demo.min.css" rel="stylesheet" />
+    <link href="assets/css/animate.min.css" rel="stylesheet" />
+    <link id="skin-link" href="" rel="stylesheet" type="text/css" />
+
+    <!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
+    <script src="assets/js/skins.min.js"></script>
+	
+	<script src="assets/js/react/react.js"></script>
+    <script src="assets/js/react/react-dom.js"></script>
+    <script src="assets/js/react/browser.min.js"></script>
+</head>
+<!--Head Ends-->
+<!--Body-->
+<body>
+
+	<div id="content">
+	</div>
+	
+	<script type="text/babel">
+		var WholePage = React.createClass({
+			render: function() {
+				return (
+					<div>
+						<div className="login-container animated fadeInDown">
+							<div className="loginbox bg-white">
+								<div className="loginbox-title">SIGN IN</div>
+								<div className="loginbox-social">
+									<div className="social-title ">Connect with Your Social Accounts</div>
+									<div className="social-buttons">
+										<a href="" className="button-facebook">
+											<i className="social-icon fa fa-facebook"></i>
+										</a>
+										<a href="" className="button-twitter">
+											<i className="social-icon fa fa-twitter"></i>
+										</a>
+										<a href="" className="button-google">
+											<i className="social-icon fa fa-google-plus"></i>
+										</a>
+									</div>
+								</div>
+								<div className="loginbox-or">
+									<div className="or-line"></div>
+									<div className="or">OR</div>
+								</div>
+								<div className="loginbox-textbox">
+									<input type="text" className="form-control" placeholder="Email" />
+								</div>
+								<div className="loginbox-textbox">
+									<input type="password" className="form-control" placeholder="Password" />
+								</div>
+								<div className="loginbox-forgot">
+									<a href="">Forgot Password?</a>
+								</div>
+								<div className="loginbox-submit">
+									<input type="button" className="btn btn-primary btn-block" value="Login"/>
+								</div>
+								<div className="loginbox-signup">
+									<a href="register.html">Sign Up With Email</a>
+								</div>
+							</div>
+							<div className="logobox">
+							</div>
+						</div>
+					</div>
+				);
+			}
+		});
+		
+		
+		ReactDOM.render(
+			<WholePage />,
+			document.getElementById('content')
+			);
+	</script>
+
+    <!--Basic Scripts-->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!--Beyond Scripts-->
+    <script src="assets/js/beyond.js"></script>
+
+    
+</body>
+<!--Body Ends-->
+</html>

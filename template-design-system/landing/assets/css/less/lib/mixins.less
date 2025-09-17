@@ -1,0 +1,67 @@
+﻿.placeholder-weight(@weight) {
+    &::-webkit-input-placeholder {
+        font-weight: @weight;
+    }
+
+    &:-moz-placeholder {
+        font-weight: @weight;
+    }
+
+    &::-moz-placeholder {
+        font-weight: @weight;
+    }
+
+    &:-ms-input-placeholder {
+        font-weight: @weight;
+    }
+}
+
+.placeholder-color(@color) {
+    &::-webkit-input-placeholder {
+        color: @color;
+    }
+
+    &:-moz-placeholder {
+        color: @color;
+    }
+
+    &::-moz-placeholder {
+        color: @color;
+    }
+
+    &:-ms-input-placeholder {
+        color: @color;
+    }
+}
+
+.placeholder-size(@size) {
+    &::-webkit-input-placeholder {
+        font-size: @size;
+    }
+
+    &:-moz-placeholder {
+        font-size: @size;
+    }
+
+    &::-moz-placeholder {
+        font-size: @size;
+    }
+
+    &:-ms-input-placeholder {
+        font-size: @size;
+    }
+}
+
+
+.clearfix {
+	*zoom: 1;
+	&:before,
+	&:after {
+		display: table;
+		content: "";
+		line-height: 0;
+	}
+	&:after {
+		clear: both;
+	}
+}

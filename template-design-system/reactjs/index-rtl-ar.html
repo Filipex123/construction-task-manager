@@ -1,0 +1,2138 @@
+﻿<!DOCTYPE html>
+<!--
+BeyondAdmin - Responsive Admin Dashboard Template build with Twitter Bootstrap 3.3.7
+Version: 1.6.1
+Purchase: http://wrapbootstrap.com
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Head -->
+<head>
+    <meta charset="utf-8" />
+    <title>لوحة القيادة</title>
+
+    <meta name="description" content="Dashboard" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+    <!--Basic Styles-->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-rtl.min.css" rel="stylesheet" />
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="assets/css/weather-icons.min.css" rel="stylesheet" />
+
+    <!--Fonts-->
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/earlyaccess/droidarabickufi.css" rel="stylesheet" type="text/css" />
+
+    <!--Beyond styles-->
+    <link href="assets/css/beyond-rtl.min.css" rel="stylesheet" />
+    <link href="assets/css/4095-rtl.min.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/demo.min.css" rel="stylesheet" />
+    <link href="assets/css/typicons.min.css" rel="stylesheet" />
+    <link href="assets/css/animate.min.css" rel="stylesheet" />
+    <link id="skin-link" href="" rel="stylesheet" type="text/css" />
+	
+	<script src="assets/js/react/react.js"></script>
+    <script src="assets/js/react/react-dom.js"></script>
+    <script src="assets/js/react/browser.min.js"></script>
+
+</head>
+<!-- /Head -->
+<!-- Body -->
+<body>
+    
+	<div id="content">
+	</div>
+	
+	<script type="text/babel">
+	var NavbarBrand = React.createClass({
+		render: function() {
+			return (
+			  <div className="navbar-header pull-right">
+                    <a href="#" className="navbar-brand">
+                        <small>
+                            <img src="assets/img/logo-rtl.png" alt="" />
+                        </small>
+                    </a>
+                </div>
+			);
+		 }
+	});
+	
+	var SideBar = React.createClass({
+		handleClick: function (e) {
+			var b = $("#sidebar").hasClass("menu-compact");
+			if (!$('#sidebar').is(':visible'))
+            $("#sidebar").toggleClass("hide");
+			$("#sidebar").toggleClass("menu-compact");
+			$(".sidebar-collapse").toggleClass("active");
+			b = $("#sidebar").hasClass("menu-compact");
+
+			if ($(".sidebar-menu").closest("div").hasClass("slimScrollDiv")) {
+				$(".sidebar-menu").slimScroll({ destroy: true });
+				$(".sidebar-menu").attr('style', '');
+			}
+			if (b) {
+				$(".open > .submenu").removeClass("open");
+			} else {
+				if ($('.page-sidebar').hasClass('sidebar-fixed')) {
+					var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+					$('.sidebar-menu').slimscroll({
+						height: 'auto',
+						position: position,
+						size: '3px',
+						color: themeprimary
+					});
+				}
+			}	
+		},
+		render: function() {
+			return (
+			  <div className="sidebar-collapse" id="sidebar-collapse" onClick={this.handleClick}>
+                    <i className="collapse-icon fa fa-bars"></i>
+                </div>
+			);
+		 }
+	});
+	
+	var AccountItem = React.createClass({
+		render: function() {
+			return (
+			  <li>
+                  <a href="#">
+                   <div className="clearfix">
+					   <div className="notification-icon">
+						<i className="fa fa-phone bg-themeprimary white"></i>
+					   </div>
+					   <div className="notification-body">
+						<span className="title">{this.props.title}</span>
+						<span className="description">{this.props.desc}</span>
+					   </div>
+					   <div className="notification-extra">
+						 <i className="fa fa-clock-o themeprimary"></i>
+						 <span className="description">{this.props.extra}</span>
+						</div>
+                   </div>
+                  </a>
+              </li>
+			);
+		 }
+	});
+	
+	var MessageItem = React.createClass({
+		render: function() {
+			return (
+			  <li>
+				<a href="#">
+                    <img src="assets/img/avatars/divyia.jpg" className="message-avatar" alt="Divyia Austin" />
+                    <div className="message">
+                        <span className="message-sender">
+							{this.props.sender}
+                        </span>
+                        <span className="message-time">
+							{this.props.time}
+                        </span>
+                        <span className="message-subject">
+							{this.props.subject}
+                        </span>
+                        <span className="message-body">
+							{this.props.body}
+                        </span>
+                    </div>
+                </a>
+              </li>
+			);
+		 }
+	});
+	
+	var TaskItem = React.createClass({
+		render: function() {
+			return (
+			  <li>
+                <a href="#">
+                    <div className="clearfix">
+                        <span className="pull-left">{this.props.title}</span>
+                        <span className="pull-right">{this.props.percent}</span>
+                    </div>
+                    <div className="progress progress-xs">
+						<div style={{width:'65%'}} className="progress-bar"></div>
+                    </div>
+                </a>
+              </li>
+			);
+		 }
+	});
+	
+	var NavbarHeaderRight = React.createClass({
+		chatClick: function (e) {
+			$('.page-chatbar').toggleClass('open');
+			$("#chat-link").toggleClass('open');
+		},
+		createCookie: function (e) {
+			if (100) {
+				var date = new Date();
+				date.setTime(date.getTime() + (100 * 24 * 60 * 60 * 1000));
+				var expires = "; expires=" + date.toGMTString();
+			}
+			else var expires = "";
+			document.cookie = e + expires + "; path=/";
+		},
+		readCookie: function (e) {
+			var nameEq = e + "=";
+			var ca = document.cookie.split(';');
+			for (var i = 0; i < ca.length; i++) {
+				var c = ca[i];
+				while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+				if (c.indexOf(nameEq) == 0) return c.substring(nameEq.length, c.length);
+			}
+			return null;
+		},
+
+		setCookiesForFixedSettings :function () {
+			createCookie("navbar-fixed-top"+ "=" + $('#checkbox_fixednavbar').is(':checked'));
+			createCookie("sidebar-fixed" + "=" + $('#checkbox_fixedsidebar').is(':checked'));
+			createCookie("breadcrumbs-fixed"+"="+ $('#checkbox_fixedbreadcrumbs').is(':checked'));
+			createCookie("page-header-fixed"+"="+ $('#checkbox_fixedheader').is(':checked'));
+
+			var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+			if ($('#checkbox_fixedsidebar').is(':checked')) {
+				if (!$('.page-sidebar').hasClass('menu-compact')) {
+					$('.sidebar-menu').slimscroll({
+						position: position,
+						size: '3px',
+						color: themeprimary,
+						height: $(window).height() - 90,
+					});
+				}
+			} else {
+				if ($(".sidebar-menu").closest("div").hasClass("slimScrollDiv")) {
+					$(".sidebar-menu").slimScroll({ destroy: true });
+					$(".sidebar-menu").attr('style', '');
+				}
+			}
+		},
+		initiateSettings: function (e) {
+			
+			if (readCookie("navbar-fixed-top") != null) {
+				if (readCookie("navbar-fixed-top") == "true") {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').addClass('navbar-fixed-top');
+				}
+			}
+
+			if (readCookie("sidebar-fixed") != null) {
+				if (readCookie("sidebar-fixed") == "true") {
+					$('#checkbox_fixedsidebar').prop('checked', true);
+					$('.page-sidebar').addClass('sidebar-fixed');
+
+					if (!$(".page-sidebar").hasClass("menu-compact")) {
+						var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+						$('.sidebar-menu').slimscroll({
+							height: $(window).height() - 90,
+							position: position,
+							size: '3px',
+							color: themeprimary
+						});
+					}
+				}
+			}
+			if (readCookie("breadcrumbs-fixed") != null) {
+				if (readCookie("breadcrumbs-fixed") == "true") {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', true);
+					$('.page-breadcrumbs').addClass('breadcrumbs-fixed');
+				}
+			}
+			if (readCookie("page-header-fixed") != null) {
+				if (readCookie("page-header-fixed") == "true") {
+					$('#checkbox_fixedheader').prop('checked', true);
+					$('.page-header').addClass('page-header-fixed');
+				}
+			}
+
+			$('#checkbox_fixednavbar').change(function () {
+				$('.navbar').toggleClass('navbar-fixed-top');
+				if (($('#checkbox_fixedsidebar').is(":checked"))) {
+					$('#checkbox_fixedsidebar').prop('checked', false);
+					$('.page-sidebar').toggleClass('sidebar-fixed');
+				}
+
+				if (($('#checkbox_fixedbreadcrumbs').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', false);
+					$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				}
+
+				if (($('#checkbox_fixedheader').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedheader').prop('checked', false);
+					$('.page-header').toggleClass('page-header-fixed');
+				}
+				setCookiesForFixedSettings();
+			});
+
+			$('#checkbox_fixedsidebar').change(function () {
+				$('.page-sidebar').toggleClass('sidebar-fixed');
+				if (!($('#checkbox_fixednavbar').is(":checked"))) {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').toggleClass('navbar-fixed-top');
+				}
+				if (($('#checkbox_fixedbreadcrumbs').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', false);
+					$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				}
+				if (($('#checkbox_fixedheader').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedheader').prop('checked', false);
+					$('.page-header').toggleClass('page-header-fixed');
+				}
+				setCookiesForFixedSettings();
+			});
+			$('#checkbox_fixedbreadcrumbs').change(function () {
+				$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				if (!($('#checkbox_fixedsidebar').is(":checked"))) {
+					$('#checkbox_fixedsidebar').prop('checked', true);
+					$('.page-sidebar').toggleClass('sidebar-fixed');
+				}
+				if (!($('#checkbox_fixednavbar').is(":checked"))) {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').toggleClass('navbar-fixed-top');
+				}
+				if (($('#checkbox_fixedheader').is(":checked")) && !($(this).is(":checked"))) {
+					$('#checkbox_fixedheader').prop('checked', false);
+					$('.page-header').toggleClass('page-header-fixed');
+				}
+				setCookiesForFixedSettings();
+			});
+			$('#checkbox_fixedheader').change(function () {
+				$('.page-header').toggleClass('page-header-fixed');
+				if (!($('#checkbox_fixedbreadcrumbs').is(":checked"))) {
+					$('#checkbox_fixedbreadcrumbs').prop('checked', true);
+					$('.page-breadcrumbs').toggleClass('breadcrumbs-fixed');
+				}
+				if (!($('#checkbox_fixedsidebar').is(":checked"))) {
+					$('#checkbox_fixedsidebar').prop('checked', true);
+					$('.page-sidebar').toggleClass('sidebar-fixed');
+				}
+				if (!($('#checkbox_fixednavbar').is(":checked"))) {
+					$('#checkbox_fixednavbar').prop('checked', true);
+					$('.navbar').toggleClass('navbar-fixed-top');
+				}
+				setCookiesForFixedSettings();
+			});
+		},
+		settingsClick: function (e) {
+			$('.navbar-account').toggleClass('setting-open');
+		},
+		componentDidMount: function() {
+			this.initiateSettings();
+		},
+		render: function() {
+			return (
+			  <div className="navbar-header pull-right">
+                    <div className="navbar-account">
+                        <ul className="account-area">
+                            <li>
+                                <a className=" dropdown-toggle" data-toggle="dropdown" title="Notifications" href="#">
+                                    <i className="icon fa fa-warning"></i>
+                                </a>
+                                <ul className="pull-right dropdown-menu dropdown-arrow dropdown-notifications">
+                                    <AccountItem title="سكايب لقائه مع باتي " desc="01:00" extra="مكتب" />
+									<AccountItem title="استراحة مجهولة " desc="15:30 حتي 05:15" extra="" />
+									<AccountItem title="كيت حفل عيد ميلاد " desc="08:30" extra="في المنزل" />
+									<AccountItem title="عشاء مع الأصدقاء " desc="10:30" extra="" />
+                                    <li className="dropdown-footer ">
+                                        <span>
+                                            اليوم، 28 مارس
+                                        </span>
+                                        <span className="pull-right">
+                                            10 درجة مئوية
+                                            <i className="wi wi-cloudy"></i>
+                                        </span>
+                                    </li>
+                                </ul>
+                                
+                            </li>
+                            <li>
+                                <a className="dropdown-toggle" data-toggle="dropdown" title="Mails" href="#">
+                                    <i className="icon fa fa-envelope"></i>
+                                    <span className="badge">3</span>
+                                </a>
+                                <ul className="pull-right dropdown-menu dropdown-arrow dropdown-messages">
+                                    <MessageItem sender="دیویا فیلیبس" time="منذ 2 دقيقة" subject="وإليك وصفة لفطيرة التفاح" body="لتعريف التطبيق بإرسال عندما يتم عرض صورة للرمز المرسلين الرئيسي" />
+									<MessageItem sender="Bing.com" time="دیروز" subject="Bing Newsletter: The January Issue‏" body="Discover new music just in time for the Grammy® Awards." />
+									<MessageItem sender="نيكولا" time="الجمعة، 22 سبتمبر" subject="جديد 4K كاميرات" body="لقد حان 4K ثورة في الأفق، والوصول إلى عدد السكان العام." />
+                                </ul>
+                                
+                            </li>
+                            <li>
+                                <a className="dropdown-toggle" data-toggle="dropdown" title="Tasks" href="#">
+                                    <i className="icon fa fa-tasks"></i>
+                                    <span className="badge">4</span>
+                                </a>
+                                <ul className="pull-right dropdown-menu dropdown-tasks dropdown-arrow ">
+                                    <li className="dropdown-header bordered-darkorange">
+                                        <i className="fa fa-tasks"></i>
+                                        4 مهام في التقدم
+                                    </li>
+                                    <TaskItem title="إنشاء حساب " percent="65%" />
+									<TaskItem title="ملف البيانات " percent="35%" />
+									<TaskItem title="تحديث استئناف " percent="75%" />
+									<TaskItem title="مضيفا اتصالات " percent="10%" />
+                                    <li className="dropdown-footer">
+                                        <a href="#">
+                                            رؤية كافة المهام
+                                        </a>
+                                        <button className="btn btn-xs btn-default shiny darkorange icon-only pull-right"><i className="fa fa-check"></i></button>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a className="wave in" id="chat-link" title="Chat" href="#" onClick={this.chatClick}>
+                                    <i className="icon glyphicon glyphicon-comment"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a className="login-area dropdown-toggle" data-toggle="dropdown">
+                                    <div className="avatar" title="View your public profile">
+                                        <img src="assets/img/avatars/adam-jansen.jpg" />
+                                    </div>
+                                    <section>
+                                        <h2><span className="profile"><span>ديفيد ستيفنسون </span></span></h2>
+                                    </section>
+                                </a>
+                                
+                                <ul className="pull-right dropdown-menu dropdown-arrow dropdown-login-area">
+                                    <li className="username"><a>ديفيد ستيفنسون</a></li>
+                                    <li className="email"><a>David.Stevenson@live.com</a></li>
+                                    
+                                    <li>
+                                        <div className="avatar-area">
+                                            <img src="assets/img/avatars/adam-jansen.jpg" className="avatar" />
+                                            <span className="caption">تغيير الصورة</span>
+                                        </div>
+                                    </li>
+                                    
+                                    <li className="edit">
+                                        <a href="profile.html" className="pull-left">الملف الشخصي</a>
+                                        <a href="#" className="pull-right">اعداد</a>
+                                    </li>
+                                    
+                                    <li className="theme-area">
+                                        <ul className="colorpicker" id="skin-changer">
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#5DB2FF'}} rel="assets/css/skins/blue.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#2dc3e8'}} rel="assets/css/skins/azure.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#03B3B2'}} rel="assets/css/skins/teal.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#53a93f'}} rel="assets/css/skins/green.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#FF8F32'}} rel="assets/css/skins/orange.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#cc324b'}} rel="assets/css/skins/pink.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#AC193D'}} rel="assets/css/skins/darkred.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#8C0095'}} rel="assets/css/skins/purple.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#0072C6'}} rel="assets/css/skins/darkblue.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#585858'}} rel="assets/css/skins/gray.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#474544'}} rel="assets/css/skins/black.min.css"></a></li>
+                                            <li><a className="colorpick-btn" href="#" style={{backgroundColor:'#001940'}} rel="assets/css/skins/deepblue.min.css"></a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <li className="dropdown-footer">
+                                        <a href="login.html">
+                                            تسجيل الخروج
+                                        </a>
+                                    </li>
+                                </ul>
+                                
+                            </li>
+                            
+                        </ul>
+						<div className="setting">
+                            <a id="btn-setting" title="Setting" href="#" onClick={this.settingsClick}>
+                                <i className="icon glyphicon glyphicon-cog"></i>
+                            </a>
+                        </div>
+						<div className="setting-container">
+                            <label>
+                                <input type="checkbox" id="checkbox_fixednavbar" />
+                                <span className="text">نافبار الثابتة</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="checkbox_fixedsidebar" />
+                                <span className="text">الشريط الجانبي ثابت</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="checkbox_fixedbreadcrumbs" />
+                                <span className="text">بردکرامبز الثابتة</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="checkbox_fixedheader" />
+                                <span className="text">رأس ثابتة</span>
+                            </label>
+                        </div>
+                        
+                    </div>
+                </div>
+			);
+		 }
+	});
+	
+	var Navbar = React.createClass({
+		render: function() {
+			return (
+				<div className="navbar">
+					<div className="navbar-inner">
+						<div className="navbar-container">
+							<NavbarBrand />
+							<SideBar />
+							<NavbarHeaderRight />
+						</div>
+					</div>
+				</div>
+			);
+		 }
+	});
+	
+	var MenuItemIcon = React.createClass({
+		render: function() {
+			return (
+				<a href={this.props.href}>
+					<i className="menu-icon fa fa-th"></i>
+                    <span className="menu-text">{this.props.text}</span>
+                </a>
+			);
+		 }
+	});
+	
+	var MenuItem = React.createClass({
+		render: function() {
+			return (
+				<a href={this.props.href}>
+                    <span className="menu-text">{this.props.text}</span>
+                </a>
+			);
+		 }
+	});
+	
+	var ParentMenuIcon = React.createClass({
+		render: function() {
+			return (
+				<a href="#" className="menu-dropdown">
+                    <i className="menu-icon fa fa-desktop"></i>
+                    <span className="menu-text">{this.props.text}</span>
+                    <i className="menu-expand"></i>
+                </a>
+			);
+		 }
+	});
+	
+	var ParentMenu = React.createClass({
+		render: function() {
+			return (
+				<a href="#" className="menu-dropdown">
+                    <span className="menu-text">{this.props.text}</span>
+                    <i className="menu-expand"></i>
+                </a>
+			);
+		 }
+	});
+	
+	var PageSidebar = React.createClass({
+		bodyClickHandler: function (e) {
+			var b = $("#sidebar").hasClass("menu-compact");
+			var menuLink = $(e.target).closest("a");
+			if (!menuLink || menuLink.length == 0)
+				return;
+			if (!menuLink.hasClass("menu-dropdown")) {
+				if (b && menuLink.get(0).parentNode.parentNode == this) {
+					var menuText = menuLink.find(".menu-text").get(0);
+					if (e.target != menuText && !$.contains(menuText, e.target)) {
+						return false;
+					}
+				}
+				return;
+			}
+			var submenu = menuLink.next().get(0);
+			if (!$(submenu).is(":visible")) {
+				var c = $(submenu.parentNode).closest("ul");
+				if (b && c.hasClass("sidebar-menu"))
+					return;
+				c.find("> .open > .submenu")
+					.each(function () {
+						if (this != submenu && !$(this.parentNode).hasClass("active"))
+							$(this).slideUp(200).parent().removeClass("open");
+					});
+			}
+			if (b && $(submenu.parentNode.parentNode).hasClass("sidebar-menu"))
+				return false;
+			$(submenu).slideToggle(200).parent().toggleClass("open");
+			return false;
+		},
+		render: function() {
+			return (
+				<div className="page-sidebar" id="sidebar">
+                
+                <div className="sidebar-header-wrapper">
+					<input type="text" className="searchinput" />
+                    <i className="searchicon fa fa-search"></i>
+                    <div className="searchhelper">تقارير البحث، الرسوم البيانية، رسائل البريد الإلكتروني أو إشعارات</div>
+                </div>
+                
+                <ul className="nav sidebar-menu" onClick={this.bodyClickHandler}>
+                    
+                    <li className="active">
+                        <MenuItemIcon href="index.html" text="لوحة القيادة " />
+                    </li>
+                    
+                    <li>
+                        <MenuItemIcon href="databoxes.html" text=" صناديق البيانات " />
+                    </li>
+                    
+                    <li>
+                        <MenuItemIcon href="widgets.html" text=" الحاجيات " />
+                    </li>
+                    
+                    <li>
+						<ParentMenuIcon text=" عناصر " />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="elements.html" text="عناصر الأساسية" />
+                            </li>
+                            <li>
+								<ParentMenu text="الرموز" />
+
+                                <ul className="submenu">
+                                    <li>
+										<MenuItemIcon href="font-awesome.html" text="Font Awesome" />
+                                    </li>
+                                    <li>
+										<MenuItemIcon href="glyph-icons.html" text="Glyph Icons" />
+                                    </li>
+                                    <li>
+										<MenuItemIcon href="typicon.html" text="Typicons" />
+                                    </li>
+                                    <li>
+										<MenuItemIcon href="weather-icons.html" text="Weather Icons" />
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+								<MenuItem href="tabs.html" text="علامات التبويب والأكورديون" />
+                            </li>
+                            <li>
+								<MenuItem href="alerts.html" text="تنبيهات وتلميحات" />
+                            </li>
+                            <li>
+								<MenuItem href="modals.html" text="شرطية ويلز" />
+                            </li>
+                            <li>
+								<MenuItem href="buttons.html" text="أزرار" />
+                            </li>
+                            <li>
+								<MenuItem href="nestable-list.html" text=" قائمة Nestable" />
+                            </li>
+                            <li>
+								<MenuItem href="treeview.html" text="تريفيف" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text=" الجداول " />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="tables-simple.html" text="بسيطة والمستجيبة" />
+                            </li>
+                            <li>
+								<MenuItem href="tables-data.html" text="جداول البيانات" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text=" أشكال " />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="form-layouts.html" text="تخطيط نموذج" />
+                            </li>
+
+                            <li>
+								<MenuItem href="form-inputs.html" text="المدخلات شكل" />
+                            </li>
+
+                            <li>
+								<MenuItem href="form-pickers.html" text="جامعو البيانات" />
+                            </li>
+                            <li>
+								<MenuItem href="form-wizard.html" text="Wizard" />
+                            </li>
+                            <li>
+								<MenuItem href="form-validation.html" text="التحقق من صحة" />
+                            </li>
+                            <li>
+								<MenuItem href="form-editors.html" text="المحررين" />
+                            </li>
+                            <li>
+								<MenuItem href="form-inputmask.html" text="مسک" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text=" الرسوم البيانية " />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="flot.html" text="الرسوم البيانية فلوت" />
+                            </li>
+
+                            <li>
+								<MenuItem href="morris.html" text=" الرسوم البيانية موريس" />
+                            </li>
+                            <li>
+								<MenuItem href="sparkline.html" text="الرسوم البيانية اسبارکلاین" />
+                            </li>
+                            <li>
+								<MenuItem href="easypiecharts.html" text="رسوم بيانية ایزی پای" />
+                            </li>
+                            <li>
+								<MenuItem href="chartjs.html" text=" ChartJS" />
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+						<MenuItemIcon href="profile.html" text="ملف" />
+                    </li>
+	
+                    <li>
+						<ParentMenuIcon text=" بريد " />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="inbox.html" text="البريد الوارد" />
+                            </li>
+
+                            <li>
+								<MenuItem href="message-view.html" text="عرض رسالة" />
+                            </li>
+                            <li>
+								<MenuItem href="message-compose.html" text="يؤلف رسالة" />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<MenuItemIcon href="calendar.html" text="تقويم" />
+                    </li>
+
+                    <li>
+						<ParentMenuIcon text=" صفحات " />
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="timeline.html" text="الجدول الزمني" />
+                            </li>
+                            <li>
+								<MenuItem href="pricing.html" text="جداول التسعير" />
+                            </li>
+
+                            <li>
+								<MenuItem href="invoice.html" text="فاتورة" />
+                            </li>
+
+                            <li>
+								<MenuItem href="login.html" text="دخول" />
+                            </li>
+                            <li>
+								<MenuItem href="register.html" text="تسجيل" />
+                            </li>
+                            <li>
+								<MenuItem href="lock.html" text="قفل الشاشة" />
+                            </li>
+                            <li>
+								<MenuItem href="typography.html" text=" أسلوب الطباعة " />
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+						<ParentMenuIcon text="أكثر الصفحات" />
+
+                        <ul className="submenu">
+                            <li>
+								<MenuItem href="error-404.html" text="الخطأ 404" />
+                            </li>
+
+                            <li>
+								<MenuItem href="error-500.html" text=" الخطأ 500" />
+                            </li>
+                            <li>
+								<MenuItem href="blank.html" text="صفحة فارغة" />
+                            </li>
+                            <li>
+								<MenuItem href="grid.html" text=" شبكة" />
+                            </li>
+                            <li>
+								<ParentMenu text="القائمة متعددة المستوى" />
+                                
+                                <ul className="submenu">
+                                    <li>
+										<MenuItemIcon href="#" text="المستوى 3" />
+                                    </li>
+
+                                    <li>
+										<ParentMenuIcon text="المستوى 4" />
+
+                                        <ul className="submenu">
+                                            <li>
+												<MenuItemIcon href="#" text="بعض تفاصيل" />
+                                            </li>
+
+                                            <li>
+												<MenuItemIcon href="#" text="تفاصيل أخرى" />
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </li>
+
+                    <li>
+						<ParentMenuIcon text="  اليمين إلى اليسار " />
+                        <ul className="submenu">
+                            <li>
+                                <a>
+                                    <span className="menu-text">Back To English</span>
+                                    <label className="pull-right margin-top-10">
+                                        <input id="rtl-changer" className="checkbox-slider slider-icon colored-primary" type="checkbox" />
+                                        <span className="text"></span>
+                                    </label>
+                                </a>
+                            </li>
+                            <li>
+								<MenuItem href="index-rtl-ar.html" text="تخطيط عربية" />
+                            </li>
+
+                            <li>
+								<MenuItem href="index-rtl-fa.html" text="تخطيط الفارسية" />
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li>
+						<MenuItemIcon href="versions.html" text="BeyondAdmin Versions" />
+                    </li>
+                </ul>
+            </div>
+			);
+		 }
+	});
+	
+	var Contact = React.createClass({
+		handleClick: function(e) {
+			$('.page-chatbar .chatbar-contacts').hide();
+			$('.page-chatbar .chatbar-messages').show();
+		},
+		render: function() {
+			return (
+				<li className="contact" onClick={this.handleClick}>
+                    <div className="contact-avatar">
+                        <img src="assets/img/avatars/John-Smith.jpg" />
+                    </div>
+                    <div className="contact-info">
+                        <div className="contact-name">{this.props.name}</div>
+                        <div className="contact-status">
+							<div className="online"></div>
+                            <div className="status">{this.props.status}</div>
+                        </div>
+                        <div className="last-chat-time">
+							{this.props.last}
+                        </div>
+                    </div>
+                </li>
+			);
+		 }
+	});
+	
+	var ContactList = React.createClass({
+		componentDidMount: function() {
+			var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+			var additionalHeight = 0;
+			if ($(window).width() < 531)
+				additionalHeight = 45;
+			$('.chatbar-contacts .contacts-list').slimscroll({
+				position: position,
+				size: '4px',
+				color: themeprimary,
+				height: $(window).height() - (86 + additionalHeight),
+			});
+		},
+		render: function() {
+			return (
+				<ul className="contacts-list">
+					<Contact name="Divyia Philips" status="online" last="last week" />
+					<Contact name="Adam Johnson" status="left 4 mins ago" last="today" />
+					<Contact name="John Smith" status="online" last="1:57 am" />
+					<Contact name="Osvaldus Valutis" status="online" last="today" />
+					<Contact name="Javi Jimenez" status="online" last="today" />
+					<Contact name="Stephanie Walter" status="online" last="yesterday" />
+					<Contact name="Sergey Azovskiy" status="offline since oct 24" last="22 oct" />
+					<Contact name="Lee Munroe" status="online" last="today" />
+					<Contact name="Divyia Philips" status="online" last="last week" />
+                </ul>
+			);
+		 }
+	});
+	
+	var ContactSearch = React.createClass({
+		render: function() {
+			return (
+				<div className="contacts-search">
+                    <input type="text" className="searchinput" placeholder="Search Contacts" />
+                    <i className="searchicon fa fa-search"></i>
+                    <div className="searchhelper">Search Your Contacts and Chat History</div>
+                </div>
+			);
+		 }
+	});
+	
+	var ChatContact = React.createClass({
+		render: function() {
+			return (
+				<div className="chatbar-contacts">
+					<ContactSearch />
+					<ContactList />
+				</div>
+			);
+		 }
+	});
+	
+	var ChatMessage = React.createClass({
+		render: function() {
+			return (
+				<li className="message">
+                    <div className="message-info">
+                        <div className="bullet"></div>
+                        <div className="contact-name">{this.props.sender}</div>
+                        <div className="message-time">{this.props.time}</div>
+                    </div>
+                    <div className="message-body">
+						{this.props.text}
+                    </div>
+                </li>
+			);
+		 }
+	});
+	
+	var ChatReply = React.createClass({
+		render: function() {
+			return (
+				<li className="message reply">
+                    <div className="message-info">
+                        <div className="bullet"></div>
+                        <div className="contact-name">{this.props.sender}</div>
+                        <div className="message-time">{this.props.time}</div>
+                    </div>
+                    <div className="message-body">
+						{this.props.text}
+                    </div>
+                </li>
+			);
+		 }
+	});
+	
+	var ChatList = React.createClass({
+		componentDidMount: function() {
+			var position = (readCookie("rtl-support") || location.pathname == "/index-rtl-fa.html" || location.pathname == "/index-rtl-ar.html") ? 'right' : 'left';
+			var additionalHeight = 0;
+			if ($(window).width() < 531)
+				additionalHeight = 45;
+			$('.chatbar-messages .messages-list').slimscroll({
+				position: position,
+				size: '4px',
+				color: themeprimary,
+				height: $(window).height() - (250 + additionalHeight),
+			});
+		},
+		render: function() {
+			return (
+				<ul className="messages-list">
+					<ChatMessage sender="Me" time="10:14 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatReply sender="Divyia" time="10:15 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+                    <ChatMessage sender="Me" time="10:14 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatReply sender="Divyia" time="10:15 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatMessage sender="Me" time="10:14 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+					<ChatReply sender="Divyia" time="10:15 AM, Today" text="Hi, Hope all is good. Are we meeting today?" />
+                 </ul>
+			);
+		 }
+	});
+	
+	var ChatSend = React.createClass({
+		render: function() {
+			return (
+				<div className="send-message">
+                    <span className="input-icon icon-right">
+                        <textarea rows="4" className="form-control" placeholder="Type your message"></textarea>
+                        <i className="fa fa-camera themeprimary"></i>
+                    </span>
+                </div>
+			);
+		 }
+	});
+	
+	var ChatBarContact = React.createClass({
+		handleClick: function(e) {
+			$('.page-chatbar .chatbar-contacts').show();
+			$('.page-chatbar .chatbar-messages').hide();
+		},
+		render: function() {
+			return (
+				<div className="messages-contact">
+                    <div className="contact-avatar">
+                        <img src="assets/img/avatars/divyia.jpg" />
+                    </div>
+                    <div className="contact-info">
+                        <div className="contact-name">{this.props.name}</div>
+                        <div className="contact-status">
+                            <div className="online"></div>
+                            <div className="status">{this.props.status}</div>
+                        </div>
+                        <div className="last-chat-time">
+							{this.props.time}
+                        </div>
+                        <div className="back" onClick={this.handleClick}>
+                            <i className="fa fa-arrow-circle-left"></i>
+                        </div>
+                    </div>
+                </div>
+			);
+		 }
+	});
+	
+	var ChatBarMessage = React.createClass({
+		render: function() {
+			return (
+				<div className="chatbar-messages" style={{display: 'none'}}>
+					<ChatBarContact name="Divyia Philips" status="online" time="a moment ago" />
+					<ChatList />
+					<ChatSend />
+				</div>
+			);
+		 }
+	});
+	
+	var ChatBar = React.createClass({
+		render: function() {
+			return (
+				<div id="chatbar" className="page-chatbar">
+					<ChatContact />
+					<ChatBarMessage />
+				</div>
+			);
+		 }
+	});
+	
+	var FirstDataBox = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div className="databox bg-white radius-bordered">
+                        <div className="databox-right bg-themesecondary">
+                            <div className="databox-piechart">
+                                <div data-toggle="easypiechart" className="easyPieChart" data-barcolor="#fff" data-linecap="butt" data-percent="50" data-animate="500" data-linewidth="3" data-size="47" data-trackcolor="rgba(255,255,255,0.1)"><span className="white font-90">{this.props.percent}%</span></div>
+                            </div>
+                        </div>
+                        <div className="databox-left">
+                            <span className="databox-number themesecondary">{this.props.number}</span>
+                            <div className="databox-text darkgray">{this.props.text}</div>
+                            <div className="databox-stat themesecondary radius-bordered">
+                                <i className="stat-icon icon-lg fa fa-tasks"></i>
+                            </div>
+						</div>
+                    </div>
+                </div>
+			);
+		 }
+	});
+	
+	var SecondDataBox = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div className="databox bg-white radius-bordered">
+                        <div className="databox-right bg-themethirdcolor">
+                            <div className="databox-piechart">
+                                <div data-toggle="easypiechart" className="easyPieChart" data-barcolor="#fff" data-linecap="butt" data-percent="15" data-animate="500" data-linewidth="3" data-size="47" data-trackcolor="rgba(255,255,255,0.2)"><span className="white font-90">{this.props.percent}%</span></div>
+                            </div>
+                        </div>
+                        <div className="databox-left">
+                            <span className="databox-number themethirdcolor">{this.props.number}</span>
+                            <div className="databox-text darkgray">{this.props.text}</div>
+                            <div className="databox-stat themethirdcolor radius-bordered">
+                                <i className="stat-icon  icon-lg fa fa-envelope-o"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			);
+		 }
+	});
+	
+	var ThirdDataBox = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div className="databox bg-white radius-bordered">
+                        <div className="databox-right bg-themeprimary">
+                            <div className="databox-piechart">
+                                <div id="users-pie" data-toggle="easypiechart" className="easyPieChart" data-barcolor="#fff" data-linecap="butt" data-percent="76" data-animate="500" data-linewidth="3" data-size="47" data-trackcolor="rgba(255,255,255,0.1)"><span className="white font-90">{this.props.percent}%</span></div>
+                            </div>
+                        </div>
+                        <div className="databox-left">
+                            <span className="databox-number themeprimary">{this.props.number}</span>
+                            <div className="databox-text darkgray">{this.props.text}</div>
+                            <div className="databox-state bg-themeprimary">
+                                <i className="fa fa-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var FourthDataBox = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div className="databox bg-white radius-bordered">
+                        <div className="databox-right no-padding">
+                            <img src="assets/img/avatars/John-Smith.jpg" style={{width:'65px', height:'65px'}} />
+                        </div>
+                        <div className="databox-left padding-top-20">
+                            <div className="databox-stat palegreen">
+                                <i className="stat-icon icon-xlg fa fa-phone"></i>
+                            </div>
+                            <div className="databox-text darkgray">{this.props.text1}</div>
+                            <div className="databox-text darkgray">{this.props.text2}</div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var FirstRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+                    <div className="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div className="row">
+							<FirstDataBox percent="50" number="14" text="المهام الجديدة" />
+							<SecondDataBox percent="15" number="1" text="رسالة جديدة" />
+							<ThirdDataBox percent="76" number="98" text="مشترکین جديدة" />
+							<FourthDataBox text1="جان اسمیت" text2="موزع نمونه" />
+						</div>
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	var DashboardHeader = React.createClass({
+		render: function() {
+			return (
+				<div className="box-header">
+                    <div className="deadline">
+                        الأيام المتبقية: 109
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var DashboardProgress = React.createClass({
+		render: function() {
+			return (
+				<div className="box-progress">
+                    <div className="progress-handle">یوم 20</div>
+                    <div className="progress progress-xs progress-no-radius bg-whitesmoke">
+                        <div className="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style={{width: '20%'}}>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var SaleDiagram = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div className="databox databox-xlg databox-vertical databox-inverted databox-shadowed">
+                        <div className="databox-top">
+                            <div className="databox-sparkline">
+                                <span data-sparkline="line" data-height="125px" data-width="100%" data-fillcolor="false" data-linecolor="themesecondary"
+                                      data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="#ffce55"
+                                      data-highlightspotcolor="#ffce55" data-highlightlinecolor="#ffce55"
+                                      data-linewidth="1.5" data-spotradius="2">
+									{this.props.numbers}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="databox-bottom no-padding text-align-center">
+                            <span className="databox-number lightcarbon no-margin">{this.props.amount}</span>
+                            <span className="databox-text lightcarbon no-margin">{this.props.unit}</span>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var SaleCircle = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div className="databox databox-xlg databox-vertical databox-inverted databox-shadowed">
+						<div className="databox-top">
+							<div className="databox-piechart">
+								<div data-toggle="easypiechart" className="easyPieChart block-center"
+                                     data-barcolor="themeprimary" data-linecap="butt" data-percent="{this.props.percent}" data-animate="500"
+                                     data-linewidth="8" data-size="125" data-trackcolor="#eee">
+                                    <span className="font-200"><i className="fa fa-gift themeprimary"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="databox-bottom no-padding text-align-center">
+                            <span className="databox-number lightcarbon no-margin">{this.props.amount}</span>
+                            <span className="databox-text lightcarbon no-margin">{this.props.text}</span>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var DashboardVisit = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-4 col-sm-4 col-xs-12">
+                    <div className="notification">
+                        <div className="clearfix">
+                            <div className="notification-icon">
+                                <i className="fa fa-phone bordered-1 bordered-orange orange"></i>
+                            </div>
+							<div className="notification-body">
+                                <span className="title">{this.props.text}</span>
+                                <span className="description">{this.props.time}</span>
+                            </div>
+                            <div className="notification-extra">
+                                <i className="fa fa-clock-o orange"></i>
+                                <span className="description">{this.props.extra}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var Dashboard = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                    <div className="row">
+						<div className="col-xs-12">
+							<div className="dashboard-box">
+								<DashboardHeader />
+								<DashboardProgress />
+								<div className="box-tabbs">
+                                    <div className="tabbable">
+                                        <ul className="nav nav-tabs tabs-flat  nav-justified" id="myTab11">
+                                            <li className="active">
+                                                <a data-toggle="tab" href="#realtime">
+                                                    في الوقت الحقيقي
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a data-toggle="tab" href="#visits">
+                                                    مرة
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a data-toggle="tab" id="contacttab" href="#bandwidth">
+                                                    عرض النطاق الترددي
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a data-toggle="tab" href="#sales">
+                                                    مبيعات
+                                                </a>
+                                            </li>
+                                        </ul>
+                                        <div className="tab-content tabs-flat no-padding">
+                                            <div id="realtime" className="tab-pane active padding-5 animated fadeInUp">
+                                                <div className="row">
+                                                    <div className="col-lg-12">
+                                                        <div id="dashboard-chart-realtime" className="chart chart-lg no-margin"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="visits" className="tab-pane  animated fadeInUp">
+													<div className="row">
+                                                        <div className="col-lg-12 chart-container">
+                                                            <div id="dashboard-chart-visits" className="chart chart-lg no-margin" style={{width:'100%'}}></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="bandwidth" className="tab-pane padding-10 animated fadeInUp">
+                                                    <div className="databox-sparkline bg-themeprimary">
+                                                        <span id="dashboard-bandwidth-chart" data-sparkline="compositeline" data-height="250px" data-width="100%" data-linecolor="#fff" data-secondlinecolor="#eee"
+                                                              data-fillcolor="rgba(255,255,255,.1)" data-secondfillcolor="rgba(255,255,255,.25)"
+                                                              data-spotradius="0"
+                                                              data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="#ffce55"
+                                                              data-highlightspotcolor="#fff" data-highlightlinecolor="#fff"
+                                                              data-linewidth="2" data-secondlinewidth="2"
+                                                              data-composite="500, 400, 100, 450, 300, 200, 100, 200">
+                                                            300,300,400,300,200,300,300,200
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div id="sales" className="tab-pane animated fadeInUp no-padding-bottom" style={{padding:'20px 20px 0 20px'}}>
+                                                    <div className="row">
+														<SaleDiagram numbers="1,2,4,3,5,6,8,7,11,14,11,12" amount="224" unit="وحدة بيع / ساعة" />
+														<SaleDiagram numbers="100,208,450,298,450,776,234,680,1100,1400,1000,1200" amount="7063$" unit="الدخل / ساعة" />
+														<SaleCircle percent="80" amount="9" text="الطلبيات الجديدة" />
+														<SaleCircle percent="40" amount="11" text="تذاکر الجديدة" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="box-visits">
+                                        <div className="row">
+											<DashboardVisit text="عيد ميلاد هاجر" time="08:30 pm" extra="فی البیت" />
+											<DashboardVisit text="شنقاً مع الأطفال" time="03:30 pm - 05:15 pm" extra="" />
+											<DashboardVisit text="اجتماع مع بتی" time="01:00 pm" extra="فی الدیوان" />
+                                        </div>
+                                    </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	var OrderItem = React.createClass({
+		render: function() {
+			return (
+				<li className="order-item">
+                    <div className="row">
+                        <div className="col-lg-8 col-md-8 col-sm-8 col-xs-8 item-right">
+                            <div className="item-booker">{this.props.name}</div>
+                            <div className="item-time">
+                                <i className="fa fa-calendar"></i>
+                                <span>{this.props.time}</span>
+                            </div>
+                        </div>
+                        <div className="col-lg-4 col-md-4 col-sm-4 col-xs-4 item-left">
+                            <div className="item-price">
+                                <span className="currency">{this.props.currency}</span>
+                                <span className="price">{this.props.amount}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a className="item-more" href="">
+                        <i></i>
+                    </a>
+                </li>
+			);
+		}
+	});
+	
+	var Orders = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                    <div className="orders-container">
+                        <div className="orders-header">
+                            <h6>أحدث الطلبيات</h6>
+                        </div>
+                        <ul className="orders-list">
+                            <OrderItem name="نید استاردز" time="منذ 10 دقيقة" currency="$" amount="400" />
+							<OrderItem name="ستيف لويس" time=" منذ 2 ساعات" currency="$" amount="620" />
+							<OrderItem name="جون فورد" time="اليوم 8 يوليو" currency="$" amount="220" />
+							<OrderItem name="كيم باسنجر" time="يوم أمس 7 يوليو" currency="$" amount="400" />
+							<OrderItem name="ستيف لويس" time=" 5 يوليو" currency="$" amount="340" />
+                        </ul>
+                        <div className="orders-footer">
+                            <a className="show-all" href=""><i className="fa fa-angle-down"></i> تظهر جميع</a>
+                            <div className="help">
+                                <a href=""><i className="fa fa-question"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var SecondRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+					<Dashboard />
+					<Orders />
+				</div>
+			);
+		}
+	});
+	
+	var TaskBoardItem = React.createClass({
+		render: function() {
+			return (
+				<li className="task-item">
+                    <div className="task-check">
+                        <label>
+                            <input type="checkbox" />
+                            <span className="text"></span>
+                        </label>
+                    </div>
+                    <div className="task-state">
+                        <span className="label label-yellow">
+							{this.props.status}
+                        </span>
+                    </div>
+                    <div className="task-time">{this.props.time}</div>
+                    <div className="task-body">{this.props.text}</div>
+                    <div className="task-creator"><a href="">{this.props.creator}</a></div>
+                    <div className="task-assignedto">{this.props.assignee}</div>
+                </li>
+			);
+		}
+	});
+	
+	var TaskBoard = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-4 col-sm-12 col-xs-12">
+                    <div className="widget">
+                        <div className="widget-header bordered-bottom bordered-themeprimary">
+                            <i className="widget-icon fa fa-tasks themeprimary"></i>
+                            <span className="widget-caption themeprimary">مجلس المهمة</span>
+						</div>
+						<div className="widget-body no-padding">
+							<div className="task-container">
+								<div className="task-search">
+									<span className="input-icon">
+										<input type="text" className="form-control" placeholder="بحث" />
+										<i className="fa fa-search gray"></i>
+									</span>
+								</div>
+								<ul className="tasks-list">
+									<TaskBoardItem status="في التقدم" time="1 منذ ساعة" text="نسأل لسيسادمينس لتثبيت بايثون 3 على الخادم وتشغيله" creator="کامیرون هیتفیلد" assignee="الملقاة على عاتقكم" />
+									<TaskBoardItem status="نشط" time="منذ 2 ساعات" text="إرسال ثائق API جديدة مع اختبار ونشر المواصفات" creator="بهرنج نیتسه" assignee="الملقاة على عاتقكم" />
+									<TaskBoardItem status="وافق" time="أمس " text="رمز إعادة بيع ديون وإعادة كتابة رموز سخيفة واختباره" creator="یفید فینشر" assignee="تعيين كيم ل" />
+								</ul>
+							</div>
+						</div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var TasksDiagram = React.createClass({
+		render: function() {
+			return (
+				<div className="col=lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <div className="databox databox-lg databox-inverted radius-bordered databox-shadowed databox-graded databox-vertical">
+                        <div className="databox-top bg-palegreen no-padding">
+                            <div className="databox-stat white bg-palegreen font-120">
+                                <i className="stat-icon fa fa-caret-down icon-xlg"></i>
+                            </div>
+                            <div className="horizontal-space space-lg"></div>
+                            <div className="databox-sparkline no-margin">
+                                <span data-sparkline="compositebar" data-height="82px" data-width="100%"
+                                      data-barcolor="#b0dc81"
+                                      data-barwidth="10px" data-barspacing="5px"
+                                      data-fillcolor="false" data-linecolor="#fff" data-spotradius="3" data-linewidth="2"
+                                      data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="#fff"
+                                      data-highlightspotcolor="#fff" data-highlightlinecolor="#fff"
+                                      data-composite={this.props.composite}>
+								    {this.props.numbers}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="databox-bottom no-padding">
+                            <div className="databox-row">
+                                <div className="databox-cell cell-6 text-align-left">
+                                    <span className="databox-text">{this.props.text1}</span>
+                                    <span className="databox-number">{this.props.number1}</span>
+                                </div>
+                                <div className="databox-cell cell-6 text-align-right">
+                                    <span className="databox-text">{this.props.text2}</span>
+                                    <span className="databox-number font-70">{this.props.number2}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var TicketItem = React.createClass({
+		render: function() {
+			return (
+				<li className="ticket-item">
+                    <div className="row">
+                        <div className="ticket-user col-lg-6 col-sm-12">
+                            <img src="assets/img/avatars/adam-jansen.jpg" className="user-avatar" />
+                            <span className="user-name">{this.props.username}</span>
+                            <span className="user-at">فی</span>
+                            <span className="user-company">{this.props.company}</span>
+                        </div>
+                        <div className="ticket-time  col-lg-4 col-sm-6 col-xs-12">
+							<div className="divider hidden-md hidden-sm hidden-xs"></div>
+                            <i className="fa fa-clock-o"></i>
+                            <span className="time">{this.props.time}</span>
+                        </div>
+                        <div className="ticket-type  col-lg-2 col-sm-6 col-xs-12">
+                            <span className="divider hidden-xs"></span>
+                            <span className="type">{this.props.type}</span>
+                        </div>
+                        <div className="ticket-state bg-palegreen">
+                            <i className="fa fa-check"></i>
+                        </div>
+                    </div>
+                </li>
+			);
+		}
+	});
+	
+	var TicketBoard = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+                    <div className="col-lg-12">
+                        <div className="widget">
+                            <div className="widget-header bordered-bottom bordered-themesecondary">
+                                <i className="widget-icon fa fa-tags themesecondary"></i>
+                                <span className="widget-caption themesecondary">مجلس تذكرة</span>
+                            </div>
+                            <div className="widget-body  no-padding">
+                                <div className="tickets-container">
+                                    <ul className="tickets-list">
+										<TicketItem username="آدام جانسون" company="مایکروسافت" time=" منذ ساعة واحدة" type="قضية" />
+										<TicketItem username="دیویا فیلیبس" company="دریبل" time="منذ 3 ساعات" type="دفع" />
+										<TicketItem username="نیکلای لارسن" company="جوجل" time="منذ 18 ساعات" type="قضية" />
+										<TicketItem username="بیل جکسون" company="مبنا" time="2 أيام منذ" type="دفع" />
+										<TicketItem username="اریک کلابتون" company="موزیکر" time="2 أيام منذ" type="معلومات" />
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var ThirdRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+					<TaskBoard />
+					<div className="col-lg-8 col-sm-12 col-xs-12">
+						<div className="row">
+							<TasksDiagram composite="7,6,5,7,9,10,8,7,6,6,4,7,8" numbers="8,4,1,2,4,6,2,4,4,8,10,7,10" text1="المبيعات " number1="$23,657" text2="سبتمبر" number2="$1,257" />
+							<TasksDiagram composite="7,6,5,7,9,10,8,6,2,4,1,2,7" numbers="10,7,10,8,4,6,6,4,7,8,4,4,8" text1="المستخدمين " number1="76,109" text2="جديدة" number2="7,540" />
+							<TasksDiagram composite="8,4,1,2,4,6,2,4,4,8,10,7,7" numbers="7,6,5,7,9,10,8,7,6,6,4,7,8" text1="الزيارات" number1="990,541" text2="سبتمبر" number2="292,123" />
+						</div>
+						<TicketBoard />
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	var ViewItem = React.createClass({
+		render: function() {
+			return (
+				<div className="databox-cell cell-2 no-padding padding-10 text-align-left">
+                    <span className="databox-number orange no-margin">{this.props.number}</span>
+                    <span className="databox-text darkgray no-margin">{this.props.text}</span>
+                </div>
+			);
+		}
+	});
+	
+	var WeekDay = React.createClass({
+		render: function() {
+			return (
+				<div className="databox-cell cell-2 text-align-center no-padding padding-top-5">
+                    <span className="databox-header white">{this.props.text}</span>
+                </div>
+			);
+		}
+	});
+	
+	var PageViews = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                    <div className="databox databox-xxlg databox-vertical databox-inverted">
+                        <div className="databox-top bg-whitesmoke no-padding">
+                            <div className="databox-row row-2 bg-orange no-padding">
+                                <div className="databox-cell cell-1 text-align-center no-padding padding-top-5">
+                                    <span className="databox-number white"><i className="fa fa-bar-chart-o no-margin"></i></span>
+                                </div>
+                                <div className="databox-cell cell-8 no-padding padding-top-5 text-align-left">
+                                    <span className="databox-number white">المشاهدات</span>
+                                </div>
+                                <div className="databox-cell cell-3 text-align-right padding-10">
+                                    <span className="databox-text white">13 ديسمبر</span>
+                                </div>
+                            </div>
+                            <div className="databox-row row-4">
+                                <div className="databox-cell cell-6 no-padding padding-10 padding-left-20 text-align-left">
+                                    <span className="databox-number orange no-margin">534,908</span>
+                                    <span className="databox-text sky no-margin">وجهات نظر</span>
+                                </div>
+                                <ViewItem number="4,129" text="لهذا الاسبوع" />
+								<ViewItem number="329" text="بالأمس" />
+								<ViewItem number="104" text="اليوم" />
+                            </div>
+                            <div className="databox-row row-6 no-padding">
+                                <div className="databox-sparkline">
+                                    <span data-sparkline="line" data-height="126px" data-width="100%" data-fillcolor="#37c2e2" data-linecolor="#37c2e2"
+                                          data-spotcolor="#fafafa" data-minspotcolor="#fafafa" data-maxspotcolor="#ffce55"
+                                          data-highlightspotcolor="#f5f5f5 " data-highlightlinecolor="#f5f5f5"
+                                          data-linewidth="2" data-spotradius="0">
+                                        5,7,6,5,9,4,3,7,2
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="databox-bottom bg-sky no-padding">
+							<WeekDay text="السبت" />
+							<WeekDay text="الجمعة" />
+							<WeekDay text="الخميس" />
+							<WeekDay text="الأربعاء" />
+							<WeekDay text="الثلاثاء" />
+							<WeekDay text="الإثنين" />
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var StatItem = React.createClass({
+		render: function() {
+			return (
+				<div className="databox-row row-2 bordered-bottom bordered-ivory padding-10">
+                    <span className="badge badge-palegreen badge-empty pull-left margin-5"></span>
+                    <span className="databox-text darkgray pull-left no-margin hidden-xs">{this.props.text}</span>
+                    <span className="databox-text darkgray pull-right no-margin uppercase">{this.props.percent}</span>
+                </div>
+			);
+		}
+	});
+	
+	var Stats = React.createClass({
+		render: function() {
+			return (
+				<div className="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                    <div className="databox databox-xxlg databox-vertical databox-shadowed bg-white radius-bordered padding-5">
+                        <div className="databox-top">
+                            <div className="databox-row row-12">
+                                <div className="databox-cell cell-3 text-center">
+                                    <div className="databox-number number-xxlg sonic-silver">164</div>
+                                    <div className="databox-text storm-cloud">على الانترنت</div>
+                                </div>
+                                <div className="databox-cell cell-9 text-align-center">
+                                    <div className="databox-row row-6 text-left">
+                                        <span className="badge badge-palegreen badge-empty margin-left-5"></span>
+                                        <span className="databox-inlinetext uppercase darkgray margin-left-5">جديد</span>
+                                        <span className="badge badge-yellow badge-empty margin-left-5"></span>
+                                        <span className="databox-inlinetext uppercase darkgray margin-left-5">عودة</span>
+                                    </div>
+                                    <div className="databox-row row-6">
+                                        <div className="progress bg-yellow progress-no-radius">
+                                            <div className="progress-bar progress-bar-palegreen" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style={{width: '78%'}}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="databox-bottom">
+                            <div className="databox-row row-12">
+                                <div className="databox-cell cell-7 text-center  padding-5">
+                                    <div id="dashboard-pie-chart-sources" className="chart"></div>
+                                </div>
+                                <div className="databox-cell cell-5 text-center no-padding-left padding-bottom-30">
+                                    <div className="databox-row row-2 bordered-bottom bordered-ivory padding-10">
+                                        <span className="databox-text sonic-silver pull-left no-margin">نوع</span>
+                                        <span className="databox-text sonic-silver pull-right no-margin uppercase">في المئة</span>
+                                    </div>
+                                    <StatItem text="تنغذی" percent="46%" />
+									<StatItem text="لینک" percent="21%" />
+									<StatItem text="مباشر" percent="12%" />
+									<StatItem text="ایمیل" percent="11%" />
+									<StatItem text="عضوي" percent="10%" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			);
+		}
+	});
+	
+	var FourthRow = React.createClass({
+		render: function() {
+			return (
+				<div className="row">
+					<Stats />
+					<PageViews />
+				</div>
+			);
+		}
+	});
+	
+	var PageContent = React.createClass({
+		fullScreenClick: function(e) {
+			var element = document.documentElement;
+			if (!$('body').hasClass("full-screen")) {
+				$('body').addClass("full-screen");
+				$('#fullscreen-toggler').addClass("active");
+					if (element.requestFullscreen) {
+						element.requestFullscreen();
+					} else if (element.mozRequestFullScreen) {
+						element.mozRequestFullScreen();
+					} else if (element.webkitRequestFullscreen) {
+						element.webkitRequestFullscreen();
+					} else if (element.msRequestFullscreen) {
+						element.msRequestFullscreen();
+					}
+			} else {
+				$('body').removeClass("full-screen");
+				$('#fullscreen-toggler').removeClass("active");
+				if (document.exitFullscreen) {
+					document.exitFullscreen();
+				} else if (document.mozCancelFullScreen) {
+					document.mozCancelFullScreen();
+				} else if (document.webkitExitFullscreen) {
+					document.webkitExitFullscreen();
+				}
+			}
+		},
+		sideBarClick: function(e) {
+			$("#sidebar").toggleClass("hide");
+			$(".sidebar-toggler").toggleClass("active");
+			return false;
+		},
+		render: function() {
+			return (
+				<div className="page-content">
+
+					<div className="page-breadcrumbs">
+						<ul className="breadcrumb">
+							<li>
+								<i className="fa fa-home"></i>
+								<a href="#">منزل</a>
+							</li>
+							<li className="active">لوحة القيادة</li>
+						</ul>
+					</div>
+
+					<div className="page-header position-relative">
+						<div className="header-title">
+							<h1>
+								لوحة القيادة
+							</h1>
+						</div>
+
+						<div className="header-buttons">
+							<a className="sidebar-toggler" href="#" onClick={this.sideBarClick}>
+								<i className="fa fa-arrows-h"></i>
+							</a>
+							<a className="refresh" id="refresh-toggler" href="">
+								<i className="glyphicon glyphicon-refresh"></i>
+							</a>
+							<a className="fullscreen" id="fullscreen-toggler" href="#" onClick={this.fullScreenClick}>
+								<i className="glyphicon glyphicon-fullscreen"></i>
+							</a>
+						</div>
+
+					</div>
+
+					<div className="page-body">
+						<FirstRow />
+						<SecondRow />
+						<ThirdRow />
+						<FourthRow />
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	var WholePage = React.createClass({
+		render: function() {
+			return (
+				<div>
+					<div className="loading-container">
+						<div className="loader"></div>
+					</div>
+					<Navbar />
+					<div className="main-container container-fluid">
+						<div className="page-container">
+							<PageSidebar />
+							<ChatBar />
+							<PageContent />
+						</div>
+					</div>
+				</div>
+			);
+		}
+	});
+	
+	
+	ReactDOM.render(
+		<WholePage />,
+		document.getElementById('content')
+		);
+	</script>
+	
+    <!--Basic Scripts-->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!--Beyond Scripts-->
+    <script src="assets/js/skins.min.js"></script>
+    <script src="assets/js/beyond.min.js"></script>
+
+
+    <!--Page Related Scripts-->
+    <!--Sparkline Charts Needed Scripts-->
+    <script src="assets/js/charts/sparkline/jquery.sparkline.js"></script>
+    <script src="assets/js/charts/sparkline/sparkline-init.js"></script>
+
+    <!--Easy Pie Charts Needed Scripts-->
+    <script src="assets/js/charts/easypiechart/jquery.easypiechart.js"></script>
+    <script src="assets/js/charts/easypiechart/easypiechart-init.js"></script>
+
+    <!--Flot Charts Needed Scripts-->
+    <script src="assets/js/charts/flot/jquery.flot.js"></script>
+    <script src="assets/js/charts/flot/jquery.flot.resize.js"></script>
+    <script src="assets/js/charts/flot/jquery.flot.pie.js"></script>
+    <script src="assets/js/charts/flot/jquery.flot.tooltip.js"></script>
+    <script src="assets/js/charts/flot/jquery.flot.orderBars.js"></script>
+
+    <script>
+        // If you want to draw your charts with Theme colors you must run initiating charts after that current skin is loaded
+        $(window).bind("load", function () {
+
+            /*Sets Themed Colors Based on Themes*/
+            themeprimary = getThemeColorFromCss('themeprimary');
+            themesecondary = getThemeColorFromCss('themesecondary');
+            themethirdcolor = getThemeColorFromCss('themethirdcolor');
+            themefourthcolor = getThemeColorFromCss('themefourthcolor');
+            themefifthcolor = getThemeColorFromCss('themefifthcolor');
+
+            //Sets The Hidden Chart Width
+            $('#dashboard-bandwidth-chart')
+                .data('width', $('.box-tabbs')
+                    .width() - 20);
+
+            //-------------------------Visitor Sources Pie Chart----------------------------------------//
+            var data = [
+                {
+                    data: [[1, 21]],
+                    color: '#fb6e52'
+                },
+                {
+                    data: [[1, 12]],
+                    color: '#e75b8d'
+                },
+                {
+                    data: [[1, 11]],
+                    color: '#a0d468'
+                },
+                {
+                    data: [[1, 10]],
+                    color: '#ffce55'
+                },
+                {
+                    data: [[1, 46]],
+                    color: '#5db2ff'
+                }
+            ];
+            var placeholder = $("#dashboard-pie-chart-sources");
+            placeholder.unbind();
+
+            $.plot(placeholder, data, {
+                series: {
+                    pie: {
+                        innerRadius: 0.45,
+                        show: true,
+                        stroke: {
+                            width: 4
+                        }
+                    }
+                }
+            });
+
+            //------------------------------Visit Chart------------------------------------------------//
+            var data2 = [{
+                color: themesecondary,
+                label: "Direct Visits",
+                data: [[3, 2], [4, 5], [5, 4], [6, 11], [7, 12], [8, 11], [9, 8], [10, 14], [11, 12], [12, 16], [13, 9],
+                [14, 10], [15, 14], [16, 15], [17, 9]],
+
+                lines: {
+                    show: true,
+                    fill: true,
+                    lineWidth: .1,
+                    fillColor: {
+                        colors: [{
+                            opacity: 0
+                        }, {
+                            opacity: 0.4
+                        }]
+                    }
+                },
+                points: {
+                    show: false
+                },
+                shadowSize: 0
+            },
+                {
+                    color: themeprimary,
+                    label: "Referral Visits",
+                    data: [[3, 10], [4, 13], [5, 12], [6, 16], [7, 19], [8, 19], [9, 24], [10, 19], [11, 18], [12, 21], [13, 17],
+                    [14, 14], [15, 12], [16, 14], [17, 15]],
+                    bars: {
+                        order: 1,
+                        show: true,
+                        borderWidth: 0,
+                        barWidth: 0.4,
+                        lineWidth: .5,
+                        fillColor: {
+                            colors: [{
+                                opacity: 0.4
+                            }, {
+                                opacity: 1
+                            }]
+                        }
+                    }
+                },
+                {
+                    color: themethirdcolor,
+                    label: "Search Engines",
+                    data: [[3, 14], [4, 11], [5, 10], [6, 9], [7, 5], [8, 8], [9, 5], [10, 6], [11, 4], [12, 7], [13, 4],
+                    [14, 3], [15, 4], [16, 6], [17, 4]],
+                    lines: {
+                        show: true,
+                        fill: false,
+                        fillColor: {
+                            colors: [{
+                                opacity: 0.3
+                            }, {
+                                opacity: 0
+                            }]
+                        }
+                    },
+                    points: {
+                        show: true
+                    }
+                }
+            ];
+            var options = {
+                legend: {
+                    show: false
+                },
+                xaxis: {
+                    tickDecimals: 0,
+                    color: '#f3f3f3'
+                },
+                yaxis: {
+                    min: 0,
+                    color: '#f3f3f3',
+                    tickFormatter: function (val, axis) {
+                        return "";
+                    },
+                },
+                grid: {
+                    hoverable: true,
+                    clickable: false,
+                    borderWidth: 0,
+                    aboveData: false,
+                    color: '#fbfbfb'
+
+                },
+                tooltip: true,
+                tooltipOpts: {
+                    defaultTheme: false,
+                    content: " <b>%x May</b> , <b>%s</b> : <span>%y</span>",
+                }
+            };
+            var placeholder = $("#dashboard-chart-visits");
+            var plot = $.plot(placeholder, data2, options);
+
+            //------------------------------Real-Time Chart-------------------------------------------//
+            var realTimedata = [],
+                realTimedata2 = [],
+                totalPoints = 300;
+
+            var getSeriesObj = function () {
+                return [
+                {
+                    data: getRandomData(),
+                    lines: {
+                        show: true,
+                        lineWidth: 1,
+                        fill: true,
+                        fillColor: {
+                            colors: [
+                                {
+                                    opacity: 0
+                                }, {
+                                    opacity: 1
+                                }
+                            ]
+                        },
+                        steps: false
+                    },
+                    shadowSize: 0
+                }, {
+                    data: getRandomData2(),
+                    lines: {
+                        lineWidth: 0,
+                        fill: true,
+                        fillColor: {
+                            colors: [
+                                {
+                                    opacity: .5
+                                }, {
+                                    opacity: 1
+                                }
+                            ]
+                        },
+                        steps: false
+                    },
+                    shadowSize: 0
+                }
+                ];
+            };
+            function getRandomData() {
+                if (realTimedata.length > 0)
+                    realTimedata = realTimedata.slice(1);
+
+                // Do a random walk
+
+                while (realTimedata.length < totalPoints) {
+
+                    var prev = realTimedata.length > 0 ? realTimedata[realTimedata.length - 1] : 50,
+                        y = prev + Math.random() * 10 - 5;
+
+                    if (y < 0) {
+                        y = 0;
+                    } else if (y > 100) {
+                        y = 100;
+                    }
+                    realTimedata.push(y);
+                }
+
+                // Zip the generated y values with the x values
+
+                var res = [];
+                for (var i = 0; i < realTimedata.length; ++i) {
+                    res.push([i, realTimedata[i]]);
+                }
+
+                return res;
+            }
+            function getRandomData2() {
+                if (realTimedata2.length > 0)
+                    realTimedata2 = realTimedata2.slice(1);
+
+                // Do a random walk
+
+                while (realTimedata2.length < totalPoints) {
+
+                    var prev = realTimedata2.length > 0 ? realTimedata[realTimedata2.length] : 50,
+                        y = prev - 25;
+
+                    if (y < 0) {
+                        y = 0;
+                    } else if (y > 100) {
+                        y = 100;
+                    }
+                    realTimedata2.push(y);
+                }
+
+
+                var res = [];
+                for (var i = 0; i < realTimedata2.length; ++i) {
+                    res.push([i, realTimedata2[i]]);
+                }
+
+                return res;
+            }
+            // Set up the control widget
+            var updateInterval = 500;
+            var plot = $.plot("#dashboard-chart-realtime", getSeriesObj(), {
+                yaxis: {
+                    color: '#f3f3f3',
+                    min: 0,
+                    max: 100,
+                    tickFormatter: function (val, axis) {
+                        return "";
+                    }
+                },
+                xaxis: {
+                    color: '#f3f3f3',
+                    min: 0,
+                    max: 100,
+                    tickFormatter: function (val, axis) {
+                        return "";
+                    }
+                },
+                grid: {
+                    hoverable: true,
+                    clickable: false,
+                    borderWidth: 0,
+                    aboveData: false
+                },
+                colors: ['#eee', themeprimary],
+            });
+
+            function update() {
+
+                plot.setData(getSeriesObj());
+
+                plot.draw();
+                setTimeout(update, updateInterval);
+            }
+            update();
+
+
+            //-------------------------Initiates Easy Pie Chart instances in page--------------------//
+            InitiateEasyPieChart.init();
+
+            //-------------------------Initiates Sparkline Chart instances in page------------------//
+            InitiateSparklineCharts.init();
+        });
+
+    </script>
+	
+</body>
+<!--  /Body -->
+</html>

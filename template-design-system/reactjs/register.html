@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<!--
+BeyondAdmin - Responsive Admin Dashboard Template build with Twitter Bootstrap 3.3.7
+Version: 1.6.1
+Purchase: http://wrapbootstrap.com
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--Head-->
+<head>
+    <meta charset="utf-8" />
+    <title>Register Page</title>
+
+    <meta name="description" content="register page" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+    <!--Basic Styles-->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link id="bootstrap-rtl-link" href="" rel="stylesheet" />
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet" />
+
+    <!--Fonts-->
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300" rel="stylesheet" type="text/css">
+
+    <!--Beyond styles-->
+    <link id="beyond-link" href="assets/css/beyond.min.css" rel="stylesheet" />
+    <link href="assets/css/demo.min.css" rel="stylesheet" />
+    <link href="assets/css/animate.min.css" rel="stylesheet" />
+    <link id="skin-link" href="" rel="stylesheet" type="text/css" />
+
+    <!--Skin Script: Place this script in head to load scripts for skins and rtl support-->
+    <script src="assets/js/skins.min.js"></script>
+	
+	<script src="assets/js/react/react.js"></script>
+    <script src="assets/js/react/react-dom.js"></script>
+    <script src="assets/js/react/browser.min.js"></script>
+</head>
+<!--Head Ends-->
+<!--Body-->
+<body>
+
+	<div id="content">
+	</div>
+	
+	<script type="text/babel">
+	var WholePage = React.createClass({
+			render: function() {
+				return (
+					<div>
+						<div className="register-container animated fadeInDown">
+							<div className="registerbox bg-white">
+								<div className="registerbox-title">Register</div>
+								<div className="registerbox-caption ">Please fill in your information</div>
+								<div className="registerbox-textbox">
+									<input type="text" className="form-control" placeholder="Username" />
+								</div>
+								<div className="registerbox-textbox">
+									<input type="password" className="form-control" placeholder="Enter Password" />
+								</div>
+								<div className="registerbox-textbox">
+									<input type="password" className="form-control" placeholder="Confirm Password" />
+								</div>
+								<hr className="wide" />
+								<div className="registerbox-textbox">
+									<input type="text" className="form-control" placeholder="Name" />
+								</div>
+								<div className="registerbox-textbox">
+									<input type="text" className="form-control" placeholder="Family" />
+								</div>
+								<div className="registerbox-textbox">
+									<div className="row">
+										<div className="col-lg-6 col-sm-6 col-xs-6 padding-right-10">
+											<input type="text" className="form-control" placeholder="Month" />
+										</div>
+										<div className="col-lg-3 col-sm-3 col-xs-3 no-padding padding-right-10">
+											<input type="text" className="form-control" placeholder="Day" />
+										</div>
+										<div className="col-lg-3 col-sm-3 col-xs-3 no-padding-left">
+											<input type="text" className="form-control" placeholder="Year" />
+										</div>
+									</div>
+								</div>
+								<div className="registerbox-textbox no-padding-bottom">
+									<div className="checkbox">
+										<label>
+											<input type="checkbox" className="colored-primary" checked="checked"/>
+											<span className="text darkgray">I agree to the Company <a className="themeprimary">Terms of Service</a> and Privacy Policy</span>
+										</label>
+									</div>
+								</div>
+								<div className="registerbox-submit">
+									<input type="button" className="btn btn-primary pull-right" value="SUBMIT"/>
+								</div>
+							</div>
+							<div className="logobox">
+							</div>
+						</div>
+					</div>
+				);
+			}
+		});
+		ReactDOM.render(<WholePage />,document.getElementById('content'));
+	</script>
+	
+    <!--Basic Scripts-->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!--Beyond Scripts-->
+    <script src="assets/js/beyond.min.js"></script>
+    
+</body>
+<!--Body Ends-->
+</html>
