@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit3, Trash2, DollarSign, Grid, List } from 'lucide-react';
+import { Edit3, Trash2, DollarSign, Grid, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tarefa, StatusColor } from '../types';
 import { TaskDetailModal } from './TaskDetailModal';
 
@@ -30,6 +30,36 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
   const [mobileView, setMobileView] = React.useState<MobileView>('cards');
   const [selectedTask, setSelectedTask] = React.useState<Tarefa | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  // Detectar se é mobile
+  React.useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  // Reset página quando mudar o número de tarefas ou view
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [tarefas.length, mobileView]);
+
+  // Configuração de paginação
+  const itemsPerPage = isMobile ? 5 : 10;
+  const totalPages = Math.ceil(tarefas.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentTarefas = tarefas.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -64,7 +94,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
 
   const CardView = () => (
     <div className="grid gap-4 sm:grid-cols-2">
-      {tarefas.map((tarefa) => (
+      {currentTarefas.map((tarefa) => (
         <div key={tarefa.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => handleTaskClick(tarefa)}>
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
@@ -83,7 +113,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
             </div>
             <div>
               <span className="text-gray-500">Valor:</span>
-              <p className="font-medium text-green-600 text-black">{formatCurrency(tarefa.valor)}</p>
+              <p className="font-medium text-green-600">{formatCurrency(tarefa.valor)}</p>
             </div>
           </div>
 
@@ -102,7 +132,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
 
   const ListView = () => (
     <div className="space-y-3">
-      {tarefas.map((tarefa) => (
+      {currentTarefas.map((tarefa) => (
         <div key={tarefa.id} className="bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => handleTaskClick(tarefa)}>
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
@@ -148,7 +178,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {tarefas.map((tarefa) => (
+          {currentTarefas.map((tarefa) => (
             <tr key={tarefa.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleTaskClick(tarefa)}>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.local}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.atividade}</td>
@@ -178,6 +208,68 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
       </table>
     </div>
   );
+
+  const PaginationControls = () => {
+    if (totalPages <= 1) return null;
+
+    const getVisiblePages = () => {
+      const maxVisible = isMobile ? 3 : 5;
+      const pages = [];
+
+      if (totalPages <= maxVisible) {
+        for (let i = 1; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        const start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+        const end = Math.min(totalPages, start + maxVisible - 1);
+
+        for (let i = start; i <= end; i++) {
+          pages.push(i);
+        }
+      }
+
+      return pages;
+    };
+
+    const visiblePages = getVisiblePages();
+
+    return (
+      <div className="flex items-center justify-between mt-6 px-2">
+        <div className="text-sm text-gray-600">
+          Mostrando {startIndex + 1}-{Math.min(endIndex, tarefas.length)} de {tarefas.length} tarefas
+        </div>
+
+        <div className="flex items-center space-x-1">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4 text-gray-600" />
+          </button>
+
+          {visiblePages.map((page) => (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${currentPage === page ? 'bg-blue-600 text-white' : 'border border-gray-300 hover:bg-gray-50 text-gray-700'}`}
+            >
+              {page}
+            </button>
+          ))}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronRight className="w-4 h-4 text-gray-600" />
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -224,6 +316,9 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
         {mobileView === 'list' && <ListView />}
         {mobileView === 'table' && <DesktopTable />}
       </div>
+
+      {/* Pagination Controls */}
+      <PaginationControls />
 
       <TaskDetailModal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal} tarefa={selectedTask} />
     </div>
