@@ -1,9 +1,11 @@
 import React from 'react';
 import { Calendar, Building, Plus } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { Obra } from '../types';
 import { TaskTable } from './TaskTable';
 import { AddTaskModal } from './AddTaskModal';
 import { ObraFilters } from './ObraFilters';
+import { BatchPaymentModal } from './BatchPaymentModal';
 
 interface ObraCardProps {
   obra: Obra;
@@ -15,6 +17,7 @@ interface ObraCardProps {
 
 export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAddTask, onUpdateTask }) => {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+  const [isBatchPaymentModalOpen, setIsBatchPaymentModalOpen] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState(obra.tarefas);
   const [editTaskId, setEditTaskId] = React.useState<string | null>(null);
 
@@ -38,6 +41,11 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
     }).format(value);
   };
 
+  const handleBatchPayment = () => {
+    console.log('Processando pagamento em lote para', filteredTarefas.length, 'tarefas');
+    // Aqui você implementaria a lógica de pagamento em lote
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hover:shadow-xl transition-shadow duration-300">
       {/* Header */}
@@ -51,12 +59,18 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
             </div>
           </div>
           <div className="flex items-center space-x-4 text-sm">
-            <div className="flex items-center space-x-1">
-              <Calendar className="w-4 h-4" />
-              <span>{formatDate(obra.dataInicio)}</span>
-            </div>
-            <div className="bg-white/20 px-3 py-1 rounded-full">
-              <span className="font-medium">{obra.tarefas.length} tarefas</span>
+            <div className="flex items-center space-x-2">
+              <div className="bg-white/20 px-3 py-1 rounded-full">
+                <span className="font-medium">{obra.tarefas.length} tarefas</span>
+              </div>
+              <button
+                onClick={() => setIsBatchPaymentModalOpen(true)}
+                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors font-medium text-sm"
+                title="Pagamento em Lote"
+              >
+                <DollarSign className="w-4 h-4" />
+                <span>Em Lote</span>
+              </button>
             </div>
           </div>
         </div>
@@ -122,6 +136,8 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
         initialTask={editTaskId ? obra.tarefas.find((t) => t.id === editTaskId) ?? null : null}
         onUpdateTask={(tarefaId, task) => onUpdateTask(obra.id, tarefaId, task)}
       />
+
+      <BatchPaymentModal isOpen={isBatchPaymentModalOpen} onClose={() => setIsBatchPaymentModalOpen(false)} onConfirm={handleBatchPayment} tarefas={filteredTarefas} />
     </div>
   );
 };
