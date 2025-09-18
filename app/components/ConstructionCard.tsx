@@ -7,15 +7,16 @@ import { ObraFilters } from './ObraFilters';
 
 interface ObraCardProps {
   obra: Obra;
-  onEdit: (tarefaId: string) => void;
   onDelete: (tarefaId: string) => void;
   onPay: (tarefaId: string) => void;
   onAddTask: (obraId: string, task: any) => void;
+  onUpdateTask: (obraId: string, tarefaId: string, task: any) => void;
 }
 
-export const ObraCard: React.FC<ObraCardProps> = ({ obra, onEdit, onDelete, onPay, onAddTask }) => {
+export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAddTask, onUpdateTask }) => {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState(obra.tarefas);
+  const [editTaskId, setEditTaskId] = React.useState<string | null>(null);
 
   // Update filtered tasks when obra.tarefas changes
   React.useEffect(() => {
@@ -98,10 +99,29 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onEdit, onDelete, onPa
             <span className="sm:hidden">Nova</span>
           </button>
         </div>
-        <TaskTable tarefas={filteredTarefas} onEdit={onEdit} onDelete={onDelete} onPay={onPay} />
+        <TaskTable
+          tarefas={filteredTarefas}
+          onEdit={(id) => {
+            setEditTaskId(id);
+            setIsAddModalOpen(true);
+          }}
+          onDelete={onDelete}
+          onPay={onPay}
+        />
       </div>
 
-      <AddTaskModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onAddTask={(task) => onAddTask(obra.id, task)} obraId={obra.id} />
+      <AddTaskModal
+        isOpen={isAddModalOpen}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setEditTaskId(null);
+        }}
+        onAddTask={(task) => onAddTask(obra.id, task)}
+        obraId={obra.id}
+        mode={editTaskId ? 'edit' : 'add'}
+        initialTask={editTaskId ? obra.tarefas.find((t) => t.id === editTaskId) ?? null : null}
+        onUpdateTask={(tarefaId, task) => onUpdateTask(obra.id, tarefaId, task)}
+      />
     </div>
   );
 };

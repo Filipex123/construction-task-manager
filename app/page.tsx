@@ -20,9 +20,16 @@ function Home() {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const handleEdit = (tarefaId: string) => {
-    // Abertura do modal é controlada pelo ObraCard ao clicar em Editar
-    console.log('Editando tarefa:', tarefaId);
+  const handleEdit = (obraId: string, tarefaId: string, updated: Omit<Tarefa, 'id'>) => {
+    setObras((prevObras) =>
+      prevObras.map((obra) => {
+        if (obra.id !== obraId) return obra;
+        return {
+          ...obra,
+          tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, ...updated } : t)),
+        };
+      })
+    );
   };
 
   const handleDelete = (tarefaId: string) => {
@@ -55,18 +62,6 @@ function Home() {
     );
   };
 
-  const handleUpdateTask = (obraId: string, tarefaId: string, updated: Omit<Tarefa, 'id'>) => {
-    setObras((prevObras) =>
-      prevObras.map((obra) => {
-        if (obra.id !== obraId) return obra;
-        return {
-          ...obra,
-          tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, ...updated } : t)),
-        };
-      })
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex h-screen">
@@ -92,7 +87,7 @@ function Home() {
               ) : (
                 <div className="space-y-6">
                   {filteredObras.map((obra) => (
-                    <ObraCard key={obra.id} obra={obra} onEdit={handleEdit} onDelete={handleDelete} onPay={handlePay} onAddTask={handleAddTask} onUpdateTask={handleUpdateTask} />
+                    <ObraCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onDelete={handleDelete} onPay={handlePay} onAddTask={handleAddTask} />
                   ))}
                 </div>
               )}
