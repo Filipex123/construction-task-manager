@@ -1,8 +1,9 @@
 import React from 'react';
-import { Calendar, MapPin, Building, Plus } from 'lucide-react';
+import { Calendar, Building, Plus } from 'lucide-react';
 import { Obra } from '../types';
 import { TaskTable } from './TaskTable';
 import { AddTaskModal } from './AddTaskModal';
+import { ObraFilters } from './ObraFilters';
 
 interface ObraCardProps {
   obra: Obra;
@@ -10,19 +11,23 @@ interface ObraCardProps {
   onDelete: (tarefaId: string) => void;
   onPay: (tarefaId: string) => void;
   onAddTask: (obraId: string, task: any) => void;
-  onUpdateTask: (obraId: string, tarefaId: string, task: any) => void;
 }
 
-export const ObraCard: React.FC<ObraCardProps> = ({ obra, onEdit, onDelete, onPay, onAddTask, onUpdateTask }) => {
+export const ObraCard: React.FC<ObraCardProps> = ({ obra, onEdit, onDelete, onPay, onAddTask }) => {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
-  const [editTaskId, setEditTaskId] = React.useState<string | null>(null);
+  const [filteredTarefas, setFilteredTarefas] = React.useState(obra.tarefas);
+
+  // Update filtered tasks when obra.tarefas changes
+  React.useEffect(() => {
+    setFilteredTarefas(obra.tarefas);
+  }, [obra.tarefas]);
 
   const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat('pt-BR').format(new Date(dateString));
   };
 
   const getTotalValue = () => {
-    return obra.tarefas.reduce((total, tarefa) => total + tarefa.valor, 0);
+    return filteredTarefas.reduce((total, tarefa) => total + tarefa.valor, 0);
   };
 
   const formatCurrency = (value: number) => {
@@ -66,19 +71,22 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onEdit, onDelete, onPa
           <div className="flex space-x-4 text-sm text-black">
             <span className="flex items-center space-x-1">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span>{obra.tarefas.filter((t) => t.status === 'concluida').length} concluídas</span>
+              <span>{filteredTarefas.filter((t) => t.status === 'concluida').length} concluídas</span>
             </span>
             <span className="flex items-center space-x-1">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span>{obra.tarefas.filter((t) => t.status === 'em_andamento').length} em andamento</span>
+              <span>{filteredTarefas.filter((t) => t.status === 'em_andamento').length} em andamento</span>
             </span>
             <span className="flex items-center space-x-1">
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span>{obra.tarefas.filter((t) => t.status === 'pendente').length} pendentes</span>
+              <span>{filteredTarefas.filter((t) => t.status === 'pendente').length} pendentes</span>
             </span>
           </div>
         </div>
       </div>
+
+      {/* Filters */}
+      <ObraFilters tarefas={obra.tarefas} onFilterChange={setFilteredTarefas} />
 
       {/* Tasks Table */}
       <div className="p-6">
@@ -90,29 +98,10 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onEdit, onDelete, onPa
             <span className="sm:hidden">Nova</span>
           </button>
         </div>
-        <TaskTable
-          tarefas={obra.tarefas}
-          onEdit={(id) => {
-            setEditTaskId(id);
-            setIsAddModalOpen(true);
-          }}
-          onDelete={onDelete}
-          onPay={onPay}
-        />
+        <TaskTable tarefas={filteredTarefas} onEdit={onEdit} onDelete={onDelete} onPay={onPay} />
       </div>
 
-      <AddTaskModal
-        isOpen={isAddModalOpen}
-        onClose={() => {
-          setIsAddModalOpen(false);
-          setEditTaskId(null);
-        }}
-        onAddTask={(task) => onAddTask(obra.id, task)}
-        obraId={obra.id}
-        mode={editTaskId ? 'edit' : 'add'}
-        initialTask={editTaskId ? obra.tarefas.find((t) => t.id === editTaskId) ?? null : null}
-        onUpdateTask={(tarefaId, task) => onUpdateTask(obra.id, tarefaId, task)}
-      />
+      <AddTaskModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onAddTask={(task) => onAddTask(obra.id, task)} obraId={obra.id} />
     </div>
   );
 };

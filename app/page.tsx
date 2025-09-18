@@ -3,9 +3,9 @@ import React, { useState, useMemo } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { SearchBar } from './components/SearchBar';
-import { ObraCard } from './components/ConstructionCard';
 import { mockObras as initialMockObras } from './mockData';
 import { Obra, Tarefa } from './types';
+import { ObraCard } from './components/ConstructionCard';
 
 function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

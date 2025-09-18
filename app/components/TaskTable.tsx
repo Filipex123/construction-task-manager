@@ -1,6 +1,7 @@
 import React from 'react';
 import { Edit3, Trash2, DollarSign, Grid, List } from 'lucide-react';
 import { Tarefa, StatusColor } from '../types';
+import { TaskDetailModal } from './TaskDetailModal';
 
 interface TaskTableProps {
   tarefas: Tarefa[];
@@ -27,12 +28,24 @@ const statusLabels = {
 
 export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete, onPay }) => {
   const [mobileView, setMobileView] = React.useState<MobileView>('cards');
+  const [selectedTask, setSelectedTask] = React.useState<Tarefa | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(value);
+  };
+
+  const handleTaskClick = (tarefa: Tarefa) => {
+    setSelectedTask(tarefa);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedTask(null);
   };
 
   const ActionButtons = ({ tarefa }: { tarefa: Tarefa }) => (
@@ -52,7 +65,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
   const CardView = () => (
     <div className="grid gap-4 sm:grid-cols-2">
       {tarefas.map((tarefa) => (
-        <div key={tarefa.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <div key={tarefa.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => handleTaskClick(tarefa)}>
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
               <h5 className="font-medium text-gray-900 text-sm mb-1">{tarefa.local}</h5>
@@ -79,7 +92,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
             <p className="font-medium text-sm text-black">{tarefa.empreiteira}</p>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
             <ActionButtons tarefa={tarefa} />
           </div>
         </div>
@@ -90,7 +103,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
   const ListView = () => (
     <div className="space-y-3">
       {tarefas.map((tarefa) => (
-        <div key={tarefa.id} className="bg-white border border-gray-200 rounded-lg p-4">
+        <div key={tarefa.id} className="bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => handleTaskClick(tarefa)}>
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-1">
@@ -101,7 +114,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
             </div>
           </div>
 
-          <div className="flex justify-between items-center text-sm">
+          <div className="flex justify-between items-center text-sm" onClick={(e) => e.stopPropagation()}>
             <div className="flex space-x-4">
               <span className="text-gray-500">
                 {tarefa.quantidade} {tarefa.unidade}
@@ -136,7 +149,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {tarefas.map((tarefa) => (
-            <tr key={tarefa.id} className="hover:bg-gray-50 transition-colors">
+            <tr key={tarefa.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleTaskClick(tarefa)}>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.local}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.atividade}</td>
               <td className="px-4 py-4 text-sm text-gray-500">{tarefa.unidade}</td>
@@ -146,7 +159,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
               <td className="px-4 py-4 text-sm">
                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.status]}`}>{statusLabels[tarefa.status]}</span>
               </td>
-              <td className="px-4 py-4 text-sm">
+              <td className="px-4 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                 <div className="flex space-x-2">
                   <button onClick={() => onEdit(tarefa.id)} className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded transition-colors" title="Editar">
                     <Edit3 className="w-4 h-4" />
@@ -211,6 +224,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
         {mobileView === 'list' && <ListView />}
         {mobileView === 'table' && <DesktopTable />}
       </div>
+
+      <TaskDetailModal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal} tarefa={selectedTask} />
     </div>
   );
 };

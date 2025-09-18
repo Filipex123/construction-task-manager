@@ -7,6 +7,16 @@ export interface Tarefa {
   valor: number;
   empreiteira: string;
   status: 'pendente' | 'em_andamento' | 'concluida' | 'atrasada';
+  // Campos adicionais para detalhes
+  statusPagamento?: string;
+  statusMedidor?: string;
+  quantidadeRealizada?: number;
+  dataMedicao?: string;
+  dataPagamentoPrevista?: string;
+  dataPagamentoRealizada?: string;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+  usuarioUltimaAtualizacao?: string;
 }
 
 export interface Obra {
