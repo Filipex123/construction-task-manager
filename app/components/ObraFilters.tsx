@@ -57,7 +57,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     let filtered = tarefas;
 
     if (status.length > 0) {
-      filtered = filtered.filter((t) => status.includes(t.status));
+      filtered = filtered.filter((t) => status.includes(t.statusPagamento));
     }
 
     if (locais.length > 0) {
@@ -193,9 +193,9 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
               {uniqueStatus.map((status) => (
                 <button
                   key={status}
-                  onClick={() => handleStatusToggle(status)}
+                  onClick={() => handleStatusToggle(status ?? 'pendente')}
                   className={`px-3 py-2 rounded-full text-xs font-medium border-2 transition-all ${
-                    selectedStatus.includes(status) ? statusColors[status as keyof typeof statusColors] : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                    selectedStatus.includes(status ?? 'pendente') ? statusColors[status as keyof typeof statusColors] : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   {statusLabels[status as keyof typeof statusLabels]}

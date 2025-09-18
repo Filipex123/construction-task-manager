@@ -20,7 +20,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     quantidade: '',
     valor: '',
     empreiteira: '',
-    status: 'pendente' as Tarefa['status'],
+    statusPagamento: 'pendente' as Tarefa['statusPagamento'],
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -70,7 +70,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       quantidade: parseFloat(formData.quantidade),
       valor: parseFloat(formData.valor),
       empreiteira: formData.empreiteira.trim(),
-      status: formData.status,
+      statusPagamento: formData.statusPagamento,
     };
 
     if (mode === 'edit' && initialTask && onUpdateTask) {
@@ -89,7 +89,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       quantidade: '',
       valor: '',
       empreiteira: '',
-      status: 'pendente',
+      statusPagamento: 'pendente',
     });
     setErrors({});
     onClose();
@@ -105,7 +105,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
         quantidade: String(initialTask.quantidade ?? ''),
         valor: String(initialTask.valor ?? ''),
         empreiteira: initialTask.empreiteira,
-        status: initialTask.status,
+        statusPagamento: initialTask.statusPagamento,
       });
       setErrors({});
     }
@@ -117,7 +117,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
         quantidade: '',
         valor: '',
         empreiteira: '',
-        status: 'pendente',
+        statusPagamento: 'pendente',
       });
       setErrors({});
     }
@@ -133,7 +133,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       quantidade: parseFloat(formData.quantidade || '0'),
       valor: parseFloat(formData.valor || '0'),
       empreiteira: formData.empreiteira.trim(),
-      status: formData.status,
+      statusPagamento: formData.statusPagamento,
     };
     return (
       normalized.local !== initialTask.local ||
@@ -142,7 +142,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       normalized.quantidade !== initialTask.quantidade ||
       normalized.valor !== initialTask.valor ||
       normalized.empreiteira !== initialTask.empreiteira ||
-      normalized.status !== initialTask.status
+      normalized.statusPagamento !== initialTask.statusPagamento
     );
   }, [mode, initialTask, formData]);
 
@@ -287,7 +287,9 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                   key={option.value}
                   type="button"
                   onClick={() => handleInputChange('status', option.value)}
-                  className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${formData.status === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                  className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                    formData.statusPagamento === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                  }`}
                 >
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${option.color}`}>{option.label}</span>
                 </button>

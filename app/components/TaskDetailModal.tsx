@@ -25,11 +25,11 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
   const statusConfig = {
     pendente: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: Clock },
     em_andamento: { label: 'Em Andamento', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: AlertCircle },
-    concluida: { label: 'Concluída', color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle },
-    atrasada: { label: 'Atrasada', color: 'bg-red-100 text-red-800 border-red-200', icon: AlertCircle },
+    pago: { label: 'Pago', color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle },
+    atrasado: { label: 'Atrasado', color: 'bg-red-100 text-red-800 border-red-200', icon: AlertCircle },
   };
 
-  const StatusIcon = statusConfig[tarefa.status].icon;
+  const StatusIcon = statusConfig[tarefa.statusPagamento].icon;
 
   // Mock data for additional fields (in real app, these would come from the tarefa object)
   const mockData = {
@@ -82,7 +82,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
           {/* Status Badge */}
           <div className="mt-3 flex items-center space-x-2">
             <StatusIcon className="w-5 h-5" />
-            <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${statusConfig[tarefa.status].color}`}>{statusConfig[tarefa.status].label}</span>
+            <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${statusConfig[tarefa.statusPagamento].color}`}>{statusConfig[tarefa.statusPagamento].label}</span>
           </div>
         </div>
 
