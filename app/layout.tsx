@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Contrutura Vital - Controlador de Obras',
+  title: 'Contrutora Vital - Controlador de Obras',
   description: 'Controlador de atividades de obras de construção civil',
 };
 
