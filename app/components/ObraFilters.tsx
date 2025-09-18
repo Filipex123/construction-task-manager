@@ -18,7 +18,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   const [atividadeInput, setAtividadeInput] = useState('');
 
   // Extrair valores únicos
-  const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.status)));
+  const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.statusPagamento)));
   const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.local))).sort();
   const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.empreiteira))).sort();
   const uniqueAtividades = Array.from(new Set(tarefas.map((t) => t.atividade))).sort();
