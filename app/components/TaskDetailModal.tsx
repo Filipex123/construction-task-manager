@@ -59,11 +59,11 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
   );
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
       {/* Mobile: Full screen, Desktop: Centered modal */}
-      <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-2xl sm:rounded-2xl overflow-hidden">
+      <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-2xl sm:rounded-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-6 py-4 text-white z-10">
+        <div className="flex-shrink-0 bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-6 py-4 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 flex-1 min-w-0">
               <div className="bg-white/20 p-2 rounded-lg">
@@ -87,7 +87,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Content */}
-        <div className="p-4 sm:p-6 overflow-y-auto h-full sm:h-auto">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           <div className="space-y-6">
             {/* Informações Principais */}
             <section>
