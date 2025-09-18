@@ -26,15 +26,15 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   const statusLabels = {
     pendente: 'Pendente',
     em_andamento: 'Em Andamento',
-    concluida: 'Concluída',
-    atrasada: 'Atrasada',
+    pago: 'Pago',
+    atrasado: 'Atrasado',
   };
 
   const statusColors = {
     pendente: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     em_andamento: 'bg-blue-100 text-blue-800 border-blue-200',
-    concluida: 'bg-green-100 text-green-800 border-green-200',
-    atrasada: 'bg-red-100 text-red-800 border-red-200',
+    pago: 'bg-green-100 text-green-800 border-green-200',
+    atrasado: 'bg-red-100 text-red-800 border-red-200',
   };
 
   // Função para busca incremental por múltiplas palavras

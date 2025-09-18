@@ -30,8 +30,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
   const statusOptions = [
     { value: 'pendente', label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
     { value: 'em_andamento', label: 'Em Andamento', color: 'bg-blue-100 text-blue-800' },
-    { value: 'concluida', label: 'Concluída', color: 'bg-green-100 text-green-800' },
-    { value: 'atrasada', label: 'Atrasada', color: 'bg-red-100 text-red-800' },
+    { value: 'pago', label: 'Pago', color: 'bg-green-100 text-green-800' },
+    { value: 'atrasado', label: 'Atrasado', color: 'bg-red-100 text-red-800' },
   ];
 
   const handleInputChange = (field: string, value: string) => {
