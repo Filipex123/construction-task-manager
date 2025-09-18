@@ -1,0 +1,17 @@
+{
+  "name": "Vital Gestão - Medição",
+  "short_name": "Vital App - Medição",
+  "description": "App para controle de medição das atividades das obras de construção civil",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#1E40AF",
+  "icons": [
+    {
+      "src": "../public/logo_construtora-vital.png",
+      "sizes": "240x240",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": []
+}

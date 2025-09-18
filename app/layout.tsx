@@ -13,8 +13,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Contrutora Vital - Controlador de Obras',
-  description: 'Controlador de atividades de obras de construção civil',
+  title: 'Vital Gestão - Medição',
+  applicationName: 'Vital App - Medição',
+  description: 'App para controle de medição das atividades das obras de construção civil',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '../logo_construtora-vital.png',
+    apple: '../logo_construtora-vital.png',
+  },
+  themeColor: '#1E40AF',
 };
 
 export default function RootLayout({

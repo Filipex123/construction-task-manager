@@ -114,18 +114,22 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
                 <span className="text-sm text-gray-600">Valor Total:</span>
                 <span className="ml-2 text-xl font-bold text-green-600">{formatCurrency(getTotalValue())}</span>
               </div>
-              <div className="flex space-x-4 text-sm text-black">
-                <span className="flex items-center space-x-1">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span>{filteredTarefas.filter((t) => t.status === 'concluida').length} concluídas</span>
+              <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
+                <span className="flex flex-col items-center space-y-1">
+                  <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'pago').length} pago</span>
+                  <div className="w-full h-1 bg-green-500 rounded-full" />
                 </span>
-                <span className="flex items-center space-x-1">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <span>{filteredTarefas.filter((t) => t.status === 'em_andamento').length} em andamento</span>
+                <span className="flex flex-col items-center space-y-1">
+                  <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'em_andamento').length} em andamento</span>
+                  <div className="w-full h-1 bg-blue-500 rounded-full" />
                 </span>
-                <span className="flex items-center space-x-1">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  <span>{filteredTarefas.filter((t) => t.status === 'pendente').length} pendentes</span>
+                <span className="flex flex-col items-center space-y-1">
+                  <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'pendente').length} pendente</span>
+                  <div className="w-full h-1 bg-yellow-500 rounded-full" />
+                </span>
+                <span className="flex flex-col items-center space-y-1">
+                  <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'atrasado').length} atrasado</span>
+                  <div className="w-full h-1 bg-red-500 rounded-full" />
                 </span>
               </div>
             </div>

@@ -6,9 +6,8 @@ export interface Tarefa {
   quantidade: number;
   valor: number;
   empreiteira: string;
-  status: 'pendente' | 'em_andamento' | 'concluida' | 'atrasada';
-  // Campos adicionais para detalhes
-  statusPagamento?: string;
+  status?: 'pendente' | 'em_andamento' | 'concluida' | 'atrasada';
+  statusPagamento: 'em_andamento' | 'pendente' | 'pago' | 'atrasado';
   statusMedidor?: string;
   quantidadeRealizada?: number;
   dataMedicao?: string;
@@ -28,5 +27,5 @@ export interface Obra {
 }
 
 export type StatusColor = {
-  [key in Tarefa['status']]: string;
+  [key in Tarefa['statusPagamento']]: string;
 };
