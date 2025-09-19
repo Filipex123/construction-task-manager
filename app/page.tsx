@@ -42,8 +42,12 @@ function Home() {
   };
 
   const handlePay = (tarefaId: string) => {
-    console.log('Processando pagamento da tarefa:', tarefaId);
-    // Aqui você implementaria a lógica de pagamento
+    setObras((prev) =>
+      prev.map((obra) => ({
+        ...obra,
+        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, statusPagamento: 'pago' } : t)),
+      }))
+    );
   };
 
   const handleAddTask = (obraId: string, newTask: Omit<Tarefa, 'id'>) => {

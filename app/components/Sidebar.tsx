@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { Menu, Home, X, Plus } from 'lucide-react';
 
 interface SidebarProps {
@@ -22,9 +23,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         <div className="flex items-center justify-between p-4 border-b border-slate-700">
           <div className={`flex items-center space-x-3 ${!isOpen && 'lg:justify-center'}`}>
             <div className="bg-blue-600 p-2 rounded-lg">
-              <Home className="w-6 h-6" />
+              <Image src="/favicon.ico" alt="Logo" width={24} height={24} />
             </div>
-            {isOpen && <h1 className="text-xl font-bold">Obra Control</h1>}
+            {isOpen && <h1 className="text-xl font-bold">Vital Gestão - Medição</h1>}
           </div>
           <button onClick={toggleSidebar} className="p-1 rounded hover:bg-slate-700 transition-colors lg:hidden">
             <X className="w-6 h-6" />

@@ -2,6 +2,7 @@ import React from 'react';
 import { Edit3, Trash2, DollarSign, Grid, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tarefa, StatusColor } from '../types';
 import { TaskDetailModal } from './TaskDetailModal';
+import { SinglePaymentModal } from './SinglePaymentModal';
 
 interface TaskTableProps {
   tarefas: Tarefa[];
@@ -30,6 +31,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
   const [mobileView, setMobileView] = React.useState<MobileView>('cards');
   const [selectedTask, setSelectedTask] = React.useState<Tarefa | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = React.useState(false);
+  const [taskToPay, setTaskToPay] = React.useState<Tarefa | null>(null);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [isMobile, setIsMobile] = React.useState(false);
 
@@ -78,6 +81,24 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
     setSelectedTask(null);
   };
 
+  const handlePayClick = (tarefa: Tarefa) => {
+    if (tarefa.statusPagamento != 'pago') {
+      setTaskToPay(tarefa);
+      setIsPaymentModalOpen(true);
+    }
+  };
+
+  const handlePaymentConfirm = () => {
+    if (taskToPay) {
+      onPay(taskToPay.id);
+    }
+  };
+
+  const handleClosePaymentModal = () => {
+    setIsPaymentModalOpen(false);
+    setTaskToPay(null);
+  };
+
   const ActionButtons = ({ tarefa }: { tarefa: Tarefa }) => (
     <div className="flex space-x-2">
       <button onClick={() => onEdit(tarefa.id)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors" title="Editar">
@@ -86,7 +107,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
       <button onClick={() => onDelete(tarefa.id)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors" title="Deletar">
         <Trash2 className="w-4 h-4" />
       </button>
-      <button onClick={() => onPay(tarefa.id)} className="p-2 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-lg transition-colors" title="Pagar">
+      <button
+        onClick={() => handlePayClick(tarefa)}
+        disabled={tarefa.statusPagamento === 'pago'}
+        className="p-2 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        title="Pagar"
+      >
         <DollarSign className="w-4 h-4" />
       </button>
     </div>
@@ -197,7 +223,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
                   <button onClick={() => onDelete(tarefa.id)} className="p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors" title="Deletar">
                     <Trash2 className="w-4 h-4" />
                   </button>
-                  <button onClick={() => onPay(tarefa.id)} className="p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-colors" title="Pagar">
+                  <button
+                    onClick={() => handlePayClick(tarefa)}
+                    disabled={tarefa.statusPagamento === 'pago'}
+                    className="p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Pagar"
+                  >
                     <DollarSign className="w-4 h-4" />
                   </button>
                 </div>
@@ -321,6 +352,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
       <PaginationControls />
 
       <TaskDetailModal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal} tarefa={selectedTask} />
+
+      <SinglePaymentModal isOpen={isPaymentModalOpen} onClose={handleClosePaymentModal} onConfirm={handlePaymentConfirm} tarefa={taskToPay} />
     </div>
   );
 };

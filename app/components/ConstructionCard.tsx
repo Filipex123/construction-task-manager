@@ -61,8 +61,7 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
   };
 
   const handleBatchPayment = () => {
-    console.log('Processando pagamento em lote para', filteredTarefas.length, 'tarefas');
-    // Aqui você implementaria a lógica de pagamento em lote
+    filteredTarefas.forEach((tarefa) => onPay(tarefa.id));
   };
 
   return (
