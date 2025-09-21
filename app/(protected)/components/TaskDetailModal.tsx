@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Calendar, DollarSign, User, Package, MapPin, Building2, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { Tarefa } from '../types';
+import { Tarefa } from '../../types';
 
 interface TaskDetailModalProps {
   isOpen: boolean;

@@ -1,13 +1,13 @@
 'use client';
 import React, { useState, useMemo } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
-import { SearchBar } from './components/SearchBar';
-import { mockObras as initialMockObras } from './mockData';
-import { Obra, Tarefa } from './types';
-import { ObraCard } from './components/ConstructionCard';
+import { Sidebar } from '.././components/Sidebar';
+import { Header } from '.././components/Header';
+import { SearchBar } from '.././components/SearchBar';
+import { mockObras as initialMockObras } from '../../mockData';
+import { Obra, Tarefa } from '../../types';
+import { ObraCard } from '.././components/ConstructionCard';
 
-function Home() {
+function Medicao() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [obras, setObras] = useState<Obra[]>(initialMockObras);
@@ -69,7 +69,7 @@ function Home() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex h-screen">
-        <Sidebar isOpen={sidebarOpen} toggleSidebar={handleToggleSidebar} />
+        <Sidebar isOpen={sidebarOpen} toggleSidebar={handleToggleSidebar} userName="Lucas Carvalho Barros"  userEmail="lucas.carvalho.barros@hotmail.com" />
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header toggleSidebar={handleToggleSidebar} />
@@ -103,4 +103,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Medicao;

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { X, Plus, MapPin, Wrench, Package, Hash, DollarSign, Building2, Edit3 } from 'lucide-react';
-import { Tarefa } from '../types';
+import { Tarefa } from '../../types';
 
 interface AddTaskModalProps {
   isOpen: boolean;

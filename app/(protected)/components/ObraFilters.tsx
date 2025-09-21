@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Filter, X, ChevronDown, ChevronUp, Search, Plus } from 'lucide-react';
-import { Tarefa } from '../types';
+import { Tarefa } from '../../types';
 
 interface ObraFiltersProps {
   tarefas: Tarefa[];

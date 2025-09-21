@@ -1,6 +1,6 @@
 import React from 'react';
 import { Edit3, Trash2, DollarSign, Grid, List, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Tarefa, StatusColor } from '../types';
+import { Tarefa, StatusColor } from '../../types';
 import { TaskDetailModal } from './TaskDetailModal';
 import { SinglePaymentModal } from './SinglePaymentModal';
 

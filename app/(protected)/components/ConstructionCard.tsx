@@ -1,7 +1,7 @@
 import React from 'react';
 import { Building, Plus, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { DollarSign } from 'lucide-react';
-import { Obra } from '../types';
+import { Obra } from '../../types';
 import { TaskTable } from './TaskTable';
 import { AddTaskModal } from './AddTaskModal';
 import { ObraFilters } from './ObraFilters';
