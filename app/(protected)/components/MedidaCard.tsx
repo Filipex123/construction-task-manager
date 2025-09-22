@@ -6,17 +6,16 @@ import { TaskTable } from './TaskTable';
 import { AddTaskModal } from './AddTaskModal';
 import { ObraFilters } from './ObraFilters';
 import { BatchPaymentModal } from './BatchPaymentModal';
+import { MedidaTable } from './MedidaTable';
 
 interface ObraCardProps {
   obra: Obra;
   onDelete?: (tarefaId: string) => void;
-  onPay?: (tarefaId: string) => void;
-  onAddTask: (obraId: string, task: any) => void;
   onUpdateTask: (obraId: string, tarefaId: string, task: any) => void;
   onLoadTasks?: (obraId: string) => Promise<void>;
 }
 
-export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAddTask, onUpdateTask, onLoadTasks }) => {
+export const MedidaCard: React.FC<ObraCardProps> = ({ obra, onDelete, onUpdateTask, onLoadTasks }) => {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [isBatchPaymentModalOpen, setIsBatchPaymentModalOpen] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState(obra.tarefas);
@@ -49,18 +48,6 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
     return filteredTarefas.reduce((total, tarefa) => total + tarefa.valor, 0);
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
-
-  const handleBatchPayment = () => {
-    if (!onPay) return;
-    filteredTarefas.forEach((tarefa) => onPay(tarefa.id));
-  };
-
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hover:shadow-xl transition-shadow duration-300">
       {/* Header */}
@@ -81,20 +68,6 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
               <div className="bg-white/20 px-3 py-1 rounded-full">
                 <span className="font-medium">{obra.tarefas.length} tarefas</span>
               </div>
-              {isExpanded && onPay && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsBatchPaymentModalOpen(true);
-                  }}
-                  className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors font-medium text-sm"
-                  title="Pagamento em Lote"
-                >
-                  <DollarSign className="w-4 h-4" />
-                  <span>Em Lote</span>
-                </button>
-              )}
-              {/* <div className="text-sm opacity-75">{isExpanded ? 'Clique para recolher' : 'Clique para expandir'}</div> */}
             </div>
           </div>
         </div>
@@ -103,36 +76,6 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
       {/* Expandable Content */}
       {isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
-          {/* Summary */}
-          {onPay && (
-            <div className="px-6 py-4 bg-gray-50 border-b">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div className="mb-2 sm:mb-0">
-                  <span className="text-sm text-gray-600">Valor Total:</span>
-                  <span className="ml-2 text-xl font-bold text-green-600">{formatCurrency(getTotalValue())}</span>
-                </div>
-                <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
-                  <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'pago').length} pago</span>
-                    <div className="w-full h-1 bg-green-500 rounded-full" />
-                  </span>
-                  <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'em_andamento').length} em andamento</span>
-                    <div className="w-full h-1 bg-blue-500 rounded-full" />
-                  </span>
-                  <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'pendente').length} pendente</span>
-                    <div className="w-full h-1 bg-yellow-500 rounded-full" />
-                  </span>
-                  <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'atrasado').length} atrasado</span>
-                    <div className="w-full h-1 bg-red-500 rounded-full" />
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Loading State */}
           {isLoading && (
             <div className="px-6 py-12 text-center">
@@ -167,14 +110,13 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
                     <p className="text-gray-500">Adicione a primeira tarefa desta obra</p>
                   </div>
                 ) : (
-                  <TaskTable
+                  <MedidaTable
                     tarefas={filteredTarefas}
                     onEdit={(id) => {
                       setEditTaskId(id);
                       setIsAddModalOpen(true);
                     }}
                     onDelete={onDelete}
-                    onPay={onPay}
                   />
                 )}
               </div>
@@ -182,19 +124,6 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
           )}
         </div>
       )}
-      <AddTaskModal
-        isOpen={isAddModalOpen}
-        onClose={() => {
-          setIsAddModalOpen(false);
-          setEditTaskId(null);
-        }}
-        onAddTask={(task) => onAddTask(obra.id, task)}
-        obraId={obra.id}
-        mode={editTaskId ? 'edit' : 'add'}
-        initialTask={editTaskId ? obra.tarefas.find((t) => t.id === editTaskId) ?? null : null}
-        onUpdateTask={(tarefaId, task) => onUpdateTask(obra.id, tarefaId, task)}
-      />
-      <BatchPaymentModal isOpen={isBatchPaymentModalOpen} onClose={() => setIsBatchPaymentModalOpen(false)} onConfirm={handleBatchPayment} tarefas={filteredTarefas} />
     </div>
   );
 };

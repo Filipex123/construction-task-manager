@@ -1,31 +1,32 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
+import React, { useState } from 'react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
-    const newErrors = { email: "", password: "" };
+    const newErrors = { email: '', password: '' };
 
     if (!email) {
-      newErrors.email = "Email é obrigatório";
+      newErrors.email = 'Email é obrigatório';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Email inválido";
+      newErrors.email = 'Email inválido';
     }
 
     if (!password) {
-      newErrors.password = "Senha é obrigatória";
+      newErrors.password = 'Senha é obrigatória';
     } else if (password.length < 6) {
-      newErrors.password = "Senha deve ter pelo menos 6 caracteres";
+      newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
     }
 
     setErrors(newErrors);
@@ -39,11 +40,11 @@ export default function LoginPage() {
     setIsLoading(true);
 
     // 🔐 Exemplo de validação simples
-    if (email === "admin@vital.com" && password === "123456") {
-      localStorage.setItem("logged", "true");
-      router.push("/"); // redireciona para a home (protegida)
+    if (email === 'admin@vital.com' && password === '123456') {
+      localStorage.setItem('logged', 'true');
+      router.push('/'); // redireciona para a home (protegida)
     } else {
-      alert("Credenciais inválidas");
+      alert('Credenciais inválidas');
     }
 
     setIsLoading(false);
@@ -55,7 +56,7 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <div className="mx-auto h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-              <Lock className="h-8 w-8 text-white" />
+              <Image src="/favicon.ico" alt="Logo" width={24} height={24} />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Bem-vindo de volta</h2>
             <p className="text-gray-600">Entre na sua conta para continuar</p>
@@ -78,7 +79,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={`appearance-none relative block w-full pl-10 pr-3 py-3 border ${
-                    errors.email ? "border-red-300" : "border-gray-300"
+                    errors.email ? 'border-red-300' : 'border-gray-300'
                   } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
                   placeholder="seu@email.com"
                 />
@@ -98,24 +99,16 @@ export default function LoginPage() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={`appearance-none relative block w-full pl-10 pr-12 py-3 border ${
-                    errors.password ? "border-red-300" : "border-gray-300"
+                    errors.password ? 'border-red-300' : 'border-gray-300'
                   } placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
                   placeholder="••••••••"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  )}
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  {showPassword ? <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" /> : <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />}
                 </button>
               </div>
               {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
@@ -124,12 +117,7 @@ export default function LoginPage() {
             {/* Checkbox e Esqueceu senha */}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
+                <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   Lembrar de mim
                 </label>
@@ -151,7 +139,7 @@ export default function LoginPage() {
                   Entrando...
                 </div>
               ) : (
-                "Entrar"
+                'Entrar'
               )}
             </button>
           </form>
@@ -159,7 +147,7 @@ export default function LoginPage() {
           {/* Cadastro */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Não tem uma conta?{" "}
+              Não tem uma conta?{' '}
               <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
                 Cadastre-se
               </a>

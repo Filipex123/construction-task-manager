@@ -19,7 +19,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
 
   // Extrair valores únicos
   const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.statusPagamento)));
-  const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.local))).sort();
+  const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.local.name))).sort();
   const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.empreiteira))).sort();
   const uniqueAtividades = Array.from(new Set(tarefas.map((t) => t.atividade))).sort();
 
@@ -61,7 +61,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     }
 
     if (locais.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.local, locais));
+      filtered = filtered.filter((t) => matchesAnyFilter(t.local.name, locais));
     }
 
     if (empreiteiras.length > 0) {

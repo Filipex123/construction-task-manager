@@ -1,30 +1,16 @@
 'use client';
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, Download, Calendar, ChevronLeft, ChevronRight, Eye, Printer } from 'lucide-react';
+import { Download, ChevronLeft, ChevronRight, Eye, Printer, X } from 'lucide-react';
 import { Sidebar } from '../.././components/Sidebar';
 import { Header } from '../.././components/Header';
-
-interface PaymentData {
-  id: number;
-  local: string;
-  atividade: string;
-  unidade: string;
-  quantidade: number;
-  valor: number;
-  empreiteira: string;
-  dataLimite: string;
-  dataPagamento: string;
-  usuarioResponsavel: string;
-  status: 'pago' | 'pendente' | 'atrasado';
-}
+import { mockRelatorio } from '@/app/mockData';
 
 const PaymentReport: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   const handleToggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -35,143 +21,34 @@ const PaymentReport: React.FC = () => {
     atividade: '',
     empreiteira: '',
     dataInicio: '',
-    dataFim: ''
+    dataFim: '',
   });
 
-  // Dados simulados
-  const mockData: PaymentData[] = [
-    {
-      id: 1,
-      local: 'Obra Centro',
-      atividade: 'Fundação',
-      unidade: 'm³',
-      quantidade: 150,
-      valor: 45000.00,
-      empreiteira: 'Construtora Alpha',
-      dataLimite: '2024-01-15',
-      dataPagamento: '2024-01-12',
-      usuarioResponsavel: 'João Silva',
-      status: 'pago'
-    },
-    {
-      id: 2,
-      local: 'Obra Norte',
-      atividade: 'Estrutura',
-      unidade: 'm²',
-      quantidade: 200,
-      valor: 80000.00,
-      empreiteira: 'Construtora Beta',
-      dataLimite: '2024-01-20',
-      dataPagamento: '2024-01-18',
-      usuarioResponsavel: 'Maria Santos',
-      status: 'pago'
-    },
-    {
-      id: 3,
-      local: 'Obra Sul',
-      atividade: 'Alvenaria',
-      unidade: 'm²',
-      quantidade: 300,
-      valor: 60000.00,
-      empreiteira: 'Construtora Gamma',
-      dataLimite: '2024-01-25',
-      dataPagamento: '2024-01-23',
-      usuarioResponsavel: 'Pedro Costa',
-      status: 'pago'
-    },
-    {
-      id: 4,
-      local: 'Obra Leste',
-      atividade: 'Cobertura',
-      unidade: 'm²',
-      quantidade: 120,
-      valor: 35000.00,
-      empreiteira: 'Construtora Delta',
-      dataLimite: '2024-02-01',
-      dataPagamento: '2024-01-30',
-      usuarioResponsavel: 'Ana Lima',
-      status: 'pago'
-    },
-    {
-      id: 5,
-      local: 'Obra Oeste',
-      atividade: 'Acabamento',
-      unidade: 'm²',
-      quantidade: 250,
-      valor: 75000.00,
-      empreiteira: 'Construtora Epsilon',
-      dataLimite: '2024-02-05',
-      dataPagamento: '2024-02-03',
-      usuarioResponsavel: 'Carlos Ferreira',
-      status: 'pago'
-    },
-    {
-      id: 6,
-      local: 'Obra Centro',
-      atividade: 'Instalações',
-      unidade: 'un',
-      quantidade: 50,
-      valor: 25000.00,
-      empreiteira: 'Construtora Alpha',
-      dataLimite: '2024-02-10',
-      dataPagamento: '2024-02-08',
-      usuarioResponsavel: 'João Silva',
-      status: 'pago'
-    },
-    {
-      id: 7,
-      local: 'Obra Norte',
-      atividade: 'Pintura',
-      unidade: 'm²',
-      quantidade: 400,
-      valor: 20000.00,
-      empreiteira: 'Construtora Beta',
-      dataLimite: '2024-02-15',
-      dataPagamento: '2024-02-12',
-      usuarioResponsavel: 'Maria Santos',
-      status: 'pago'
-    },
-    {
-      id: 8,
-      local: 'Obra Sul',
-      atividade: 'Paisagismo',
-      unidade: 'm²',
-      quantidade: 100,
-      valor: 15000.00,
-      empreiteira: 'Construtora Gamma',
-      dataLimite: '2024-02-20',
-      dataPagamento: '2024-02-18',
-      usuarioResponsavel: 'Pedro Costa',
-      status: 'pago'
-    }
-  ];
+  const hasActiveFilters = filters.local.length > 0 || filters.atividade.length > 0 || filters.empreiteira.length > 0 || filters.dataInicio.length > 0 || filters.dataFim.length > 0;
 
   // Filtrar dados
   const filteredData = useMemo(() => {
-    return mockData.filter(item => {
-      const matchesSearch = searchTerm === '' || 
-        Object.values(item).some(value => 
-          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      
+    return mockRelatorio.filter((item) => {
+      const matchesSearch = searchTerm === '' || Object.values(item).some((value) => value.toString().toLowerCase().includes(searchTerm.toLowerCase()));
+
       const matchesLocal = filters.local === '' || item.local.includes(filters.local);
       const matchesAtividade = filters.atividade === '' || item.atividade.includes(filters.atividade);
       const matchesEmpreiteira = filters.empreiteira === '' || item.empreiteira.includes(filters.empreiteira);
-      
+
       let matchesDataInicio = true;
       let matchesDataFim = true;
-      
+
       if (filters.dataInicio) {
         matchesDataInicio = new Date(item.dataPagamento) >= new Date(filters.dataInicio);
       }
-      
+
       if (filters.dataFim) {
         matchesDataFim = new Date(item.dataPagamento) <= new Date(filters.dataFim);
       }
-      
+
       return matchesSearch && matchesLocal && matchesAtividade && matchesEmpreiteira && matchesDataInicio && matchesDataFim;
     });
-  }, [mockData, searchTerm, filters]);
+  }, [mockRelatorio, searchTerm, filters]);
 
   // Paginação
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -179,7 +56,7 @@ const PaymentReport: React.FC = () => {
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
   };
 
@@ -189,7 +66,7 @@ const PaymentReport: React.FC = () => {
       atividade: '',
       empreiteira: '',
       dataInicio: '',
-      dataFim: ''
+      dataFim: '',
     });
     setSearchTerm('');
     setCurrentPage(1);
@@ -198,7 +75,7 @@ const PaymentReport: React.FC = () => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(value);
   };
 
@@ -312,7 +189,9 @@ const PaymentReport: React.FC = () => {
             <p>Total de Registros: ${filteredData.length}</p>
           </div>
           
-          ${Object.values(filters).some(filter => filter !== '') || searchTerm ? `
+          ${
+            Object.values(filters).some((filter) => filter !== '') || searchTerm
+              ? `
           <div class="filters-info">
             <h3>Filtros Aplicados:</h3>
             ${searchTerm ? `<p><strong>Busca:</strong> ${searchTerm}</p>` : ''}
@@ -322,7 +201,9 @@ const PaymentReport: React.FC = () => {
             ${filters.dataInicio ? `<p><strong>Data Início:</strong> ${formatDate(filters.dataInicio)}</p>` : ''}
             ${filters.dataFim ? `<p><strong>Data Fim:</strong> ${formatDate(filters.dataFim)}</p>` : ''}
           </div>
-          ` : ''}
+          `
+              : ''
+          }
           
           <table>
             <thead>
@@ -339,7 +220,9 @@ const PaymentReport: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              ${filteredData.map(item => `
+              ${filteredData
+                .map(
+                  (item) => `
                 <tr>
                   <td>${item.local}</td>
                   <td>${item.atividade}</td>
@@ -351,7 +234,9 @@ const PaymentReport: React.FC = () => {
                   <td>${formatDate(item.dataPagamento)}</td>
                   <td>${item.usuarioResponsavel}</td>
                 </tr>
-              `).join('')}
+              `
+                )
+                .join('')}
             </tbody>
           </table>
           
@@ -359,8 +244,8 @@ const PaymentReport: React.FC = () => {
             <h3>Resumo Geral</h3>
             <p>Total de Quantidade: ${totalQuantidade.toLocaleString('pt-BR')}</p>
             <p>Valor Total: ${formatCurrency(totalValor)}</p>
-            <p>Número de Empreiteiras: ${new Set(filteredData.map(item => item.empreiteira)).size}</p>
-            <p>Número de Locais: ${new Set(filteredData.map(item => item.local)).size}</p>
+            <p>Número de Empreiteiras: ${new Set(filteredData.map((item) => item.empreiteira)).size}</p>
+            <p>Número de Locais: ${new Set(filteredData.map((item) => item.local)).size}</p>
           </div>
           
           <div class="footer">
@@ -381,253 +266,152 @@ const PaymentReport: React.FC = () => {
     };
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pago': return 'bg-green-100 text-green-800';
-      case 'pendente': return 'bg-yellow-100 text-yellow-800';
-      case 'atrasado': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
-      <div className="min-h-screen bg-gray-100">
-          <div className="flex h-screen">
-              <Sidebar isOpen={sidebarOpen} toggleSidebar={handleToggleSidebar} userName="Lucas Carvalho Barros" userEmail="lucas.carvalho.barros@hotmail.com" />
+    <div className="min-h-screen bg-gray-100">
+      <div className="flex h-screen">
+        <Sidebar isOpen={sidebarOpen} toggleSidebar={handleToggleSidebar} userName="Lucas Carvalho Barros" userEmail="lucas.carvalho.barros@hotmail.com" />
 
-              <div className="flex-1 flex flex-col overflow-hidden">
-                  <Header toggleSidebar={handleToggleSidebar} />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Header toggleSidebar={handleToggleSidebar} title={'Relatorios'} />
 
-                  <main className="flex-1 overflow-x-hidden overflow-y-auto">
-                      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                          <div className="mb-8">
-                              <h2 className="text-2xl font-bold text-gray-900 mb-2">Relatório de Pagamentos</h2>
-                          </div>
-                          <div className="space-y-6">
-                              <div className="flex items-center justify-between">
-                                  <div className="flex space-x-3">
-                                      <button
-                                          onClick={handlePrint}
-                                          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                                      >
-                                          <Printer className="h-4 w-4 mr-2" />
-                                          Imprimir
-                                      </button>
-                                      <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                          <Download className="h-4 w-4 mr-2" />
-                                          Exportar
-                                      </button>
-                                  </div>
-                              </div>
-
-                              {/* Filtros e Busca */}
-                              <div className="bg-white rounded-lg shadow-md p-6">
-                                  <div className="flex flex-col lg:flex-row gap-4 mb-4">
-                                      <div className="flex-1">
-                                          <div className="relative">
-                                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                              <input
-                                                  type="text"
-                                                  placeholder="Buscar em todos os campos..."
-                                                  value={searchTerm}
-                                                  onChange={(e) => setSearchTerm(e.target.value)}
-                                                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                              />
-                                          </div>
-                                      </div>
-                                      <button
-                                          onClick={() => setShowFilters(!showFilters)}
-                                          className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                                      >
-                                          <Filter className="h-4 w-4 mr-2" />
-                                          Filtros
-                                      </button>
-                                  </div>
-
-                                  {showFilters && (
-                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg">
-                                          <div>
-                                              <label className="block text-sm font-medium text-gray-700 mb-1">Local</label>
-                                              <input
-                                                  type="text"
-                                                  value={filters.local}
-                                                  onChange={(e) => handleFilterChange('local', e.target.value)}
-                                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                  placeholder="Filtrar por local"
-                                              />
-                                          </div>
-                                          <div>
-                                              <label className="block text-sm font-medium text-gray-700 mb-1">Atividade</label>
-                                              <input
-                                                  type="text"
-                                                  value={filters.atividade}
-                                                  onChange={(e) => handleFilterChange('atividade', e.target.value)}
-                                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                  placeholder="Filtrar por atividade"
-                                              />
-                                          </div>
-                                          <div>
-                                              <label className="block text-sm font-medium text-gray-700 mb-1">Empreiteira</label>
-                                              <input
-                                                  type="text"
-                                                  value={filters.empreiteira}
-                                                  onChange={(e) => handleFilterChange('empreiteira', e.target.value)}
-                                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                  placeholder="Filtrar por empreiteira"
-                                              />
-                                          </div>
-                                          <div>
-                                              <label className="block text-sm font-medium text-gray-700 mb-1">Data Início</label>
-                                              <input
-                                                  type="date"
-                                                  value={filters.dataInicio}
-                                                  onChange={(e) => handleFilterChange('dataInicio', e.target.value)}
-                                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                              />
-                                          </div>
-                                          <div>
-                                              <label className="block text-sm font-medium text-gray-700 mb-1">Data Fim</label>
-                                              <input
-                                                  type="date"
-                                                  value={filters.dataFim}
-                                                  onChange={(e) => handleFilterChange('dataFim', e.target.value)}
-                                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                              />
-                                          </div>
-                                          <div className="lg:col-span-5 flex justify-end">
-                                              <button
-                                                  onClick={clearFilters}
-                                                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
-                                              >
-                                                  Limpar Filtros
-                                              </button>
-                                          </div>
-                                      </div>
-                                  )}
-                              </div>
-
-                              {/* Tabela */}
-                              <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                                  <div className="overflow-x-auto">
-                                      <table className="min-w-full divide-y divide-gray-200">
-                                          <thead className="bg-gray-50">
-                                              <tr>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Local</th>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atividade</th>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unidade</th>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empreiteira</th>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Limite</th>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Pagamento</th>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
-                                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                                              </tr>
-                                          </thead>
-                                          <tbody className="bg-white divide-y divide-gray-200">
-                                              {paginatedData.map((item) => (
-                                                  <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                                                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.local}</td>
-                                                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.atividade}</td>
-                                                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.unidade}</td>
-                                                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.quantidade.toLocaleString('pt-BR')}</td>
-                                                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{formatCurrency(item.valor)}</td>
-                                                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.empreiteira}</td>
-                                                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(item.dataLimite)}</td>
-                                                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(item.dataPagamento)}</td>
-                                                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.usuarioResponsavel}</td>
-                                                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                          <button className="text-blue-600 hover:text-blue-900 transition-colors">
-                                                              <Eye className="h-4 w-4" />
-                                                          </button>
-                                                      </td>
-                                                  </tr>
-                                              ))}
-                                          </tbody>
-                                      </table>
-                                  </div>
-
-                                  {/* Paginação */}
-                                  <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                                      <div className="flex-1 flex justify-between sm:hidden">
-                                          <button
-                                              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                              disabled={currentPage === 1}
-                                              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                          >
-                                              Anterior
-                                          </button>
-                                          <button
-                                              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                                              disabled={currentPage === totalPages}
-                                              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                          >
-                                              Próximo
-                                          </button>
-                                      </div>
-                                      <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                                          <div className="flex items-center space-x-2">
-                                              <p className="text-sm text-gray-700">
-                                                  Mostrando <span className="font-medium">{startIndex + 1}</span> a{' '}
-                                                  <span className="font-medium">{Math.min(startIndex + itemsPerPage, filteredData.length)}</span> de{' '}
-                                                  <span className="font-medium">{filteredData.length}</span> resultados
-                                              </p>
-                                              <select
-                                                  value={itemsPerPage}
-                                                  onChange={(e) => {
-                                                      setItemsPerPage(Number(e.target.value));
-                                                      setCurrentPage(1);
-                                                  }}
-                                                  className="ml-4 px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                              >
-                                                  <option value={10}>10 por página</option>
-                                                  <option value={25}>25 por página</option>
-                                                  <option value={50}>50 por página</option>
-                                              </select>
-                                          </div>
-                                          <div>
-                                              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                                  <button
-                                                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                                      disabled={currentPage === 1}
-                                                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                  >
-                                                      <ChevronLeft className="h-5 w-5" />
-                                                  </button>
-                                                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                                                      const page = i + 1;
-                                                      return (
-                                                          <button
-                                                              key={page}
-                                                              onClick={() => setCurrentPage(page)}
-                                                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === page
-                                                                      ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                                                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                                                  }`}
-                                                          >
-                                                              {page}
-                                                          </button>
-                                                      );
-                                                  })}
-                                                  <button
-                                                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                                                      disabled={currentPage === totalPages}
-                                                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                  >
-                                                      <ChevronRight className="h-5 w-5" />
-                                                  </button>
-                                              </nav>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-
-                      </div>
-                  </main>
+          <main className="flex-1 overflow-x-hidden overflow-y-auto">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Relatório de Pagamentos</h2>
               </div>
-          </div>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex space-x-3">
+                    <button onClick={handlePrint} className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                      <Printer className="h-4 w-4 mr-2" />
+                      Imprimir
+                    </button>
+                    <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                      <Download className="h-4 w-4 mr-2" />
+                      Exportar
+                    </button>
+                  </div>
+                </div>
+
+                {/* Tabela */}
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Local</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atividade</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unidade</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empreiteira</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Limite</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Pagamento</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {paginatedData.map((item) => (
+                          <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.local}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.atividade}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.unidade}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.quantidade.toLocaleString('pt-BR')}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{formatCurrency(item.valor)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.empreiteira}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(item.dataLimite)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(item.dataPagamento)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.usuarioResponsavel}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <button className="text-blue-600 hover:text-blue-900 transition-colors">
+                                <Eye className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Paginação */}
+                  <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                    <div className="flex-1 flex justify-between sm:hidden">
+                      <button
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}
+                        className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Anterior
+                      </button>
+                      <button
+                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                        disabled={currentPage === totalPages}
+                        className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Próximo
+                      </button>
+                    </div>
+                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                      <div className="flex items-center space-x-2">
+                        <p className="text-sm text-gray-700">
+                          Mostrando <span className="font-medium">{startIndex + 1}</span> a <span className="font-medium">{Math.min(startIndex + itemsPerPage, filteredData.length)}</span> de{' '}
+                          <span className="font-medium">{filteredData.length}</span> resultados
+                        </p>
+                        <select
+                          value={itemsPerPage}
+                          onChange={(e) => {
+                            setItemsPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                          }}
+                          className="text-gray-600 ml-4 px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value={10}>10 por página</option>
+                          <option value={25}>25 por página</option>
+                          <option value={50}>50 por página</option>
+                        </select>
+                      </div>
+                      <div>
+                        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                          <button
+                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                            disabled={currentPage === 1}
+                            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <ChevronLeft className="h-5 w-5" />
+                          </button>
+                          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                            const page = i + 1;
+                            return (
+                              <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                  currentPage === page ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            );
+                          })}
+                          <button
+                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                            disabled={currentPage === totalPages}
+                            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <ChevronRight className="h-5 w-5" />
+                          </button>
+                        </nav>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
+    </div>
   );
 };
 

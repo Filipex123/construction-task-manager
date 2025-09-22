@@ -1,8 +1,6 @@
-import { Obra } from './types';
+import { Obra, PaymentData } from './types';
 
 export const mockObras: Obra[] = [
-  // ... suas obras 1, 2 e 3
-
   {
     id: '4',
     nome: 'Residencial Jardim das Flores',
@@ -11,7 +9,7 @@ export const mockObras: Obra[] = [
     tarefas: [
       {
         id: '4-1',
-        local: 'Fundação',
+        local: { id: '1', name: 'Fundação' },
         atividade: 'Escavação e concretagem',
         unidade: 'm³',
         quantidade: 150,
@@ -21,7 +19,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '4-2',
-        local: 'Estrutura',
+        local: { id: '2', name: 'Estrutura' },
         atividade: 'Levantamento de pilares',
         unidade: 'unidade',
         quantidade: 20,
@@ -31,7 +29,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '4-3',
-        local: 'Cobertura',
+        local: { id: '3', name: 'Cobertura' },
         atividade: 'Instalação de telhado cerâmico',
         unidade: 'm²',
         quantidade: 350,
@@ -41,7 +39,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '4-4',
-        local: 'Instalações',
+        local: { id: '4', name: 'Instalações' },
         atividade: 'Rede hidráulica',
         unidade: 'ponto',
         quantidade: 40,
@@ -51,7 +49,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '4-5',
-        local: 'Instalações',
+        local: { id: '5', name: 'Instalações' },
         atividade: 'Rede elétrica',
         unidade: 'ponto',
         quantidade: 60,
@@ -61,7 +59,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '4-6',
-        local: 'Acabamento interno',
+        local: { id: '6', name: 'Acabamento interno' },
         atividade: 'Pintura geral',
         unidade: 'm²',
         quantidade: 400,
@@ -71,7 +69,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '4-7',
-        local: 'Acabamento interno',
+        local: { id: '7', name: 'Acabamento interno' },
         atividade: 'Assentamento de piso porcelanato',
         unidade: 'm²',
         quantidade: 250,
@@ -81,7 +79,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '4-8',
-        local: 'Área comum',
+        local: { id: '8', name: 'Área comum' },
         atividade: 'Paisagismo',
         unidade: 'm²',
         quantidade: 180,
@@ -91,7 +89,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '4-9',
-        local: 'Garagem',
+        local: { id: '9', name: 'Garagem' },
         atividade: 'Pavimentação',
         unidade: 'm²',
         quantidade: 200,
@@ -101,7 +99,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '4-10',
-        local: 'Portaria',
+        local: { id: '10', name: 'Portaria' },
         atividade: 'Instalação de portão eletrônico',
         unidade: 'unidade',
         quantidade: 1,
@@ -119,7 +117,7 @@ export const mockObras: Obra[] = [
     tarefas: [
       {
         id: '5-1',
-        local: 'Fundação',
+        local: { id: '1', name: 'Fundação' },
         atividade: 'Estacas pré-moldadas',
         unidade: 'm',
         quantidade: 500,
@@ -129,7 +127,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-2',
-        local: 'Estrutura',
+        local: { id: '2', name: 'Estrutura' },
         atividade: 'Concretagem de lajes',
         unidade: 'm²',
         quantidade: 1000,
@@ -139,7 +137,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-3',
-        local: 'Estrutura',
+        local: { id: '3', name: 'Estrutura' },
         atividade: 'Colocação de vigas metálicas',
         unidade: 'ton',
         quantidade: 20,
@@ -149,7 +147,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-4',
-        local: 'Cobertura',
+        local: { id: '4', name: 'Cobertura' },
         atividade: 'Telhado metálico',
         unidade: 'm²',
         quantidade: 800,
@@ -159,7 +157,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-5',
-        local: 'Instalações',
+        local: { id: '5', name: 'Instalações' },
         atividade: 'Rede de gases hospitalares',
         unidade: 'ponto',
         quantidade: 50,
@@ -169,7 +167,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-6',
-        local: 'Instalações',
+        local: { id: '6', name: 'Instalações' },
         atividade: 'Rede elétrica hospitalar',
         unidade: 'ponto',
         quantidade: 200,
@@ -179,7 +177,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-7',
-        local: 'Acabamento interno',
+        local: { id: '7', name: 'Acabamento interno' },
         atividade: 'Piso vinílico antiestático',
         unidade: 'm²',
         quantidade: 1500,
@@ -189,7 +187,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-8',
-        local: 'Acabamento interno',
+        local: { id: '8', name: 'Acabamento interno' },
         atividade: 'Forro acústico',
         unidade: 'm²',
         quantidade: 1200,
@@ -199,7 +197,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-9',
-        local: 'Acabamento interno',
+        local: { id: '9', name: 'Acabamento interno' },
         atividade: 'Pintura epóxi',
         unidade: 'm²',
         quantidade: 900,
@@ -209,7 +207,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-10',
-        local: 'Ambulatório',
+        local: { id: '10', name: 'Ambulatório' },
         atividade: 'Divisórias hospitalares',
         unidade: 'm²',
         quantidade: 400,
@@ -219,7 +217,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-11',
-        local: 'Enfermarias',
+        local: { id: '11', name: 'Enfermarias' },
         atividade: 'Instalação de camas hospitalares',
         unidade: 'unidade',
         quantidade: 120,
@@ -229,7 +227,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-12',
-        local: 'UTI',
+        local: { id: '12', name: 'UTI' },
         atividade: 'Instalação de monitores cardíacos',
         unidade: 'unidade',
         quantidade: 40,
@@ -239,7 +237,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-13',
-        local: 'Centro Cirúrgico',
+        local: { id: '13', name: 'Centro Cirúrgico' },
         atividade: 'Montagem de salas cirúrgicas',
         unidade: 'unidade',
         quantidade: 5,
@@ -249,7 +247,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-14',
-        local: 'Laboratório',
+        local: { id: '14', name: 'Laboratório' },
         atividade: 'Instalação de bancadas inox',
         unidade: 'm²',
         quantidade: 200,
@@ -259,7 +257,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-15',
-        local: 'Recepção',
+        local: { id: '15', name: 'Recepção' },
         atividade: 'Montagem de balcão de atendimento',
         unidade: 'unidade',
         quantidade: 1,
@@ -269,7 +267,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-16',
-        local: 'Refeitório',
+        local: { id: '16', name: 'Refeitório' },
         atividade: 'Instalação de cozinha industrial',
         unidade: 'unidade',
         quantidade: 1,
@@ -279,7 +277,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-17',
-        local: 'Estacionamento',
+        local: { id: '17', name: 'Estacionamento' },
         atividade: 'Pavimentação asfáltica',
         unidade: 'm²',
         quantidade: 3000,
@@ -289,7 +287,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-18',
-        local: 'Áreas externas',
+        local: { id: '18', name: 'Áreas externas' },
         atividade: 'Paisagismo completo',
         unidade: 'm²',
         quantidade: 1000,
@@ -299,7 +297,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-19',
-        local: 'Segurança',
+        local: { id: '19', name: 'Segurança' },
         atividade: 'Instalação de câmeras CFTV',
         unidade: 'unidade',
         quantidade: 60,
@@ -309,7 +307,7 @@ export const mockObras: Obra[] = [
       },
       {
         id: '5-20',
-        local: 'Portaria',
+        local: { id: '20', name: 'Portaria' },
         atividade: 'Controle de acesso biométrico',
         unidade: 'unidade',
         quantidade: 4,
@@ -318,5 +316,112 @@ export const mockObras: Obra[] = [
         statusPagamento: 'em_andamento',
       },
     ],
+  },
+];
+
+export const mockRelatorio: PaymentData[] = [
+  {
+    id: 1,
+    local: 'Obra Centro',
+    atividade: 'Fundação',
+    unidade: 'm³',
+    quantidade: 150,
+    valor: 45000.0,
+    empreiteira: 'Construtora Alpha',
+    dataLimite: '2024-01-15',
+    dataPagamento: '2024-01-12',
+    usuarioResponsavel: 'João Silva',
+    status: 'pago',
+  },
+  {
+    id: 2,
+    local: 'Obra Norte',
+    atividade: 'Estrutura',
+    unidade: 'm²',
+    quantidade: 200,
+    valor: 80000.0,
+    empreiteira: 'Construtora Beta',
+    dataLimite: '2024-01-20',
+    dataPagamento: '2024-01-18',
+    usuarioResponsavel: 'Maria Santos',
+    status: 'pago',
+  },
+  {
+    id: 3,
+    local: 'Obra Sul',
+    atividade: 'Alvenaria',
+    unidade: 'm²',
+    quantidade: 300,
+    valor: 60000.0,
+    empreiteira: 'Construtora Gamma',
+    dataLimite: '2024-01-25',
+    dataPagamento: '2024-01-23',
+    usuarioResponsavel: 'Pedro Costa',
+    status: 'pago',
+  },
+  {
+    id: 4,
+    local: 'Obra Leste',
+    atividade: 'Cobertura',
+    unidade: 'm²',
+    quantidade: 120,
+    valor: 35000.0,
+    empreiteira: 'Construtora Delta',
+    dataLimite: '2024-02-01',
+    dataPagamento: '2024-01-30',
+    usuarioResponsavel: 'Ana Lima',
+    status: 'pago',
+  },
+  {
+    id: 5,
+    local: 'Obra Oeste',
+    atividade: 'Acabamento',
+    unidade: 'm²',
+    quantidade: 250,
+    valor: 75000.0,
+    empreiteira: 'Construtora Epsilon',
+    dataLimite: '2024-02-05',
+    dataPagamento: '2024-02-03',
+    usuarioResponsavel: 'Carlos Ferreira',
+    status: 'pago',
+  },
+  {
+    id: 6,
+    local: 'Obra Centro',
+    atividade: 'Instalações',
+    unidade: 'un',
+    quantidade: 50,
+    valor: 25000.0,
+    empreiteira: 'Construtora Alpha',
+    dataLimite: '2024-02-10',
+    dataPagamento: '2024-02-08',
+    usuarioResponsavel: 'João Silva',
+    status: 'pago',
+  },
+  {
+    id: 7,
+    local: 'Obra Norte',
+    atividade: 'Pintura',
+    unidade: 'm²',
+    quantidade: 400,
+    valor: 20000.0,
+    empreiteira: 'Construtora Beta',
+    dataLimite: '2024-02-15',
+    dataPagamento: '2024-02-12',
+    usuarioResponsavel: 'Maria Santos',
+    status: 'pago',
+  },
+  {
+    id: 8,
+    local: 'Obra Sul',
+    atividade: 'Paisagismo',
+    unidade: 'm²',
+    quantidade: 100,
+    valor: 15000.0,
+    empreiteira: 'Construtora Gamma',
+    dataLimite: '2024-02-20',
+    dataPagamento: '2024-02-18',
+    usuarioResponsavel: 'Pedro Costa',
+    status: 'pago',
   },
 ];

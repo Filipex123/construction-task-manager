@@ -1,14 +1,14 @@
 import React from 'react';
 import { Edit3, Trash2, DollarSign, Grid, List, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Tarefa, StatusColor } from '../../types';
 import { TaskDetailModal } from './TaskDetailModal';
 import { SinglePaymentModal } from './SinglePaymentModal';
+import { StatusColor, Tarefa } from '@/app/types';
 
 interface TaskTableProps {
   tarefas: Tarefa[];
   onEdit: (tarefaId: string) => void;
-  onDelete?: (tarefaId: string) => void;
-  onPay?: (tarefaId: string) => void;
+  onDelete: (tarefaId: string) => void;
+  onPay: (tarefaId: string) => void;
 }
 
 type MobileView = 'table' | 'cards' | 'list';
@@ -89,7 +89,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
   };
 
   const handlePaymentConfirm = () => {
-    if (taskToPay && onPay) {
+    if (taskToPay) {
       onPay(taskToPay.id);
     }
   };
@@ -104,21 +104,17 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
       <button onClick={() => onEdit(tarefa.id)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors" title="Editar">
         <Edit3 className="w-4 h-4" />
       </button>
-      {onDelete && (
-        <button onClick={() => onDelete(tarefa.id)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors" title="Deletar">
-          <Trash2 className="w-4 h-4" />
-        </button>
-      )}
-      {onPay && (
-        <button
-          onClick={() => handlePayClick(tarefa)}
-          disabled={tarefa.statusPagamento === 'pago'}
-          className="p-2 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Pagar"
-        >
-          <DollarSign className="w-4 h-4" />
-        </button>
-      )}
+      <button onClick={() => onDelete(tarefa.id)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors" title="Deletar">
+        <Trash2 className="w-4 h-4" />
+      </button>
+      <button
+        onClick={() => handlePayClick(tarefa)}
+        disabled={tarefa.statusPagamento === 'pago'}
+        className="p-2 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        title="Pagar"
+      >
+        <DollarSign className="w-4 h-4" />
+      </button>
     </div>
   );
 
@@ -221,24 +217,14 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
               </td>
               <td className="px-4 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                 <div className="flex space-x-2">
-                  <button onClick={() => onEdit(tarefa.id)} className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded transition-colors" title="Editar">
-                    <Edit3 className="w-4 h-4" />
+                  <button
+                    onClick={() => handlePayClick(tarefa)}
+                    disabled={tarefa.statusPagamento === 'pago'}
+                    className="p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Pagar"
+                  >
+                    <DollarSign className="w-4 h-4" />
                   </button>
-                  {onDelete && (
-                    <button onClick={() => onDelete(tarefa.id)} className="p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors" title="Deletar">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                  {onPay && (
-                    <button
-                      onClick={() => handlePayClick(tarefa)}
-                      disabled={tarefa.statusPagamento === 'pago'}
-                      className="p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Pagar"
-                    >
-                      <DollarSign className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
               </td>
             </tr>
