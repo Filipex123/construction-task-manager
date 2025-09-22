@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { X, Plus, MapPin, Wrench, Package, Hash, DollarSign, Building2, Edit3 } from 'lucide-react';
 import { Tarefa } from '../../types';
+import { mockLocais, mockObras } from '@/app/mockData';
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -32,6 +33,57 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     { value: 'em_andamento', label: 'Em Andamento', color: 'bg-blue-100 text-blue-800' },
     { value: 'pago', label: 'Pago', color: 'bg-green-100 text-green-800' },
     { value: 'atrasado', label: 'Atrasado', color: 'bg-red-100 text-red-800' },
+  ];
+
+  const empreiteiraOptions = [
+    {
+      id: 1,
+      descricao: 'Especializada em fundações e terraplanagem',
+      nome: 'SoloFirme',
+      createdAt: '2024-02-01',
+    },
+    {
+      id: 2,
+      descricao: 'Serviços de alvenaria estrutural e acabamentos',
+      nome: 'Constrular',
+      createdAt: '2024-02-02',
+    },
+    {
+      id: 3,
+      descricao: 'Instalações elétricas prediais e industriais',
+      nome: 'EletroMax',
+      createdAt: '2024-02-03',
+    },
+    {
+      id: 4,
+      descricao: 'Tubulações hidráulicas e sistemas de esgoto',
+      nome: 'Hidrosul',
+      createdAt: '2024-02-04',
+    },
+    {
+      id: 5,
+      descricao: 'Montagem de estruturas metálicas e soldagem',
+      nome: 'MetalAr',
+      createdAt: '2024-02-05',
+    },
+    {
+      id: 6,
+      descricao: 'Revestimentos cerâmicos, pisos e azulejos',
+      nome: 'RevestLar',
+      createdAt: '2024-02-06',
+    },
+    {
+      id: 7,
+      descricao: 'Serviços de pintura residencial e predial',
+      nome: 'Pintart',
+      createdAt: '2024-02-07',
+    },
+    {
+      id: 8,
+      descricao: 'Instalação de vidros temperados e esquadrias',
+      nome: 'VidroReal',
+      createdAt: '2024-02-08',
+    },
   ];
 
   const handleInputChange = (field: string, value: string) => {
@@ -170,15 +222,26 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
               <MapPin className="w-4 h-4" />
               <span>Local</span>
             </label>
-            <input
-              type="text"
-              value={formData.local.name}
-              onChange={(e) => handleInputChange('local', e.target.value)}
-              placeholder="Ex: Térreo - Hall Principal"
-              className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
+            <select
+              value={formData.local.id}
+              onChange={(e) => {
+                const selected = mockLocais.find((l) => l.id === e.target.value) || { id: '', name: '' };
+                setFormData((prev) => ({ ...prev, local: selected }));
+                if (errors.local) setErrors((prev) => ({ ...prev, local: '' }));
+              }}
+              className={`w-full text-gray-900 px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
                 errors.local ? 'border-red-300 bg-red-50' : 'border-gray-300'
               }`}
-            />
+            >
+              <option value="" className="text-gray-500">
+                Selecione um local
+              </option>
+              {mockLocais.map((l) => (
+                <option key={l.id} value={l.id} className="text-gray-900">
+                  {l.name}
+                </option>
+              ))}
+            </select>
             {errors.local && <p className="text-red-600 text-sm mt-1">{errors.local}</p>}
           </div>
 
@@ -266,15 +329,25 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
               <Building2 className="w-4 h-4" />
               <span>Empreiteira</span>
             </label>
-            <input
-              type="text"
+            <select
               value={formData.empreiteira}
-              onChange={(e) => handleInputChange('empreiteira', e.target.value)}
-              placeholder="Ex: Cerâmica Silva Ltda"
-              className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
+              onChange={(e) => {
+                setFormData((prev) => ({ ...prev, empreiteira: e.target.value }));
+                if (errors.empreiteira) setErrors((prev) => ({ ...prev, empreiteira: '' }));
+              }}
+              className={`w-full text-gray-900 px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
                 errors.empreiteira ? 'border-red-300 bg-red-50' : 'border-gray-300'
               }`}
-            />
+            >
+              <option value="" className="text-gray-500">
+                Selecione uma empreiteira
+              </option>
+              {empreiteiraOptions.map((eOpt) => (
+                <option key={eOpt.id} value={eOpt.nome} className="text-gray-900">
+                  {eOpt.nome}
+                </option>
+              ))}
+            </select>
             {errors.empreiteira && <p className="text-red-600 text-sm mt-1">{errors.empreiteira}</p>}
           </div>
 

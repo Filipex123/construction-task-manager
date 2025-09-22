@@ -425,3 +425,24 @@ export const mockRelatorio: PaymentData[] = [
     status: 'pago',
   },
 ];
+
+export const mockLocais = [
+  { id: '1', name: 'Fundação' },
+  { id: '2', name: 'Estrutura' },
+  { id: '3', name: 'Cobertura' },
+  { id: '4', name: 'Instalações' },
+  { id: '5', name: 'Acabamento interno' },
+  { id: '6', name: 'Área comum' },
+  { id: '7', name: 'Garagem' },
+  { id: '8', name: 'Portaria' },
+  { id: '9', name: 'Ambulatório' },
+  { id: '10', name: 'Enfermarias' },
+  { id: '11', name: 'UTI' },
+  { id: '12', name: 'Centro Cirúrgico' },
+  { id: '13', name: 'Laboratório' },
+  { id: '14', name: 'Recepção' },
+  { id: '15', name: 'Refeitório' },
+  { id: '16', name: 'Estacionamento' },
+  { id: '17', name: 'Áreas externas' },
+  { id: '18', name: 'Segurança' },
+];
