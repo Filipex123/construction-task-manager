@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     shortcut: '../logo_construtora-vital.png',
     apple: '../logo_construtora-vital.png',
   },
-  // themeColor: '#1E40AF',
+  // themeColor: '#ffffff',
 };
 
 export default function RootLayout({

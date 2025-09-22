@@ -3,9 +3,10 @@ import { Menu, Bell, User } from 'lucide-react';
 
 interface HeaderProps {
   toggleSidebar: () => void;
+  title?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
+export const Header: React.FC<HeaderProps> = ({ toggleSidebar, title = '' }) => {
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
       <div className="flex items-center justify-between">
@@ -13,7 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           <button onClick={toggleSidebar} className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden">
             <Menu className="w-6 h-6 text-gray-600" />
           </button>
-          <h1 className="text-xl font-semibold text-gray-800">Controle de Obras</h1>
+          <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
         </div>
 
         <div className="flex items-center space-x-3">

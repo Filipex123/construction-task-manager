@@ -1,13 +1,13 @@
 'use client';
 import React, { useState, useMemo } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
-import { SearchBar } from './components/SearchBar';
-import { mockObras as initialMockObras } from './mockData';
-import { Obra, Tarefa } from './types';
-import { ObraCard } from './components/ConstructionCard';
+import { Sidebar } from '../components/Sidebar';
+import { Header } from '../components/Header';
+import { SearchBar } from '../components/SearchBar';
+import { mockObras as initialMockObras } from '@/app/mockData';
+import { Obra, Tarefa } from '@/app/types';
+import { LocalCard } from '../components/LocalCard';
 
-function Home() {
+function LocalPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [obras, setObras] = useState<Obra[]>(initialMockObras);
@@ -41,15 +41,6 @@ function Home() {
     );
   };
 
-  const handlePay = (tarefaId: string) => {
-    setObras((prev) =>
-      prev.map((obra) => ({
-        ...obra,
-        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, statusPagamento: 'pago' } : t)),
-      }))
-    );
-  };
-
   const handleAddTask = (obraId: string, newTask: Omit<Tarefa, 'id'>) => {
     setObras((prevObras) =>
       prevObras.map((obra) => {
@@ -66,22 +57,46 @@ function Home() {
     );
   };
 
+  const handleLoadTasks = async (obraId: string) => {
+    // Simula chamada para o backend
+    console.log('Carregando tarefas para obra:', obraId);
+
+    // Simula delay de rede
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Aqui você faria a chamada real para o backend:
+    // const response = await fetch(`/api/obras/${obraId}/tarefas`);
+    // const tarefas = await response.json();
+    //
+    // setObras(prevObras =>
+    //   prevObras.map(obra =>
+    //     obra.id === obraId ? { ...obra, tarefas } : obra
+    //   )
+    // );
+
+    console.log('Tarefas carregadas com sucesso');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex h-screen">
-        <Sidebar isOpen={sidebarOpen} toggleSidebar={handleToggleSidebar} />
+        <Sidebar isOpen={sidebarOpen} toggleSidebar={handleToggleSidebar} userName="Lucas Carvalho Barros" userEmail="lucas.carvalho.barros@hotmail.com" />
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <Header toggleSidebar={handleToggleSidebar} />
+          <Header toggleSidebar={handleToggleSidebar} title={'Controle de Obras e Locais'} />
 
           <main className="flex-1 overflow-x-hidden overflow-y-auto">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Gerenciar Obras</h2>
-                <p className="text-gray-600">Controle e monitore todas as atividades das suas obras</p>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Gerenciar Obras e Locais</h2>
+                <p className="text-gray-600">Controle e monitore todas os locais das suas obras</p>
               </div>
 
-              <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+              {/* <DashboardSummary obras={obras} /> */}
+
+              <div className="mb-6">
+                <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+              </div>
 
               {filteredObras.length === 0 ? (
                 <div className="text-center py-12">
@@ -91,7 +106,16 @@ function Home() {
               ) : (
                 <div className="space-y-6">
                   {filteredObras.map((obra) => (
-                    <ObraCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onDelete={handleDelete} onPay={handlePay} onAddTask={handleAddTask} />
+                    <LocalCard
+                      key={obra.id}
+                      obra={obra}
+                      onAddLocal={function (obraId: string, task: any): void {
+                        throw new Error('Function not implemented.');
+                      }}
+                      onUpdateLocal={function (obraId: string, tarefaId: string, task: any): void {
+                        throw new Error('Function not implemented.');
+                      }}
+                    />
                   ))}
                 </div>
               )}
@@ -103,4 +127,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default LocalPage;

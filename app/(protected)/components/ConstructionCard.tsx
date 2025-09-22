@@ -1,7 +1,7 @@
 import React from 'react';
 import { Building, Plus, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { DollarSign } from 'lucide-react';
-import { Obra } from '../types';
+import { Obra } from '../../types';
 import { TaskTable } from './TaskTable';
 import { AddTaskModal } from './AddTaskModal';
 import { ObraFilters } from './ObraFilters';
@@ -9,8 +9,8 @@ import { BatchPaymentModal } from './BatchPaymentModal';
 
 interface ObraCardProps {
   obra: Obra;
-  onDelete: (tarefaId: string) => void;
-  onPay: (tarefaId: string) => void;
+  onDelete?: (tarefaId: string) => void;
+  onPay?: (tarefaId: string) => void;
   onAddTask: (obraId: string, task: any) => void;
   onUpdateTask: (obraId: string, tarefaId: string, task: any) => void;
   onLoadTasks?: (obraId: string) => Promise<void>;
@@ -45,10 +45,6 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
     setIsExpanded(!isExpanded);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat('pt-BR').format(new Date(dateString));
-  };
-
   const getTotalValue = () => {
     return filteredTarefas.reduce((total, tarefa) => total + tarefa.valor, 0);
   };
@@ -61,6 +57,7 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
   };
 
   const handleBatchPayment = () => {
+    if (!onPay) return;
     filteredTarefas.forEach((tarefa) => onPay(tarefa.id));
   };
 
@@ -84,7 +81,7 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
               <div className="bg-white/20 px-3 py-1 rounded-full">
                 <span className="font-medium">{obra.tarefas.length} tarefas</span>
               </div>
-              {isExpanded && (
+              {isExpanded && onPay && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -107,32 +104,34 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
       {isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
           {/* Summary */}
-          <div className="px-6 py-4 bg-gray-50 border-b">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="mb-2 sm:mb-0">
-                <span className="text-sm text-gray-600">Valor Total:</span>
-                <span className="ml-2 text-xl font-bold text-green-600">{formatCurrency(getTotalValue())}</span>
-              </div>
-              <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'pago').length} pago</span>
-                  <div className="w-full h-1 bg-green-500 rounded-full" />
-                </span>
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'em_andamento').length} em andamento</span>
-                  <div className="w-full h-1 bg-blue-500 rounded-full" />
-                </span>
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'pendente').length} pendente</span>
-                  <div className="w-full h-1 bg-yellow-500 rounded-full" />
-                </span>
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'atrasado').length} atrasado</span>
-                  <div className="w-full h-1 bg-red-500 rounded-full" />
-                </span>
+          {onPay && (
+            <div className="px-6 py-4 bg-gray-50 border-b">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-2 sm:mb-0">
+                  <span className="text-sm text-gray-600">Valor Total:</span>
+                  <span className="ml-2 text-xl font-bold text-green-600">{formatCurrency(getTotalValue())}</span>
+                </div>
+                <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
+                  <span className="flex flex-col items-center space-y-1">
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'pago').length} pago</span>
+                    <div className="w-full h-1 bg-green-500 rounded-full" />
+                  </span>
+                  <span className="flex flex-col items-center space-y-1">
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'em_andamento').length} em andamento</span>
+                    <div className="w-full h-1 bg-blue-500 rounded-full" />
+                  </span>
+                  <span className="flex flex-col items-center space-y-1">
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'pendente').length} pendente</span>
+                    <div className="w-full h-1 bg-yellow-500 rounded-full" />
+                  </span>
+                  <span className="flex flex-col items-center space-y-1">
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'atrasado').length} atrasado</span>
+                    <div className="w-full h-1 bg-red-500 rounded-full" />
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Loading State */}
           {isLoading && (

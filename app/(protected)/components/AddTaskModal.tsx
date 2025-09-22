@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { X, Plus, MapPin, Wrench, Package, Hash, DollarSign, Building2, Edit3 } from 'lucide-react';
-import { Tarefa } from '../types';
+import { Tarefa } from '../../types';
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -14,7 +14,7 @@ interface AddTaskModalProps {
 
 export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAddTask, obraId, mode = 'add', initialTask = null, onUpdateTask }) => {
   const [formData, setFormData] = useState({
-    local: '',
+    local: { id: '', name: '' },
     atividade: '',
     unidade: 'm²',
     quantidade: '',
@@ -44,7 +44,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.local.trim()) newErrors.local = 'Local é obrigatório';
+    if (!formData.local.name.trim()) newErrors.local = 'Local é obrigatório';
     if (!formData.atividade.trim()) newErrors.atividade = 'Atividade é obrigatória';
     if (!formData.quantidade || parseFloat(formData.quantidade) <= 0) {
       newErrors.quantidade = 'Quantidade deve ser maior que zero';
@@ -64,7 +64,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     if (!validateForm()) return;
 
     const newTask: Omit<Tarefa, 'id'> = {
-      local: formData.local.trim(),
+      local: { id: formData.local.id, name: formData.local.name.trim() },
       atividade: formData.atividade.trim(),
       unidade: formData.unidade,
       quantidade: parseFloat(formData.quantidade),
@@ -83,7 +83,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
   const handleClose = () => {
     setFormData({
-      local: '',
+      local: { id: '', name: '' },
       atividade: '',
       unidade: 'm²',
       quantidade: '',
@@ -111,7 +111,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     }
     if (isOpen && mode === 'add' && !initialTask) {
       setFormData({
-        local: '',
+        local: { id: '', name: '' },
         atividade: '',
         unidade: 'm²',
         quantidade: '',
@@ -127,7 +127,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
   const isDirty = useMemo(() => {
     if (mode !== 'edit' || !initialTask) return true; // allow add mode
     const normalized = {
-      local: formData.local.trim(),
+      local: { id: formData.local.id, name: formData.local.name },
       atividade: formData.atividade.trim(),
       unidade: formData.unidade,
       quantidade: parseFloat(formData.quantidade || '0'),
@@ -172,7 +172,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
             </label>
             <input
               type="text"
-              value={formData.local}
+              value={formData.local.name}
               onChange={(e) => handleInputChange('local', e.target.value)}
               placeholder="Ex: Térreo - Hall Principal"
               className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${

@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, DollarSign, CheckCircle, MapPin, Building2, Package, Hash } from 'lucide-react';
-import { Tarefa } from '../types';
+import { Tarefa } from '../../types';
 
 interface SinglePaymentModalProps {
   isOpen: boolean;
@@ -71,7 +71,7 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
                     <div className="flex items-center space-x-2">
                       <div className="flex items-center space-x-1 text-sm text-green-700">
                         <MapPin className="w-4 h-4" />
-                        <span>{tarefa.local}</span>
+                        <span>{tarefa.local.name}</span>
                       </div>
                     </div>
                   </div>
@@ -122,7 +122,7 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-600 mb-1">Local</p>
-                      <p className="text-base font-semibold text-gray-900">{tarefa.local}</p>
+                      <p className="text-base font-semibold text-gray-900">{tarefa.local.name}</p>
                     </div>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, DollarSign, CheckCircle, MapPin, Building2, Package } from 'lucide-react';
-import { Tarefa } from '../types';
+import { Tarefa } from '../../types';
 
 interface BatchPaymentModalProps {
   isOpen: boolean;
@@ -113,7 +113,7 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
                         <div className="flex items-center space-x-2 mt-1">
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <MapPin className="w-3 h-3" />
-                            <span className="truncate">{tarefa.local}</span>
+                            <span className="truncate">{tarefa.local.name}</span>
                           </div>
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <Building2 className="w-3 h-3" />
@@ -156,8 +156,8 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
               </h3>
               <div className="flex flex-wrap gap-2">
                 {uniqueLocais.map((local) => (
-                  <span key={local} className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
-                    {local}
+                  <span key={local.id} className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+                    {local.name}
                   </span>
                 ))}
               </div>
