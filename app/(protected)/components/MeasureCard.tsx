@@ -6,7 +6,7 @@ import { TaskTable } from './TaskTable';
 import { AddTaskModal } from './AddTaskModal';
 import { ObraFilters } from './ObraFilters';
 import { BatchPaymentModal } from './BatchPaymentModal';
-import { MedidaTable } from './MedidaTable';
+import { MedidaTable } from './MeasureTable';
 
 interface ObraCardProps {
   obra: Obra;
@@ -94,14 +94,6 @@ export const MedidaCard: React.FC<ObraCardProps> = ({ obra, onDelete, onUpdateTa
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-800">Tarefas</h4>
-                  <button
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span className="hidden sm:inline">Nova Tarefa</span>
-                    <span className="sm:hidden">Nova</span>
-                  </button>
                 </div>
 
                 {obra.tarefas.length === 0 ? (

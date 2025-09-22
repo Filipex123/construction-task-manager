@@ -6,7 +6,7 @@ import { SearchBar } from '.././components/SearchBar';
 import { mockObras as initialMockObras } from '../../mockData';
 import { Obra, Tarefa } from '../../types';
 import { ObraCard } from '.././components/ConstructionCard';
-import { MedidaCard } from '../components/MedidaCard';
+import { MedidaCard } from '../components/MeasureCard';
 
 function Medicao() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
