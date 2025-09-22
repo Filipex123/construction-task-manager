@@ -104,6 +104,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, userNam
                 {isOpen && <span className="font-medium">Relatório de Pagamento</span>}
               </a>
             </div>
+            <div className="px-4">
+              <a
+                href="/unidadeMedidas"
+                className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${
+                  !isOpen && "lg:justify-center lg:px-2"
+                }`}
+              >
+                <Plus className="w-5 h-5 flex-shrink-0" />
+                {isOpen && <span className="font-medium">Unidade de Medida</span>}
+              </a>
+            </div>
           </nav>
         </div>
 
