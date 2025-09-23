@@ -53,7 +53,7 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal
           <div className="flex items-center space-x-4 text-sm">
             <div className="flex items-center space-x-2">
               <div className="bg-white/20 px-3 py-1 rounded-full">
-                <span className="font-medium">{obra.tarefas.length} tarefas</span>
+                <span className="font-medium">{obra.tarefas.length} Locais</span>
               </div>
             </div>
           </div>
@@ -67,7 +67,7 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal
           {isLoading && (
             <div className="px-6 py-12 text-center">
               <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-              <p className="text-gray-600">Carregando tarefas...</p>
+              <p className="text-gray-600">Carregando Locais...</p>
             </div>
           )}
 
@@ -77,7 +77,7 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal
               {/* Tasks Table */}
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-semibold text-gray-800">Tarefas</h4>
+                  <h4 className="text-lg font-semibold text-gray-800">Locais</h4>
                   <button
                     onClick={() => setIsAddModalOpen(true)}
                     className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"

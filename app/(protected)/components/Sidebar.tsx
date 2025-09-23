@@ -73,16 +73,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, userNam
               {isOpen && isCadastroOpen && (
                 <div className="mt-2 ml-6 flex flex-col gap-1">
                   <a href="/nova-obra" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
-                    <span className="text-sm">Cadastro de Obra</span>
+                    <span className="text-sm">Cadastro de Obra e Local</span>
                   </a>
                   <a href="/tarefa" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
-                    <span className="text-sm">Cadastro de tarefa</span>
+                    <span className="text-sm">Cadastro de Tarefa</span>
                   </a>
                   <a href="/empreiteira" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
-                    <span className="text-sm">Cadastro empreiteira</span>
+                    <span className="text-sm">Cadastro Empreiteira</span>
                   </a>
                   <a href="/unidade-medidas" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
-                    <span className="text-sm">Cadastro de unidade</span>
+                    <span className="text-sm">Cadastro de Unidade</span>
                   </a>
                 </div>
               )}
