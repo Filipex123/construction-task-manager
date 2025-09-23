@@ -4,18 +4,19 @@ import { DollarSign } from 'lucide-react';
 import { Obra } from '../../types';
 import { TaskTable } from './TaskTable';
 import { AddTaskModal } from './AddTaskModal';
-import { ObraFilters } from './ObraFilters';
+import { ObraMeasureFilter } from './ObraMeasureFilter';
 import { BatchPaymentModal } from './BatchPaymentModal';
 import { MedidaTable } from './MeasureTable';
 
-interface ObraCardProps {
+interface MedidaCardProps {
   obra: Obra;
   onDelete?: (tarefaId: string) => void;
+    onPay?: (tarefaId: string) => void;
   onUpdateTask: (obraId: string, tarefaId: string, task: any) => void;
   onLoadTasks?: (obraId: string) => Promise<void>;
 }
 
-export const MedidaCard: React.FC<ObraCardProps> = ({ obra, onDelete, onUpdateTask, onLoadTasks }) => {
+export const MedidaCard: React.FC<MedidaCardProps> = ({ obra, onDelete, onPay, onUpdateTask, onLoadTasks }) => {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [isBatchPaymentModalOpen, setIsBatchPaymentModalOpen] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState(obra.tarefas);
@@ -67,7 +68,7 @@ export const MedidaCard: React.FC<ObraCardProps> = ({ obra, onDelete, onUpdateTa
             <div className="flex items-center space-x-2">
               <div className="bg-white/20 px-3 py-1 rounded-full">
                 <span className="font-medium">{obra.tarefas.length} tarefas</span>
-              </div>
+              </div>              
             </div>
           </div>
         </div>
@@ -88,7 +89,7 @@ export const MedidaCard: React.FC<ObraCardProps> = ({ obra, onDelete, onUpdateTa
           {!isLoading && (
             <>
               {/* Filters */}
-              <ObraFilters tarefas={obra.tarefas} onFilterChange={setFilteredTarefas} />
+              <ObraMeasureFilter tarefas={obra.tarefas} onFilterChange={setFilteredTarefas} />
 
               {/* Tasks Table */}
               <div className="p-6">

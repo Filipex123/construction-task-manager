@@ -16,6 +16,7 @@ export const mockObras: Obra[] = [
         valor: 22500,
         empreiteira: 'Concretar Engenharia',
         statusPagamento: 'pago',
+        statusMedicao: 'medido',
       },
       {
         id: '4-2',
@@ -26,6 +27,7 @@ export const mockObras: Obra[] = [
         valor: 18000,
         empreiteira: 'Estruturas Forte',
         statusPagamento: 'em_andamento',
+        statusMedicao: 'em_andamento',
       },
       {
         id: '4-3',
@@ -36,6 +38,7 @@ export const mockObras: Obra[] = [
         valor: 24500,
         empreiteira: 'Telhas Brasil',
         statusPagamento: 'pendente',
+        statusMedicao: 'medido',
       },
       {
         id: '4-4',
@@ -46,6 +49,7 @@ export const mockObras: Obra[] = [
         valor: 8000,
         empreiteira: 'Hidro Center',
         statusPagamento: 'em_andamento',
+        statusMedicao: 'em_andamento',
       },
       {
         id: '4-5',
@@ -56,6 +60,7 @@ export const mockObras: Obra[] = [
         valor: 12000,
         empreiteira: 'Eletro Master',
         statusPagamento: 'pendente',
+        statusMedicao: 'retencao',
       },
       {
         id: '4-6',
@@ -66,6 +71,7 @@ export const mockObras: Obra[] = [
         valor: 16000,
         empreiteira: 'Tintas & Cia',
         statusPagamento: 'atrasado',
+        statusMedicao: 'medido',
       },
       {
         id: '4-7',
@@ -76,6 +82,7 @@ export const mockObras: Obra[] = [
         valor: 22500,
         empreiteira: 'Pisos Premium',
         statusPagamento: 'pago',
+        statusMedicao: 'retencao',
       },
       {
         id: '4-8',
@@ -86,6 +93,7 @@ export const mockObras: Obra[] = [
         valor: 10800,
         empreiteira: 'Verde Vida',
         statusPagamento: 'em_andamento',
+        statusMedicao: 'em_andamento',
       },
       {
         id: '4-9',
@@ -96,6 +104,7 @@ export const mockObras: Obra[] = [
         valor: 16000,
         empreiteira: 'Asfaltos União',
         statusPagamento: 'pendente',
+        statusMedicao: 'medido',
       },
       {
         id: '4-10',
@@ -106,6 +115,7 @@ export const mockObras: Obra[] = [
         valor: 7500,
         empreiteira: 'SegPort Tech',
         statusPagamento: 'pago',
+        statusMedicao: 'retencao',
       },
     ],
   },
@@ -124,6 +134,7 @@ export const mockObras: Obra[] = [
         valor: 75000,
         empreiteira: 'Fundatec',
         statusPagamento: 'pago',
+        statusMedicao: 'medido',
       },
       {
         id: '5-2',
@@ -134,6 +145,7 @@ export const mockObras: Obra[] = [
         valor: 95000,
         empreiteira: 'Concretar Engenharia',
         statusPagamento: 'em_andamento',
+        statusMedicao: 'em_andamento',
       },
       {
         id: '5-3',
@@ -144,6 +156,7 @@ export const mockObras: Obra[] = [
         valor: 180000,
         empreiteira: 'Metal Forte',
         statusPagamento: 'pendente',
+        statusMedicao: 'medido',
       },
       {
         id: '5-4',
@@ -154,6 +167,7 @@ export const mockObras: Obra[] = [
         valor: 64000,
         empreiteira: 'CobreBem',
         statusPagamento: 'em_andamento',
+        statusMedicao: 'em_andamento',
       },
       {
         id: '5-5',
@@ -164,6 +178,7 @@ export const mockObras: Obra[] = [
         valor: 50000,
         empreiteira: 'HospGases Ltda',
         statusPagamento: 'pendente',
+        statusMedicao: 'medido',
       },
       {
         id: '5-6',
@@ -174,6 +189,7 @@ export const mockObras: Obra[] = [
         valor: 40000,
         empreiteira: 'Eletro Master',
         statusPagamento: 'em_andamento',
+        statusMedicao: 'em_andamento',
       },
       {
         id: '5-7',
@@ -184,6 +200,7 @@ export const mockObras: Obra[] = [
         valor: 135000,
         empreiteira: 'Pisos Premium',
         statusPagamento: 'pendente',
+        statusMedicao: 'medido',
       },
       {
         id: '5-8',
@@ -194,6 +211,7 @@ export const mockObras: Obra[] = [
         valor: 96000,
         empreiteira: 'Acústica Total',
         statusPagamento: 'pago',
+        statusMedicao: 'medido',
       },
       {
         id: '5-9',
@@ -204,6 +222,7 @@ export const mockObras: Obra[] = [
         valor: 54000,
         empreiteira: 'Tintas & Cia',
         statusPagamento: 'em_andamento',
+        statusMedicao: 'em_andamento',
       },
       {
         id: '5-10',
@@ -214,6 +233,7 @@ export const mockObras: Obra[] = [
         valor: 32000,
         empreiteira: 'HospConstrutora',
         statusPagamento: 'pendente',
+         statusMedicao: 'medido',
       },
       {
         id: '5-11',
@@ -224,6 +244,7 @@ export const mockObras: Obra[] = [
         valor: 240000,
         empreiteira: 'MediTech',
         statusPagamento: 'em_andamento',
+         statusMedicao: 'em_andamento',
       },
       {
         id: '5-12',
@@ -234,6 +255,7 @@ export const mockObras: Obra[] = [
         valor: 400000,
         empreiteira: 'CardioLife',
         statusPagamento: 'pendente',
+        statusMedicao: 'medido',
       },
       {
         id: '5-13',
@@ -244,6 +266,7 @@ export const mockObras: Obra[] = [
         valor: 500000,
         empreiteira: 'CirurgiTech',
         statusPagamento: 'em_andamento',
+        statusMedicao: 'em_andamento',
       },
       {
         id: '5-14',
@@ -254,6 +277,7 @@ export const mockObras: Obra[] = [
         valor: 60000,
         empreiteira: 'Inox Prime',
         statusPagamento: 'pago',
+         statusMedicao: 'medido',
       },
       {
         id: '5-15',
@@ -264,6 +288,7 @@ export const mockObras: Obra[] = [
         valor: 15000,
         empreiteira: 'Moveis Hospitalares',
         statusPagamento: 'pendente',
+         statusMedicao: 'medido',
       },
       {
         id: '5-16',
@@ -274,6 +299,7 @@ export const mockObras: Obra[] = [
         valor: 180000,
         empreiteira: 'CozinTec',
         statusPagamento: 'em_andamento',
+        statusMedicao: 'em_andamento',
       },
       {
         id: '5-17',
@@ -284,6 +310,7 @@ export const mockObras: Obra[] = [
         valor: 240000,
         empreiteira: 'Asfaltos União',
         statusPagamento: 'pendente',
+         statusMedicao: 'medido',
       },
       {
         id: '5-18',
@@ -294,6 +321,7 @@ export const mockObras: Obra[] = [
         valor: 60000,
         empreiteira: 'Verde Vida',
         statusPagamento: 'pago',
+         statusMedicao: 'medido',
       },
       {
         id: '5-19',
@@ -304,6 +332,7 @@ export const mockObras: Obra[] = [
         valor: 90000,
         empreiteira: 'SegPort Tech',
         statusPagamento: 'pendente',
+         statusMedicao: 'medido',
       },
       {
         id: '5-20',
@@ -314,6 +343,7 @@ export const mockObras: Obra[] = [
         valor: 40000,
         empreiteira: 'BioAccess Ltda',
         statusPagamento: 'em_andamento',
+         statusMedicao: 'em_andamento',
       },
     ],
   },

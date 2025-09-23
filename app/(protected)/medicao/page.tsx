@@ -49,6 +49,17 @@ function Medicao() {
     );
   };
 
+
+  ///Revisar logica deve realizar a medição dos campos filtrados
+    const handlePay = (tarefaId: string) => {
+    setObras((prev) =>
+      prev.map((obra) => ({
+        ...obra,
+        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, statusPagamento: 'pago' } : t)),
+      }))
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex h-screen">
@@ -75,8 +86,8 @@ function Medicao() {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {filteredObras.map((obra) => (
-                    <MedidaCard key={obra.id} obra={obra} onUpdateTask={handleEdit} />
+                  {filteredObras.map((obra) => (                    
+                    <MedidaCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onPay={handlePay} />                   
                   ))}
                 </div>
               )}

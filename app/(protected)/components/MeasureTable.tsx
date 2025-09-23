@@ -1,6 +1,6 @@
 import React from 'react';
 import { Edit3, Trash2, DollarSign, Grid, List, ChevronLeft, ChevronRight, Ruler } from 'lucide-react';
-import { Tarefa, StatusColor } from '../../types';
+import { Tarefa, StatusColorMedicao } from '../../types';
 import { TaskDetailModal } from './TaskDetailModal';
 import { SinglePaymentModal } from './SinglePaymentModal';
 import { MeasureEntryModal } from './MeasureEntryModal';
@@ -13,18 +13,18 @@ interface TaskTableProps {
 
 type MobileView = 'table' | 'cards' | 'list';
 
-const statusConfig: StatusColor = {
+const statusConfig: StatusColorMedicao = {
   pendente: 'bg-yellow-100 text-yellow-800',
   em_andamento: 'bg-blue-100 text-blue-800',
-  pago: 'bg-green-100 text-green-800',
-  atrasado: 'bg-red-100 text-red-800',
+  medido: 'bg-green-100 text-green-800',
+  retencao: 'bg-red-100 text-red-800',
 };
 
 const statusLabels = {
   pendente: 'Pendente',
   em_andamento: 'Em Andamento',
-  pago: 'Pago',
-  atrasado: 'Atrasado',
+  medido: 'Medido',
+  retencao: 'Retenção',
 };
 
 export const MedidaTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete }) => {
@@ -108,7 +108,7 @@ export const MedidaTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelet
               <h5 className="font-medium text-gray-900 text-sm mb-1">{tarefa.local.name}</h5>
               <p className="text-gray-600 text-sm">{tarefa.atividade}</p>
             </div>
-            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.statusPagamento]}`}>{statusLabels[tarefa.statusPagamento]}</span>
+            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.statusMedicao]}`}>{statusLabels[tarefa.statusMedicao]}</span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-sm mb-3">
@@ -145,7 +145,7 @@ export const MedidaTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelet
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-1">
                 <h5 className="font-medium text-gray-900 text-sm">{tarefa.local.name}</h5>
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.statusPagamento]}`}>{statusLabels[tarefa.statusPagamento]}</span>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.statusMedicao]}`}>{statusLabels[tarefa.statusMedicao]}</span>
               </div>
               <p className="text-gray-600 text-sm mb-2">{tarefa.atividade}</p>
             </div>
@@ -194,7 +194,7 @@ export const MedidaTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelet
               <td className="px-4 py-4 text-sm font-medium text-gray-900">{formatCurrency(tarefa.valor)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.empreiteira}</td>
               <td className="px-4 py-4 text-sm">
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.statusPagamento]}`}>{statusLabels[tarefa.statusPagamento]}</span>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.statusMedicao]}`}>{statusLabels[tarefa.statusMedicao]}</span>
               </td>
               <td className="px-4 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                 <div className="flex space-x-2">

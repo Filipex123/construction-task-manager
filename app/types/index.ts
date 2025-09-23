@@ -8,6 +8,7 @@ export interface Tarefa {
   empreiteira: string;
   status?: 'pendente' | 'em_andamento' | 'concluida' | 'atrasada';
   statusPagamento: 'em_andamento' | 'pendente' | 'pago' | 'atrasado';
+  statusMedicao: 'em_andamento' | 'pendente' | 'medido' | 'retencao';
   statusMedidor?: string;
   quantidadeRealizada?: number;
   dataMedicao?: string;
@@ -32,6 +33,10 @@ export interface Obra {
 
 export type StatusColor = {
   [key in Tarefa['statusPagamento']]: string;
+};
+
+export type StatusColorMedicao = {
+  [key in Tarefa['statusMedicao']]: string;
 };
 
 export interface PaymentData {
