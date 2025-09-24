@@ -123,6 +123,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       valor: parseFloat(formData.valor),
       empreiteira: formData.empreiteira.trim(),
       statusPagamento: formData.statusPagamento,
+      statusMedicao: 'pendente',
     };
 
     if (mode === 'edit' && initialTask && onUpdateTask) {
