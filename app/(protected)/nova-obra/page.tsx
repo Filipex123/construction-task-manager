@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useMemo } from 'react';
+import { Plus } from 'lucide-react';
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
 import { SearchBar } from '../components/SearchBar';
@@ -11,6 +12,7 @@ function LocalPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [obras, setObras] = useState<Obra[]>(initialMockObras);
+   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
 
   const filteredObras = useMemo(() => {
     return obras.filter((obra) => obra.nome.toLowerCase().includes(searchTerm.toLowerCase()) || obra.descricao.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -95,7 +97,20 @@ function LocalPage() {
               {/* <DashboardSummary obras={obras} /> */}
 
               <div className="mb-6">
-                <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+                <div>
+                  <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+                </div>
+                <br />
+                <div className="flex items-center justify-end mb-4">                  
+                  <button
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Novo Obra</span>
+                    <span className="sm:hidden">Novo</span>
+                  </button>
+                </div>                
               </div>
 
               {filteredObras.length === 0 ? (
