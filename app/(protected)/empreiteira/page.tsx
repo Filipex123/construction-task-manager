@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, Plus, Edit, Trash2, X, Save, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Save, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Sidebar } from '.././components/Sidebar';
 import { Header } from '.././components/Header';
 import { SearchBar } from '../components/SearchBar';

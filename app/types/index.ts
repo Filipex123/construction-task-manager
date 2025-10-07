@@ -15,6 +15,7 @@ export interface Tarefa {
   dataPagamentoPrevista?: string;
   dataPagamentoRealizada?: string;
   dataCriacao?: string;
+  dataLimite?: string;
   dataAtualizacao?: string;
   usuarioUltimaAtualizacao?: string;
 }

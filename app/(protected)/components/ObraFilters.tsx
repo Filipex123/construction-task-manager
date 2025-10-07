@@ -13,6 +13,8 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   const [selectedLocais, setSelectedLocais] = useState<string[]>([]);
   const [selectedEmpreiteiras, setSelectedEmpreiteiras] = useState<string[]>([]);
   const [selectedAtividades, setSelectedAtividades] = useState<string[]>([]);
+  const [dataCriacaoInput, setDataCriacaoInput] = useState('');
+  const [dataLimiteInput, setDataLimiteInput] = useState('');
   const [localInput, setLocalInput] = useState('');
   const [empreiteiraInput, setEmpreiteiraInput] = useState('');
   const [atividadeInput, setAtividadeInput] = useState('');
@@ -53,7 +55,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     return selectedFilters.some((filter) => matchesIncrementalSearch(text, filter));
   };
 
-  const applyFilters = (status: string[], locais: string[], empreiteiras: string[], atividades: string[]) => {
+  const applyFilters = (status: string[], locais: string[], empreiteiras: string[], atividades: string[], dataCriacao: string, dataLimite: string) => {
     let filtered = tarefas;
 
     if (status.length > 0) {
@@ -72,6 +74,28 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
       filtered = filtered.filter((t) => matchesAnyFilter(t.atividade, atividades));
     }
 
+    if (dataCriacao.trim()) {
+      const dataCriacaoTerms = dataCriacao
+        .split(',')
+        .map((term) => term.trim())
+        .filter((term) => term);
+      filtered = filtered.filter((t) => {
+        const dataCriacaoStr = t.dataCriacao ? new Date(t.dataCriacao).toISOString().split('T')[0] : '';
+        return dataCriacaoTerms.some((term) => dataCriacaoStr.includes(term));
+      });
+    }
+
+    if (dataLimite.trim()) {
+      const dataLimiteTerms = dataLimite
+        .split(',')
+        .map((term) => term.trim())
+        .filter((term) => term);
+      filtered = filtered.filter((t) => {
+        const dataLimiteStr = t.dataLimite ? new Date(t.dataLimite).toISOString().split('T')[0] : '';
+        return dataLimiteTerms.some((term) => dataLimiteStr.includes(term));
+      });
+    }
+
     onFilterChange(filtered);
   };
 
@@ -79,7 +103,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     const newSelected = selectedStatus.includes(status) ? selectedStatus.filter((s) => s !== status) : [...selectedStatus, status];
 
     setSelectedStatus(newSelected);
-    applyFilters(newSelected, selectedLocais, selectedEmpreiteiras, selectedAtividades);
+    applyFilters(newSelected, selectedLocais, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, dataLimiteInput);
   };
 
   const addLocalFilter = (value: string) => {
@@ -87,14 +111,14 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
       const newSelected = [...selectedLocais, value.trim()];
       setSelectedLocais(newSelected);
       setLocalInput('');
-      applyFilters(selectedStatus, newSelected, selectedEmpreiteiras, selectedAtividades);
+      applyFilters(selectedStatus, newSelected, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, dataLimiteInput);
     }
   };
 
   const removeLocalFilter = (value: string) => {
     const newSelected = selectedLocais.filter((item) => item !== value);
     setSelectedLocais(newSelected);
-    applyFilters(selectedStatus, newSelected, selectedEmpreiteiras, selectedAtividades);
+    applyFilters(selectedStatus, newSelected, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, dataLimiteInput);
   };
 
   const addEmpreiteiraFilter = (value: string) => {
@@ -102,14 +126,14 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
       const newSelected = [...selectedEmpreiteiras, value.trim()];
       setSelectedEmpreiteiras(newSelected);
       setEmpreiteiraInput('');
-      applyFilters(selectedStatus, selectedLocais, newSelected, selectedAtividades);
+      applyFilters(selectedStatus, selectedLocais, newSelected, selectedAtividades, dataCriacaoInput, dataLimiteInput);
     }
   };
 
   const removeEmpreiteiraFilter = (value: string) => {
     const newSelected = selectedEmpreiteiras.filter((item) => item !== value);
     setSelectedEmpreiteiras(newSelected);
-    applyFilters(selectedStatus, selectedLocais, newSelected, selectedAtividades);
+    applyFilters(selectedStatus, selectedLocais, newSelected, selectedAtividades, dataCriacaoInput, dataLimiteInput);
   };
 
   const addAtividadeFilter = (value: string) => {
@@ -117,14 +141,14 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
       const newSelected = [...selectedAtividades, value.trim()];
       setSelectedAtividades(newSelected);
       setAtividadeInput('');
-      applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, newSelected);
+      applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, newSelected, dataCriacaoInput, dataLimiteInput);
     }
   };
 
   const removeAtividadeFilter = (value: string) => {
     const newSelected = selectedAtividades.filter((item) => item !== value);
     setSelectedAtividades(newSelected);
-    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, newSelected);
+    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, newSelected, dataCriacaoInput, dataLimiteInput);
   };
 
   const clearAllFilters = () => {
@@ -132,14 +156,28 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     setSelectedLocais([]);
     setSelectedEmpreiteiras([]);
     setSelectedAtividades([]);
+    setDataCriacaoInput('');
+    setDataLimiteInput('');
     setLocalInput('');
     setEmpreiteiraInput('');
     setAtividadeInput('');
     onFilterChange(tarefas);
   };
 
-  const hasActiveFilters = selectedStatus.length > 0 || selectedLocais.length > 0 || selectedEmpreiteiras.length > 0 || selectedAtividades.length > 0;
-  const activeFiltersCount = selectedStatus.length + selectedLocais.length + selectedEmpreiteiras.length + selectedAtividades.length;
+  const handleDataCriacaoChange = (value: string) => {
+    setDataCriacaoInput(value);
+    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, value, dataLimiteInput);
+  };
+
+  const handleDataLimiteChange = (value: string) => {
+    setDataLimiteInput(value);
+    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, value);
+  };
+
+  const hasActiveFilters =
+    selectedStatus.length > 0 || selectedLocais.length > 0 || selectedEmpreiteiras.length > 0 || selectedAtividades.length > 0 || dataCriacaoInput.trim() || dataLimiteInput.trim();
+  const activeFiltersCount =
+    selectedStatus.length + selectedLocais.length + selectedEmpreiteiras.length + selectedAtividades.length + (dataCriacaoInput.trim() ? 1 : 0) + (dataLimiteInput.trim() ? 1 : 0);
 
   // Filtrar sugestões baseadas no texto digitado
   const getFilteredLocais = () => {
@@ -371,6 +409,34 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Data de Criação Filter */}
+          <div>
+            <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Data de Criação</h5>
+            <div className="relative">
+              <input
+                type="text"
+                value={dataCriacaoInput}
+                onChange={(e) => handleDataCriacaoChange(e.target.value)}
+                placeholder="Ex: 2024-01-15, 2024-02-20"
+                className="w-full text-gray-900 placeholder-gray-400 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Data Limite Filter */}
+          <div>
+            <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Data Limite</h5>
+            <div className="relative">
+              <input
+                type="text"
+                value={dataLimiteInput}
+                onChange={(e) => handleDataLimiteChange(e.target.value)}
+                placeholder="Ex: 2024-03-10, 2024-04-05"
+                className="w-full text-gray-900 placeholder-gray-400 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm"
+              />
             </div>
           </div>
         </div>

@@ -62,9 +62,9 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hover:shadow-xl transition-shadow duration-300">
+    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hover:shadow-xl transition-shadow duration-300 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-all duration-200" onClick={handleToggleExpand}>
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-5 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-all duration-200" onClick={handleToggleExpand}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-3 mb-2 sm:mb-0">
             <div className="flex items-center space-x-2">
@@ -105,7 +105,7 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
         <div className="animate-in slide-in-from-top-2 duration-300">
           {/* Summary */}
           {onPay && (
-            <div className="px-6 py-4 bg-gray-50 border-b">
+            <div className="px-8 py-5 bg-gray-50 border-b">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div className="mb-2 sm:mb-0">
                   <span className="text-sm text-gray-600">Valor Total:</span>
@@ -135,7 +135,7 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
 
           {/* Loading State */}
           {isLoading && (
-            <div className="px-6 py-12 text-center">
+            <div className="px-8 py-12 text-center">
               <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
               <p className="text-gray-600">Carregando tarefas...</p>
             </div>
@@ -148,7 +148,7 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
               <ObraFilters tarefas={obra.tarefas} onFilterChange={setFilteredTarefas} />
 
               {/* Tasks Table */}
-              <div className="p-6">
+              <div className="p-8">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-800">Tarefas</h4>
                   <button

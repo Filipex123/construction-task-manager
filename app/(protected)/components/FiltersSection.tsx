@@ -9,6 +9,8 @@ export interface FiltersState {
   empreiteira: string;
   dataInicio: string;
   dataFim: string;
+  dataCriacao: string;
+  dataLimite: string;
 }
 
 interface FiltersSectionProps {
@@ -41,7 +43,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({ searchTerm, onSe
       </div>
 
       {showFilters && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4 p-4 bg-gray-50 rounded-lg">
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-1">Local</label>
             <input
@@ -90,8 +92,30 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({ searchTerm, onSe
               className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 text-gray-900 placeholder-gray-400"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-500 mb-1">Data de Criação</label>
+            <input
+              type="text"
+              value={filters.dataCriacao}
+              onChange={(e) => onFilterChange('dataCriacao', e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 text-gray-900 placeholder-gray-400"
+              placeholder="Ex: 2024-01-15, 2024-02-20"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-500 mb-1">Data Limite</label>
+            <input
+              type="text"
+              value={filters.dataLimite}
+              onChange={(e) => onFilterChange('dataLimite', e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 text-gray-900 placeholder-gray-400"
+              placeholder="Ex: 2024-03-10, 2024-04-05"
+            />
+          </div>
           {hasActiveFilters && (
             <>
+              <div></div>
+              <div></div>
               <div></div>
               <div></div>
               <div></div>

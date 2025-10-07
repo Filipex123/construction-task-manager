@@ -203,6 +203,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empreiteira</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Criação</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Limite</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
           </tr>
@@ -216,6 +218,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.quantidade}</td>
               <td className="px-4 py-4 text-sm font-medium text-gray-900">{formatCurrency(tarefa.valor)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.empreiteira}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.dataCriacao}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.dataLimite}</td>
               <td className="px-4 py-4 text-sm">
                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.statusPagamento]}`}>{statusLabels[tarefa.statusPagamento]}</span>
               </td>
