@@ -15,6 +15,51 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   const [selectedAtividades, setSelectedAtividades] = useState<string[]>([]);
   const [dataCriacaoInput, setDataCriacaoInput] = useState('');
   const [dataLimiteInput, setDataLimiteInput] = useState('');
+
+  // Função para formatar data para DD/MM/YYYY
+  const formatDateToDisplay = (dateString: string): string => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  // Função para converter DD/MM/YYYY para YYYY-MM-DD (formato do input date)
+  const formatDateForInput = (dateString: string): string => {
+    if (!dateString) return '';
+
+    // Se já está no formato YYYY-MM-DD, retorna como está
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return dateString;
+    }
+
+    // Se está no formato DD/MM/YYYY, converte para YYYY-MM-DD
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+      const [day, month, year] = dateString.split('/');
+      return `${year}-${month}-${day}`;
+    }
+
+    return '';
+  };
+
+  // Função para aplicar máscara DD/MM/YYYY durante a digitação
+  const applyDateMask = (value: string): string => {
+    // Remove tudo que não é dígito
+    const digits = value.replace(/\D/g, '');
+
+    // Aplica a máscara DD/MM/YYYY
+    if (digits.length <= 2) {
+      return digits;
+    } else if (digits.length <= 4) {
+      return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    } else {
+      return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
+    }
+  };
   const [localInput, setLocalInput] = useState('');
   const [empreiteiraInput, setEmpreiteiraInput] = useState('');
   const [atividadeInput, setAtividadeInput] = useState('');
@@ -34,7 +79,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
 
   const statusColors = {
     pendente: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    em_andamento: 'bg-blue-100 text-blue-800 border-blue-200',
+    em_andamento: 'bg-blue-100 text-blue-800 border-blue-200 text-center',
     pago: 'bg-green-100 text-green-800 border-green-200',
     atrasado: 'bg-red-100 text-red-800 border-red-200',
   };
@@ -75,25 +120,23 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     }
 
     if (dataCriacao.trim()) {
-      const dataCriacaoTerms = dataCriacao
-        .split(',')
-        .map((term) => term.trim())
-        .filter((term) => term);
-      filtered = filtered.filter((t) => {
-        const dataCriacaoStr = t.dataCriacao ? new Date(t.dataCriacao).toISOString().split('T')[0] : '';
-        return dataCriacaoTerms.some((term) => dataCriacaoStr.includes(term));
-      });
+      const dataCriacaoFormatted = formatDateForInput(dataCriacao);
+      if (dataCriacaoFormatted) {
+        filtered = filtered.filter((t) => {
+          const dataCriacaoStr = t.dataCriacao ? new Date(t.dataCriacao).toISOString().split('T')[0] : '';
+          return dataCriacaoStr === dataCriacaoFormatted;
+        });
+      }
     }
 
     if (dataLimite.trim()) {
-      const dataLimiteTerms = dataLimite
-        .split(',')
-        .map((term) => term.trim())
-        .filter((term) => term);
-      filtered = filtered.filter((t) => {
-        const dataLimiteStr = t.dataLimite ? new Date(t.dataLimite).toISOString().split('T')[0] : '';
-        return dataLimiteTerms.some((term) => dataLimiteStr.includes(term));
-      });
+      const dataLimiteFormatted = formatDateForInput(dataLimite);
+      if (dataLimiteFormatted) {
+        filtered = filtered.filter((t) => {
+          const dataLimiteStr = t.dataLimite ? new Date(t.dataLimite).toISOString().split('T')[0] : '';
+          return dataLimiteStr === dataLimiteFormatted;
+        });
+      }
     }
 
     onFilterChange(filtered);
@@ -165,13 +208,17 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   };
 
   const handleDataCriacaoChange = (value: string) => {
-    setDataCriacaoInput(value);
-    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, value, dataLimiteInput);
+    // Se o valor é do input date (YYYY-MM-DD), converte para DD/MM/YYYY para exibição
+    const displayValue = value.includes('-') ? formatDateToDisplay(value) : applyDateMask(value);
+    setDataCriacaoInput(displayValue);
+    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, displayValue, dataLimiteInput);
   };
 
   const handleDataLimiteChange = (value: string) => {
-    setDataLimiteInput(value);
-    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, value);
+    // Se o valor é do input date (YYYY-MM-DD), converte para DD/MM/YYYY para exibição
+    const displayValue = value.includes('-') ? formatDateToDisplay(value) : applyDateMask(value);
+    setDataLimiteInput(displayValue);
+    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, displayValue);
   };
 
   const hasActiveFilters =
@@ -412,31 +459,33 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
             </div>
           </div>
 
-          {/* Data de Criação Filter */}
-          <div>
-            <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Data de Criação</h5>
-            <div className="relative">
-              <input
-                type="text"
-                value={dataCriacaoInput}
-                onChange={(e) => handleDataCriacaoChange(e.target.value)}
-                placeholder="Ex: 2024-01-15, 2024-02-20"
-                className="w-full text-gray-900 placeholder-gray-400 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all text-sm"
-              />
+          <div className="flex flex-row gap-6">
+            {/* Data de Criação Filter */}
+            <div className="flex-1">
+              <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Data de Criação</h5>
+              <div className="relative">
+                <input
+                  type="date"
+                  value={formatDateForInput(dataCriacaoInput)}
+                  onChange={(e) => handleDataCriacaoChange(e.target.value)}
+                  className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all text-sm"
+                />
+                {dataCriacaoInput && <div className="mt-2 text-xs text-gray-500">Filtrado por: {dataCriacaoInput}</div>}
+              </div>
             </div>
-          </div>
 
-          {/* Data Limite Filter */}
-          <div>
-            <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Data Limite</h5>
-            <div className="relative">
-              <input
-                type="text"
-                value={dataLimiteInput}
-                onChange={(e) => handleDataLimiteChange(e.target.value)}
-                placeholder="Ex: 2024-03-10, 2024-04-05"
-                className="w-full text-gray-900 placeholder-gray-400 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm"
-              />
+            {/* Data Limite Filter */}
+            <div className="flex-1">
+              <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Data Limite</h5>
+              <div className="relative">
+                <input
+                  type="date"
+                  value={formatDateForInput(dataLimiteInput)}
+                  onChange={(e) => handleDataLimiteChange(e.target.value)}
+                  className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm"
+                />
+                {dataLimiteInput && <div className="mt-2 text-xs text-gray-500">Filtrado por: {dataLimiteInput}</div>}
+              </div>
             </div>
           </div>
         </div>

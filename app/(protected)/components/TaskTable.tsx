@@ -71,6 +71,17 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
     }).format(value);
   };
 
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const handleTaskClick = (tarefa: Tarefa) => {
     setSelectedTask(tarefa);
     setIsDetailModalOpen(true);
@@ -218,10 +229,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.quantidade}</td>
               <td className="px-4 py-4 text-sm font-medium text-gray-900">{formatCurrency(tarefa.valor)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.empreiteira}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.dataCriacao}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.dataLimite}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{formatDate(tarefa.dataCriacao)}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{formatDate(tarefa.dataLimite)}</td>
               <td className="px-4 py-4 text-sm">
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.statusPagamento]}`}>{statusLabels[tarefa.statusPagamento]}</span>
+                <span className={`inline-flex  w-[100px] h-[40px] items-center justify-center px-2 py-1 text-xs font-semibold rounded-full text-center ${statusConfig[tarefa.statusPagamento]}`}>
+                  {statusLabels[tarefa.statusPagamento]}
+                </span>
               </td>
               <td className="px-4 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                 <div className="flex space-x-2">
