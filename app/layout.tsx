@@ -34,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased  bg-gray-100`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen font-sans antialiased  bg-gray-100`}>
         <SidebarProvider>
           <PageTitleProvider>
             <PageTemplate children={children} />
