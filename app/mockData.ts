@@ -536,7 +536,7 @@ export const mockContractors: Empreiteira[] = [
   },
 ];
 
-export const mockUnits: UnidadeMedida[] =[
+export const mockUnits: UnidadeMedida[] = [
   {
     id: 1,
     descricao: 'Metro Quadrado',
@@ -585,4 +585,4 @@ export const mockUnits: UnidadeMedida[] =[
     complemento: 't',
     createdAt: '2024-01-22',
   },
-]);
+];
