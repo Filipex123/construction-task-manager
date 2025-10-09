@@ -32,6 +32,20 @@ export interface Obra {
   tarefas: Tarefa[];
 }
 
+export interface Empreiteira {
+  id: number;
+  nome: string;
+  descricao: string;
+  createdAt: string;
+}
+
+export interface UnidadeMedida {
+  id: number;
+  descricao: string;
+  complemento: string;
+  createdAt: string;
+}
+
 export type StatusColor = {
   [key in Tarefa['statusPagamento']]: string;
 };
