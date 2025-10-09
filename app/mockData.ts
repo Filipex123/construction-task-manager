@@ -1,4 +1,4 @@
-import { Obra, PaymentData } from './types';
+import { Empreiteira, Obra, PaymentData, UnidadeMedida } from './types';
 
 export const mockObras: Obra[] = [
   {
@@ -484,3 +484,105 @@ export const mockLocais = [
   { id: '17', name: 'Áreas externas' },
   { id: '18', name: 'Segurança' },
 ];
+
+export const mockContractors: Empreiteira[] = [
+  {
+    id: 1,
+    descricao: 'Especializada em fundações e terraplanagem',
+    nome: 'SoloFirme',
+    createdAt: '2024-02-01',
+  },
+  {
+    id: 2,
+    descricao: 'Serviços de alvenaria estrutural e acabamentos',
+    nome: 'Constrular',
+    createdAt: '2024-02-02',
+  },
+  {
+    id: 3,
+    descricao: 'Instalações elétricas prediais e industriais',
+    nome: 'EletroMax',
+    createdAt: '2024-02-03',
+  },
+  {
+    id: 4,
+    descricao: 'Tubulações hidráulicas e sistemas de esgoto',
+    nome: 'Hidrosul',
+    createdAt: '2024-02-04',
+  },
+  {
+    id: 5,
+    descricao: 'Montagem de estruturas metálicas e soldagem',
+    nome: 'MetalAr',
+    createdAt: '2024-02-05',
+  },
+  {
+    id: 6,
+    descricao: 'Revestimentos cerâmicos, pisos e azulejos',
+    nome: 'RevestLar',
+    createdAt: '2024-02-06',
+  },
+  {
+    id: 7,
+    descricao: 'Serviços de pintura residencial e predial',
+    nome: 'Pintart',
+    createdAt: '2024-02-07',
+  },
+  {
+    id: 8,
+    descricao: 'Instalação de vidros temperados e esquadrias',
+    nome: 'VidroReal',
+    createdAt: '2024-02-08',
+  },
+];
+
+export const mockUnits: UnidadeMedida[] =[
+  {
+    id: 1,
+    descricao: 'Metro Quadrado',
+    complemento: 'm²',
+    createdAt: '2024-01-15',
+  },
+  {
+    id: 2,
+    descricao: 'Metro Cúbico',
+    complemento: 'm³',
+    createdAt: '2024-01-16',
+  },
+  {
+    id: 3,
+    descricao: 'Quilograma',
+    complemento: 'kg',
+    createdAt: '2024-01-17',
+  },
+  {
+    id: 4,
+    descricao: 'Quilômetro',
+    complemento: 'km',
+    createdAt: '2024-01-18',
+  },
+  {
+    id: 5,
+    descricao: 'Metro Linear',
+    complemento: 'm',
+    createdAt: '2024-01-19',
+  },
+  {
+    id: 6,
+    descricao: 'Litro',
+    complemento: 'l',
+    createdAt: '2024-01-20',
+  },
+  {
+    id: 7,
+    descricao: 'Unidade',
+    complemento: 'un',
+    createdAt: '2024-01-21',
+  },
+  {
+    id: 8,
+    descricao: 'Tonelada',
+    complemento: 't',
+    createdAt: '2024-01-22',
+  },
+]);

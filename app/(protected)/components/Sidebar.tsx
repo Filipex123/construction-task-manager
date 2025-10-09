@@ -1,16 +1,17 @@
-import React from 'react';
+import { useSidebar } from '@/app/context/Sidebar.context';
+import { ChevronDown, ChevronRight, ClipboardList, DollarSign, LogOut, Menu, Plus, Ruler, User, X } from 'lucide-react';
 import Image from 'next/image';
-import { Menu, Home, X, Plus, User, LogOut, ChevronDown, ChevronRight, DollarSign, Ruler, ClipboardList } from 'lucide-react';
+import React from 'react';
 
 interface SidebarProps {
-  isOpen: boolean;
-  toggleSidebar: () => void;
   userName: string;
   userEmail: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, userName, userEmail }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
+  const { isOpen, toggleSidebar } = useSidebar();
   const [isCadastroOpen, setIsCadastroOpen] = React.useState<boolean>(false);
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -18,7 +19,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, userNam
 
       {/* Sidebar */}
       <div
-        className={`fixed left-0 top-0 h-full bg-slate-900 text-white z-30 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 h-full bg-slate-900 text-white z-30 transform transition-all duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:relative lg:translate-x-0 ${isOpen ? 'w-64' : 'lg:w-16'} flex flex-col justify-between`}
       >
@@ -92,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, userNam
             <div className="px-4">
               <a href="/relatorios/pagamento" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
                 <ClipboardList className="w-5 h-5 flex-shrink-0" />
-                {isOpen && <span className="font-medium">Relatorio</span>}
+                {isOpen && <span className="font-medium">Relatório</span>}
               </a>
             </div>
           </nav>

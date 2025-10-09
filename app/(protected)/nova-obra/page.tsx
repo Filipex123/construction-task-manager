@@ -1,18 +1,18 @@
 'use client';
-import React, { useState, useMemo } from 'react';
-import { Plus } from 'lucide-react';
-import { Sidebar } from '../components/Sidebar';
-import { Header } from '../components/Header';
-import { SearchBar } from '../components/SearchBar';
+import { usePageTitle } from '@/app/context/PageTitle.context';
 import { mockObras as initialMockObras } from '@/app/mockData';
 import { Obra, Tarefa } from '@/app/types';
+import { Plus } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 import { LocalCard } from '../components/LocalCard';
+import { SearchBar } from '../components/SearchBar';
 
 function LocalPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [obras, setObras] = useState<Obra[]>(initialMockObras);
-   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+  const { setTitle, setSubtitle, setDescription } = usePageTitle();
 
   const filteredObras = useMemo(() => {
     return obras.filter((obra) => obra.nome.toLowerCase().includes(searchTerm.toLowerCase()) || obra.descricao.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -79,66 +79,52 @@ function LocalPage() {
     console.log('Tarefas carregadas com sucesso');
   };
 
+  React.useEffect(() => {
+    setTitle('Cadastro de Obras e Locais');
+    setSubtitle('Gerenciar Obras e Locais');
+    setDescription('Controle e monitore todas os locais das suas obras');
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex h-screen">
-        <Sidebar isOpen={sidebarOpen} toggleSidebar={handleToggleSidebar} userName="Lucas Carvalho Barros" userEmail="lucas.carvalho.barros@hotmail.com" />
+    <>
+      {/* <DashboardSummary obras={obras} /> */}
 
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Header toggleSidebar={handleToggleSidebar} title={'Controle de Obras e Locais'} />
-
-          <main className="flex-1 overflow-x-hidden overflow-y-auto">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Gerenciar Obras e Locais</h2>
-                <p className="text-gray-600">Controle e monitore todas os locais das suas obras</p>
-              </div>
-
-              {/* <DashboardSummary obras={obras} /> */}
-
-              <div className="mb-6">
-                <div>
-                  <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
-                </div>
-                <br />
-                <div className="flex items-center justify-end mb-4">                  
-                  <button
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span className="hidden sm:inline">Novo Obra</span>
-                    <span className="sm:hidden">Novo</span>
-                  </button>
-                </div>                
-              </div>
-
-              {filteredObras.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-gray-400 text-lg mb-2">Nenhuma obra encontrada</div>
-                  <p className="text-gray-500">{searchTerm ? 'Tente ajustar sua pesquisa' : 'Não há obras cadastradas'}</p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {filteredObras.map((obra) => (
-                    <LocalCard
-                      key={obra.id}
-                      obra={obra}
-                      onAddLocal={function (obraId: string, task: any): void {
-                        throw new Error('Function not implemented.');
-                      }}
-                      onUpdateLocal={function (obraId: string, tarefaId: string, task: any): void {
-                        throw new Error('Function not implemented.');
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </main>
+      <div className="mb-6">
+        <div>
+          <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+        </div>
+        <br />
+        <div className="flex items-center justify-end mb-4">
+          <button onClick={() => setIsAddModalOpen(true)} className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Novo Obra</span>
+            <span className="sm:hidden">Novo</span>
+          </button>
         </div>
       </div>
-    </div>
+
+      {filteredObras.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="text-gray-400 text-lg mb-2">Nenhuma obra encontrada</div>
+          <p className="text-gray-500">{searchTerm ? 'Tente ajustar sua pesquisa' : 'Não há obras cadastradas'}</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {filteredObras.map((obra) => (
+            <LocalCard
+              key={obra.id}
+              obra={obra}
+              onAddLocal={function (obraId: string, task: any): void {
+                throw new Error('Function not implemented.');
+              }}
+              onUpdateLocal={function (obraId: string, tarefaId: string, task: any): void {
+                throw new Error('Function not implemented.');
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 

@@ -1,17 +1,16 @@
 'use client';
-import React, { useState, useMemo } from 'react';
-import { Sidebar } from '.././components/Sidebar';
-import { Header } from '.././components/Header';
-import { SearchBar } from '.././components/SearchBar';
+import { usePageTitle } from '@/app/context/PageTitle.context';
+import React, { useMemo, useState } from 'react';
 import { mockObras as initialMockObras } from '../../mockData';
 import { Obra, Tarefa } from '../../types';
-import { ObraCard } from '.././components/ConstructionCard';
+import { SearchBar } from '.././components/SearchBar';
 import { MedidaCard } from '../components/MeasureCard';
 
 function Medicao() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [obras, setObras] = useState<Obra[]>(initialMockObras);
+  const { setTitle, setSubtitle, setDescription } = usePageTitle();
 
   const filteredObras = useMemo(() => {
     return obras.filter((obra) => obra.nome.toLowerCase().includes(searchTerm.toLowerCase()) || obra.descricao.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -49,9 +48,8 @@ function Medicao() {
     );
   };
 
-
   ///Revisar logica deve realizar a medição dos campos filtrados
-    const handlePay = (tarefaId: string) => {
+  const handlePay = (tarefaId: string) => {
     setObras((prev) =>
       prev.map((obra) => ({
         ...obra,
@@ -60,42 +58,31 @@ function Medicao() {
     );
   };
 
+  React.useEffect(() => {
+    setTitle('Medição');
+    setSubtitle('Gerenciar Medição');
+    setDescription('Controle e monitore todas as atividades das suas obras');
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex h-screen">
-        <Sidebar isOpen={sidebarOpen} toggleSidebar={handleToggleSidebar} userName="Lucas Carvalho Barros" userEmail="lucas.carvalho.barros@hotmail.com" />
-
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Header toggleSidebar={handleToggleSidebar} title="Medição" />
-
-          <main className="flex-1 overflow-x-hidden overflow-y-auto">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Gerenciar Medição</h2>
-                <p className="text-gray-600">Controle e monitore todas as atividades das suas obras</p>
-              </div>
-
-              <div className="mb-6">
-                <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
-              </div>
-
-              {filteredObras.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-gray-400 text-lg mb-2">Nenhuma obra encontrada</div>
-                  <p className="text-gray-500">{searchTerm ? 'Tente ajustar sua pesquisa' : 'Não há obras cadastradas'}</p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {filteredObras.map((obra) => (                    
-                    <MedidaCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onPay={handlePay} />                   
-                  ))}
-                </div>
-              )}
-            </div>
-          </main>
-        </div>
+    <>
+      <div className="mb-6">
+        <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
       </div>
-    </div>
+
+      {filteredObras.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="text-gray-400 text-lg mb-2">Nenhuma obra encontrada</div>
+          <p className="text-gray-500">{searchTerm ? 'Tente ajustar sua pesquisa' : 'Não há obras cadastradas'}</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {filteredObras.map((obra) => (
+            <MedidaCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onPay={handlePay} />
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
