@@ -40,10 +40,12 @@ export interface Empreiteira {
 }
 
 export interface UnidadeMedida {
-  id: number;
-  descricao: string;
-  complemento: string;
-  createdAt: string;
+  id: string;
+  complement: string;  
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+  usuarioUltimaAtualizacao?: string;
 }
 
 export type StatusColor = {

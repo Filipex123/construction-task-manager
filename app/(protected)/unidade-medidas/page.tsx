@@ -1,7 +1,7 @@
 'use client';
 
 import { usePageTitle } from '@/app/context/PageTitle.context';
-import { mockUnits } from '@/app/mockData';
+import { unidadesService } from '@/app/services/unidadesService';
 import { UnidadeMedida } from '@/app/types';
 import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
@@ -17,17 +17,16 @@ const UnidadeMedidaPage: React.FC = () => {
   const [errors, setErrors] = useState({ descricao: '', complemento: '' });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
-  const [units, setUnits] = useState<UnidadeMedida[]>(mockUnits);
+  const [units, setUnits] = useState<UnidadeMedida[]>([]);
 
   const handleToggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Dados simulados
-
+  
   // Filtrar dados
   const filteredData = useMemo(() => {
-    return units.filter((unit) => searchTerm === '' || unit.descricao.toLowerCase().includes(searchTerm.toLowerCase()) || unit.complemento.toLowerCase().includes(searchTerm.toLowerCase()));
+    return units.filter((unit) => searchTerm === '' || unit.description.toLowerCase().includes(searchTerm.toLowerCase()) || unit.complement.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [units, searchTerm]);
 
   // Paginação
@@ -48,14 +47,14 @@ const UnidadeMedidaPage: React.FC = () => {
 
     // Verificar se já existe uma unidade com a mesma descrição ou complemento
     const existingUnit = units.find(
-      (unit) => unit.id !== editingItem?.id && (unit.descricao.toLowerCase() === formData.descricao.toLowerCase() || unit.complemento.toLowerCase() === formData.complemento.toLowerCase())
+      (unit) => unit.id !== editingItem?.id && (unit.description.toLowerCase() === formData.descricao.toLowerCase() || unit.complement.toLowerCase() === formData.complemento.toLowerCase())
     );
 
     if (existingUnit) {
-      if (existingUnit.descricao.toLowerCase() === formData.descricao.toLowerCase()) {
+      if (existingUnit.description.toLowerCase() === formData.descricao.toLowerCase()) {
         newErrors.descricao = 'Já existe uma unidade com esta descrição';
       }
-      if (existingUnit.complemento.toLowerCase() === formData.complemento.toLowerCase()) {
+      if (existingUnit.complement.toLowerCase() === formData.complemento.toLowerCase()) {
         newErrors.complemento = 'Já existe uma unidade com este complemento';
       }
     }
@@ -67,7 +66,7 @@ const UnidadeMedidaPage: React.FC = () => {
   const handleOpenModal = (unit?: UnidadeMedida) => {
     if (unit) {
       setEditingItem(unit);
-      setFormData({ descricao: unit.descricao, complemento: unit.complemento });
+      setFormData({ descricao: unit.description, complemento: unit.complement });
     } else {
       setEditingItem(null);
       setFormData({ descricao: '', complemento: '' });
@@ -83,40 +82,45 @@ const UnidadeMedidaPage: React.FC = () => {
     setErrors({ descricao: '', complemento: '' });
   };
 
-  const handleSave = () => {
-    if (!validateForm()) return;
+const handleSave = async () => {
+  if (!validateForm()) return;
 
+  try {
     if (editingItem) {
-      // Editar
-      setUnits((prev) => prev.map((unit) => (unit.id === editingItem.id ? { ...unit, descricao: formData.descricao, complemento: formData.complemento } : unit)));
+      await unidadesService.atualizar(editingItem.id, {
+        description: formData.descricao,
+        complement: formData.complemento,
+      });
     } else {
-      // Criar novo
-      const newUnit: UnidadeMedida = {
-        id: Math.max(...units.map((u) => u.id)) + 1,
-        descricao: formData.descricao,
-        complemento: formData.complemento,
-        createdAt: new Date().toISOString().split('T')[0],
-      };
-      setUnits((prev) => [...prev, newUnit]);
+      await unidadesService.criar({
+        description: formData.descricao,
+        complement: formData.complemento,
+      });
     }
 
+    const data = await unidadesService.listar();
+    setUnits(data);
     handleCloseModal();
-  };
+  } catch (error) {
+    console.error(error);
+    alert('Erro ao salvar unidade.');
+  }
+};
 
-  const handleDelete = (id: number) => {
-    if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
-      setUnits((prev) => prev.filter((unit) => unit.id !== id));
 
-      // Ajustar página atual se necessário
-      const newFilteredData = units
-        .filter((unit) => unit.id !== id)
-        .filter((unit) => searchTerm === '' || unit.descricao.toLowerCase().includes(searchTerm.toLowerCase()) || unit.complemento.toLowerCase().includes(searchTerm.toLowerCase()));
-      const newTotalPages = Math.ceil(newFilteredData.length / itemsPerPage);
-      if (currentPage > newTotalPages && newTotalPages > 0) {
-        setCurrentPage(newTotalPages);
-      }
+  const handleDelete = async (id: string) => {
+  if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
+    try {
+      await unidadesService.excluir(id);
+      const data = await unidadesService.listar();
+      setUnits(data);
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao excluir unidade.');
     }
-  };
+  }
+};
+
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR');
@@ -125,7 +129,21 @@ const UnidadeMedidaPage: React.FC = () => {
   React.useEffect(() => {
     setTitle('Cadastro de Unidade');
     setSubtitle('Unidades de Medida');
-    setSubtitle('Cadastro e Controle das Unidades de Medida');
+    setDescription('Cadastro e Controle das Unidades de Medida');
+
+    const carregar = async () => {
+      try {
+        
+        const data = await unidadesService.listar();
+        console.error(data);
+        setUnits(data);
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao carregar unidades.');
+      }
+    };
+
+    carregar();
   }, []);
 
   return (
@@ -165,9 +183,9 @@ const UnidadeMedidaPage: React.FC = () => {
                 {paginatedData.map((unit) => (
                   <tr key={unit.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.descricao}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{unit.complemento}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(unit.createdAt)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.complement}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{unit.description}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.createdAt}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex space-x-2">
                         <button onClick={() => handleOpenModal(unit)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
@@ -293,7 +311,7 @@ const UnidadeMedidaPage: React.FC = () => {
                   <input
                     id="complemento"
                     type="text"
-                    value={formData.descricao}
+                    value={formData.complemento}
                     onChange={(e) => setFormData((prev) => ({ ...prev, complemento: e.target.value }))}
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.descricao ? 'border-red-300' : 'border-gray-300'
