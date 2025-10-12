@@ -1,7 +1,7 @@
 'use client';
 
 import { usePageTitle } from '@/app/context/PageTitle.context';
-import { mockContractors } from '@/app/mockData';
+import { empreiteraService } from '@/app/services/empreiteiraService';
 import { Empreiteira } from '@/app/types';
 import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
@@ -16,14 +16,15 @@ const EmpreiteiraPage: React.FC = () => {
   const [editingItem, setEditingItem] = useState<Empreiteira | null>(null);
   const [formData, setFormData] = useState({ descricao: '', nome: '' });
   const [errors, setErrors] = useState({ descricao: '', nome: '' });
-  const [contractors, setContractors] = useState<Empreiteira[]>(mockContractors);
+  const [contractors, setContractors] = useState<Empreiteira[]>([]);
 
   // Filtrar dados
   const filteredData = useMemo(() => {
     return contractors.filter(
-      (mockcontractor) => searchTerm === '' || mockcontractor.descricao.toLowerCase().includes(searchTerm.toLowerCase()) || mockcontractor.nome.toLowerCase().includes(searchTerm.toLowerCase())
+      (contractor) => searchTerm === '' || contractor.description.toLowerCase().includes(searchTerm.toLowerCase()) || contractor.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [contractors, searchTerm]);
+
 
   // Paginação
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -43,14 +44,14 @@ const EmpreiteiraPage: React.FC = () => {
 
     // Verificar se já existe uma unidade com a mesma descrição ou complemento
     const existingUnit = contractors.find(
-      (unit) => unit.id !== editingItem?.id && (unit.descricao.toLowerCase() === formData.descricao.toLowerCase() || unit.nome.toLowerCase() === formData.nome.toLowerCase())
+      (unit) => unit.id !== editingItem?.id && (unit.description.toLowerCase() === formData.descricao.toLowerCase() || unit.name.toLowerCase() === formData.nome.toLowerCase())
     );
 
     if (existingUnit) {
-      if (existingUnit.descricao.toLowerCase() === formData.descricao.toLowerCase()) {
+      if (existingUnit.description.toLowerCase() === formData.descricao.toLowerCase()) {
         newErrors.descricao = 'Já existe uma unidade com esta descrição';
       }
-      if (existingUnit.nome.toLowerCase() === formData.nome.toLowerCase()) {
+      if (existingUnit.name.toLowerCase() === formData.nome.toLowerCase()) {
         newErrors.nome = 'Já existe uma unidade com este nome';
       }
     }
@@ -62,7 +63,7 @@ const EmpreiteiraPage: React.FC = () => {
   const handleOpenModal = (unit?: Empreiteira) => {
     if (unit) {
       setEditingItem(unit);
-      setFormData({ descricao: unit.descricao, nome: unit.nome });
+      setFormData({ descricao: unit.description, nome: unit.name });
     } else {
       setEditingItem(null);
       setFormData({ descricao: '', nome: '' });
@@ -78,37 +79,43 @@ const EmpreiteiraPage: React.FC = () => {
     setErrors({ descricao: '', nome: '' });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateForm()) return;
-
-    if (editingItem) {
-      // Editar
-      setContractors((prev) => prev.map((unit) => (unit.id === editingItem.id ? { ...unit, descricao: formData.descricao, nome: formData.nome } : unit)));
-    } else {
-      // Criar novo
-      const newUnit: Empreiteira = {
-        id: Math.max(...contractors.map((u) => u.id)) + 1,
-        descricao: formData.descricao,
-        nome: formData.nome,
-        createdAt: new Date().toISOString().split('T')[0],
-      };
-      setContractors((prev) => [...prev, newUnit]);
+  
+    try {
+      if (editingItem) {
+        await empreiteraService.atualizar(editingItem.id, {
+          description: formData.descricao,
+          name: formData.nome,
+        });
+      } else {
+        await empreiteraService.criar({
+          description: formData.descricao,
+          name: formData.nome,
+          entity: '',
+          cnpj: ''
+        });
+      }
+  
+      const data = await empreiteraService.listar();
+      setContractors(data);
+      handleCloseModal();
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao salvar unidade.');
     }
-
-    handleCloseModal();
   };
 
-  const handleDelete = (id: number) => {
-    if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
-      setContractors((prev) => prev.filter((unit) => unit.id !== id));
 
-      // Ajustar página atual se necessário
-      const newFilteredData = contractors
-        .filter((unit) => unit.id !== id)
-        .filter((unit) => searchTerm === '' || unit.descricao.toLowerCase().includes(searchTerm.toLowerCase()) || unit.nome.toLowerCase().includes(searchTerm.toLowerCase()));
-      const newTotalPages = Math.ceil(newFilteredData.length / itemsPerPage);
-      if (currentPage > newTotalPages && newTotalPages > 0) {
-        setCurrentPage(newTotalPages);
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
+      try {
+        await empreiteraService.excluir(id);
+        const data = await empreiteraService.listar();
+        setContractors(data);
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao excluir unidade.');
       }
     }
   };
@@ -121,7 +128,19 @@ const EmpreiteiraPage: React.FC = () => {
     setTitle('Cadastro de Empreiteiras');
     setSubtitle('Empreiteiras');
     setDescription('Cadastro e Controle das Empreiteiras parceiras');
-  }, []);
+  
+      const carregar = async () => {
+        try {        
+          const data = await empreiteraService.listar();               
+          setContractors(data);
+        } catch (error) {
+          console.error(error);
+          alert('Erro ao carregar unidades.');
+        }
+      };
+  
+      carregar();
+    }, []);
 
   return (
     <div className="space-y-6">
@@ -159,9 +178,9 @@ const EmpreiteiraPage: React.FC = () => {
               {paginatedData.map((unit) => (
                 <tr key={unit.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-600">{unit.nome}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.descricao}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(unit.createdAt)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-600">{unit.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.description}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.createdAt}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex space-x-2">
                       <button onClick={() => handleOpenModal(unit)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
@@ -263,6 +282,22 @@ const EmpreiteiraPage: React.FC = () => {
             </div>
 
             <div className="p-6 space-y-4">
+               <div>
+                <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-2">
+                  Nome *
+                </label>
+                <input
+                  id="nome"
+                  type="text"
+                  value={formData.nome}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, nome: e.target.value }))}
+                  className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
+                    errors.nome ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Ex: Construtora Vital²"
+                />
+                {errors.nome && <p className="mt-1 text-sm text-red-600">{errors.nome}</p>}
+              </div>
               <div>
                 <label htmlFor="descricao" className="block text-sm font-medium text-gray-700 mb-2">
                   Descrição *
@@ -275,27 +310,10 @@ const EmpreiteiraPage: React.FC = () => {
                   className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                     errors.descricao ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="Ex: Metro Quadrado"
+                  placeholder="Ex: Construtora responsavel por realizar fundação e baldrame"
                 />
                 {errors.descricao && <p className="mt-1 text-sm text-red-600">{errors.descricao}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="complemento" className="block text-sm font-medium text-gray-700 mb-2">
-                  Complemento *
-                </label>
-                <input
-                  id="complemento"
-                  type="text"
-                  value={formData.nome}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, complemento: e.target.value }))}
-                  className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
-                    errors.nome ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                  placeholder="Ex: m²"
-                />
-                {errors.nome && <p className="mt-1 text-sm text-red-600">{errors.nome}</p>}
-              </div>
+              </div>             
             </div>
 
             <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200">

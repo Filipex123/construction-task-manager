@@ -1,23 +1,23 @@
 'use client';
 
 import { usePageTitle } from '@/app/context/PageTitle.context';
-import { unidadesService } from '@/app/services/unidadesService';
-import { UnidadeMedida } from '@/app/types';
+import { atividadesService } from '@/app/services/atividadesService';
+import { Atividades } from '@/app/types';
 import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { SearchBar } from '../components/SearchBar';
 
-const UnidadeMedidaPage: React.FC = () => {
+const AtividadesPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingItem, setEditingItem] = useState<UnidadeMedida | null>(null);
+  const [editingItem, setEditingItem] = useState<Atividades | null>(null);
   const [formData, setFormData] = useState({ descricao: '', complemento: '' });
   const [errors, setErrors] = useState({ descricao: '', complemento: '' });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
-  const [units, setUnits] = useState<UnidadeMedida[]>([]);
+  const [units, setUnits] = useState<Atividades[]>([]);
 
   const handleToggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -63,7 +63,7 @@ const UnidadeMedidaPage: React.FC = () => {
     return !newErrors.descricao && !newErrors.complemento;
   };
 
-  const handleOpenModal = (unit?: UnidadeMedida) => {
+  const handleOpenModal = (unit?: Atividades) => {
     if (unit) {
       setEditingItem(unit);
       setFormData({ descricao: unit.description, complemento: unit.complement });
@@ -87,18 +87,18 @@ const handleSave = async () => {
 
   try {
     if (editingItem) {
-      await unidadesService.atualizar(editingItem.ID, {
+      await atividadesService.atualizar(editingItem.ID, {
         description: formData.descricao,
         complement: formData.complemento,
       });
     } else {
-      await unidadesService.criar({
+      await atividadesService.criar({
         description: formData.descricao,
         complement: formData.complemento,
       });
     }
 
-    const data = await unidadesService.listar();
+    const data = await atividadesService.listar();
     setUnits(data);
     handleCloseModal();
   } catch (error) {
@@ -111,8 +111,8 @@ const handleSave = async () => {
   const handleDelete = async (id: string) => {
   if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
     try {
-      await unidadesService.excluir(id);
-      const data = await unidadesService.listar();
+      await atividadesService.excluir(id);
+      const data = await atividadesService.listar();
       setUnits(data);
     } catch (error) {
       console.error(error);
@@ -127,13 +127,13 @@ const handleSave = async () => {
   };
 
   React.useEffect(() => {
-    setTitle('Cadastro de Unidade');
-    setSubtitle('Unidades de Medida');
-    setDescription('Cadastro e Controle das Unidades de Medida');
+    setTitle('Cadastro de Atividades');
+    setSubtitle('Atividades');
+    setDescription('Cadastro e Controle das Atividades');
 
     const carregar = async () => {
       try {        
-        const data = await unidadesService.listar();        
+        const data = await atividadesService.listar();        
         setUnits(data);
       } catch (error) {
         console.error(error);
@@ -150,7 +150,7 @@ const handleSave = async () => {
         <div className="flex items-center justify-between">
           <button onClick={() => handleOpenModal()} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <Plus className="h-4 w-4 mr-2" />
-            Nova Unidade
+            Nova Atividade
           </button>
         </div>
 
@@ -278,7 +278,7 @@ const handleSave = async () => {
           <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-900">{editingItem ? 'Editar Unidade de Medida' : 'Nova Unidade de Medida'}</h2>
+                <h2 className="text-xl font-semibold text-gray-900">{editingItem ? 'Editar Atividade' : 'Nova Atividade'}</h2>
                 <button onClick={handleCloseModal} className="text-gray-400 hover:text-gray-600 transition-colors">
                   <X className="h-6 w-6" />
                 </button>
@@ -297,7 +297,7 @@ const handleSave = async () => {
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.descricao ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Ex: Metro Quadrado"
+                    placeholder="Ex: Contrapiso"
                   />
                   {errors.descricao && <p className="mt-1 text-sm text-red-600">{errors.descricao}</p>}
                 </div>
@@ -314,7 +314,7 @@ const handleSave = async () => {
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.descricao ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Ex: m²"
+                    placeholder="Ex: Atividade reponsavel por nivelar o contrapiso"
                   />
                   {errors.descricao && <p className="mt-1 text-sm text-red-600">{errors.descricao}</p>}
                 </div>
@@ -337,4 +337,4 @@ const handleSave = async () => {
   );
 };
 
-export default UnidadeMedidaPage;
+export default AtividadesPage;

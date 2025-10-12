@@ -79,6 +79,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
                   <a href="/tarefa" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro de Tarefa</span>
                   </a>
+                  <a href="/atividades" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                    <span className="text-sm">Cadastro de Atividades</span>
+                  </a>
                   <a href="/empreiteira" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro Empreiteira</span>
                   </a>

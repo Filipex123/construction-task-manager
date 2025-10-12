@@ -33,19 +33,32 @@ export interface Obra {
 }
 
 export interface Empreiteira {
-  id: number;
-  nome: string;
-  descricao: string;
-  createdAt: string;
+  id: string;
+  entity?:string;
+  name: string;
+  cnpj?: string;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export interface UnidadeMedida {
-  id: string;
+  ID: string;
   complement: string;  
   description: string;
   createdAt?: string;
   updatedAt?: string;
-  usuarioUltimaAtualizacao?: string;
+  updatedBy?: string;
+}
+
+export interface Atividades {
+  ID: string;
+  complement: string;  
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export type StatusColor = {
