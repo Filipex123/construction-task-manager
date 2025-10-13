@@ -1,6 +1,6 @@
 import { Atividades } from '@/app/types';
 
-const API_URL = 'https://nowtgniebi.execute-api.us-east-1.amazonaws.com/prod/unidadesdemedida';
+const API_URL = 'https://8dg3v1avkb.execute-api.us-east-1.amazonaws.com/prod/atividades';
 
 export const atividadesService = {
   async listar(): Promise<Atividades[]> {
