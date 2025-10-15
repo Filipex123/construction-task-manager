@@ -1,8 +1,6 @@
+import { Local, Tarefa } from '@/app/types';
+import { ChevronLeft, ChevronRight, Edit3, Grid, List, Trash2 } from 'lucide-react';
 import React from 'react';
-import { Edit3, Trash2, DollarSign, Grid, List, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Tarefa, StatusColor, Local } from '@/app/types';
-import { TaskDetailModal } from './TaskDetailModal';
-import { SinglePaymentModal } from './SinglePaymentModal';
 
 interface LocalTableProps {
   locais: Local[];

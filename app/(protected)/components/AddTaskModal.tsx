@@ -3,11 +3,6 @@ import { Building2, DollarSign, Edit3, Hash, MapPin, Package, Plus, Wrench, X } 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Tarefa } from '../../types';
 
-interface idName {
-  id: number | string | undefined;
-  name: string;
-}
-
 interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,27 +14,16 @@ interface AddTaskModalProps {
 }
 
 export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAddTask, obraId, mode = 'add', initialTask = null, onUpdateTask }) => {
-  const [formData, setFormData] = useState({
-    local: { id: 0, name: '' },
-    atividade: { id: 0, name: '' },
-    unidade: { id: 0, name: '' },
-    empreiteira: { id: 0, name: '' },
-    quantidade: '',
-    valor: '',
-    statusPagamento: 'pendente' as Tarefa['paymentStatus'],
-  });
-
+  const [formData, setFormData] = useState<Omit<Tarefa, 'id'>>();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const unidadeOptions = ['m²', 'm³', 'm', 'unidade', 'kg', 'ton', 'ponto', 'peça', 'conjunto', 'verba'];
-
   const statusOptions = [
     { value: 'pendente', label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
     { value: 'em_andamento', label: 'Em Andamento', color: 'bg-blue-100 text-blue-800' },
     { value: 'pago', label: 'Pago', color: 'bg-green-100 text-green-800' },
     { value: 'atrasado', label: 'Atrasado', color: 'bg-red-100 text-red-800' },
   ];
-
   const empreiteiraOptions = [
     {
       id: 1,
@@ -101,15 +85,15 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.local.name.trim()) newErrors.local = 'Local é obrigatório';
-    if (!formData.atividade.name.trim()) newErrors.atividade = 'Atividade é obrigatória';
-    if (!formData.quantidade || parseFloat(formData.quantidade) <= 0) {
+    if (!formData?.location?.name?.trim()) newErrors.local = 'Local é obrigatório';
+    if (!formData?.activity?.name?.trim()) newErrors.atividade = 'Atividade é obrigatória';
+    if (!formData?.quantity || formData.quantity <= 0) {
       newErrors.quantidade = 'Quantidade deve ser maior que zero';
     }
-    if (!formData.valor || parseFloat(formData.valor) <= 0) {
+    if (!formData?.totalAmount || formData.totalAmount <= 0) {
       newErrors.valor = 'Valor deve ser maior que zero';
     }
-    if (!formData.empreiteira.name.trim()) newErrors.empreiteira = 'Empreiteira é obrigatória';
+    if (!formData?.contractor?.name?.trim()) newErrors.empreiteira = 'Empreiteira é obrigatória';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -121,13 +105,13 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     if (!validateForm()) return;
 
     const newTask: Omit<Tarefa, 'id'> = {
-      location: { id: Number(formData.local.id), name: formData.local.name.trim() },
-      activity: { id: Number(formData.atividade.id), name: formData.atividade.name.trim() },
-      unitOfMeasure: { id: Number(formData.unidade.id), name: formData.unidade.name.trim() },
-      contractor: { id: Number(formData.empreiteira.id), name: formData.empreiteira.name.trim() },
-      quantity: parseFloat(formData.quantidade),
-      totalAmount: parseFloat(formData.valor),
-      paymentStatus: formData.statusPagamento,
+      location: { id: Number(formData?.location?.id), name: formData?.location?.name?.trim() },
+      activity: { id: Number(formData?.activity?.id), name: formData?.activity?.name?.trim() },
+      unitOfMeasure: { id: Number(formData?.unitOfMeasure?.id), name: formData?.unitOfMeasure?.name?.trim() },
+      contractor: { id: Number(formData?.contractor?.id), name: formData?.contractor?.name?.trim() },
+      quantity: formData?.quantity,
+      totalAmount: formData?.totalAmount,
+      paymentStatus: formData?.paymentStatus,
       measurementStatus: 'pendente',
       quantityExecuted: 0,
     };
@@ -142,13 +126,13 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
   const handleClose = () => {
     setFormData({
-      local: { id: 0, name: '' },
-      atividade: { id: 0, name: '' },
-      unidade: { id: 0, name: '' },
-      empreiteira: { id: 0, name: '' },
-      quantidade: '',
-      valor: '',
-      statusPagamento: 'pendente',
+      location: { id: 0, name: '' },
+      activity: { id: 0, name: '' },
+      unitOfMeasure: { id: 0, name: '' },
+      contractor: { id: 0, name: '' },
+      quantity: 0,
+      totalAmount: 0,
+      paymentStatus: 'pendente',
     });
     setErrors({});
     onClose();
@@ -158,25 +142,25 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
   useEffect(() => {
     if (isOpen && mode === 'edit' && initialTask) {
       setFormData({
-        local: initialTask.location,
-        atividade: initialTask.activity,
-        unidade: initialTask.unitOfMeasure,
-        quantidade: String(initialTask.quantity ?? ''),
-        valor: String(initialTask.totalAmount ?? ''),
-        empreiteira: initialTask.contractor,
-        statusPagamento: initialTask.paymentStatus,
+        location: initialTask.location,
+        activity: initialTask.activity,
+        unitOfMeasure: initialTask.unitOfMeasure,
+        quantity: initialTask.quantity ?? 0,
+        totalAmount: initialTask.totalAmount ?? 0,
+        contractor: initialTask.contractor,
+        paymentStatus: initialTask.paymentStatus,
       });
       setErrors({});
     }
     if (isOpen && mode === 'add' && !initialTask) {
       setFormData({
-        local: { id: 0, name: '' },
-        atividade: '',
-        unidade: 'm²',
-        quantidade: '',
-        valor: '',
-        empreiteira: '',
-        statusPagamento: 'pendente',
+        location: { id: 0, name: '' },
+        activity: { id: 0, name: '' },
+        unitOfMeasure: { id: 0, name: '' },
+        contractor: { id: 0, name: '' },
+        quantity: 0,
+        totalAmount: 0,
+        paymentStatus: 'pendente',
       });
       setErrors({});
     }
@@ -186,22 +170,24 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
   const isDirty = useMemo(() => {
     if (mode !== 'edit' || !initialTask) return true; // allow add mode
     const normalized = {
-      local: { id: formData.local.id, name: formData.local.name },
-      atividade: formData.atividade.trim(),
-      unidade: formData.unidade,
-      quantidade: parseFloat(formData.quantidade || '0'),
-      valor: parseFloat(formData.valor || '0'),
-      empreiteira: formData.empreiteira.trim(),
-      statusPagamento: formData.statusPagamento,
+      location: { id: Number(formData?.location?.id), name: formData?.location?.name?.trim() },
+      activity: { id: Number(formData?.activity?.id), name: formData?.activity?.name?.trim() },
+      unitOfMeasure: { id: Number(formData?.unitOfMeasure?.id), name: formData?.unitOfMeasure?.name?.trim() },
+      contractor: { id: Number(formData?.contractor?.id), name: formData?.contractor?.name?.trim() },
+      quantity: formData?.quantity,
+      totalAmount: formData?.totalAmount,
+      paymentStatus: formData?.paymentStatus,
+      measurementStatus: 'pendente',
+      quantityExecuted: 0,
     };
     return (
-      normalized.local !== initialTask.location ||
-      normalized.atividade !== initialTask.activity ||
-      normalized.unidade !== initialTask.unitOfMeasure ||
-      normalized.quantidade !== initialTask.quantity ||
-      normalized.valor !== initialTask.totalAmount ||
-      normalized.empreiteira !== initialTask.contractor ||
-      normalized.statusPagamento !== initialTask.paymentStatus
+      normalized.location !== initialTask.location ||
+      normalized.activity !== initialTask.activity ||
+      normalized.unitOfMeasure !== initialTask.unitOfMeasure ||
+      normalized.quantity !== initialTask.quantity ||
+      normalized.totalAmount !== initialTask.totalAmount ||
+      normalized.contractor !== initialTask.contractor ||
+      normalized.paymentStatus !== initialTask.paymentStatus
     );
   }, [mode, initialTask, formData]);
 
@@ -230,7 +216,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
               <span>Local</span>
             </label>
             <select
-              value={formData.local.id}
+              value={formData?.location?.id}
               onChange={(e) => {
                 const selected = mockLocais.find((l) => l.id === e.target.value) || { id: '', name: '' };
                 setFormData((prev) => ({ ...prev, local: selected }));
@@ -260,7 +246,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
             </label>
             <input
               type="text"
-              value={formData.atividade}
+              value={formData?.activity?.name}
               onChange={(e) => handleInputChange('atividade', e.target.value)}
               placeholder="Ex: Instalação de piso cerâmico"
               className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
@@ -278,7 +264,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                 <span>Unidade</span>
               </label>
               <select
-                value={formData.unidade}
+                value={formData?.unitOfMeasure?.name}
                 onChange={(e) => handleInputChange('unidade', e.target.value)}
                 className="w-full text-gray-900 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               >
@@ -299,7 +285,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                 type="number"
                 step="0.01"
                 min="0"
-                value={formData.quantidade}
+                value={formData?.quantity}
                 onChange={(e) => handleInputChange('quantidade', e.target.value)}
                 placeholder="0"
                 className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
@@ -320,7 +306,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
               type="number"
               step="0.01"
               min="0"
-              value={formData.valor}
+              value={formData?.totalAmount}
               onChange={(e) => handleInputChange('valor', e.target.value)}
               placeholder="0,00"
               className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
@@ -337,7 +323,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
               <span>Empreiteira</span>
             </label>
             <select
-              value={formData.empreiteira}
+              value={formData?.contractor?.name}
               onChange={(e) => {
                 setFormData((prev) => ({ ...prev, empreiteira: e.target.value }));
                 if (errors.empreiteira) setErrors((prev) => ({ ...prev, empreiteira: '' }));
@@ -368,7 +354,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                   type="button"
                   onClick={() => handleInputChange('status', option.value)}
                   className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
-                    formData.statusPagamento === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                    formData?.paymentStatus === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${option.color}`}>{option.label}</span>

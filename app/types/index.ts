@@ -1,14 +1,14 @@
 export interface Tarefa {
   id: number;
-  location: Local;
-  activity: Atividades;
-  unitOfMeasure: UnidadeMedida;
-  contractor: Empreiteira;
-  quantity: number;
-  totalAmount: number;
-  paymentStatus: 'em_andamento' | 'pendente' | 'pago' | 'atrasado';
-  measurementStatus: 'em_andamento' | 'pendente' | 'medido' | 'retencao';
-  quantityExecuted: number;
+  location?: Local;
+  activity?: Atividades;
+  unitOfMeasure?: UnidadeMedida;
+  contractor?: Empreiteira;
+  quantity?: number;
+  totalAmount?: number;
+  paymentStatus?: 'em_andamento' | 'pendente' | 'pago' | 'atrasado';
+  measurementStatus?: 'em_andamento' | 'pendente' | 'medido' | 'retencao';
+  quantityExecuted?: number;
   measurementDate?: string;
   dueDate?: string;
   paymentDate?: string;
@@ -19,7 +19,7 @@ export interface Tarefa {
 
 export interface Local {
   id?: number;
-  name: string;
+  name?: string;
   fkObra?: number;
   updatedAt?: string;
   updatedBy?: string;
@@ -70,11 +70,11 @@ export interface PageableResponse<T> {
 }
 
 export type StatusColor = {
-  [key in Tarefa['paymentStatus']]: string;
+  [key in NonNullable<Tarefa['paymentStatus']>]: string;
 };
 
 export type StatusColorMedicao = {
-  [key in Tarefa['measurementStatus']]: string;
+  [key in NonNullable<Tarefa['measurementStatus']>]: string;
 };
 
 // will be descontinued

@@ -19,7 +19,7 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
     }).format(value);
   };
 
-  const totalValue = tarefas.reduce((sum, tarefa) => sum + tarefa.totalAmount, 0);
+  const totalValue = tarefas.reduce((sum, tarefa) => sum + (tarefa.totalAmount ?? 0), 0);
   const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.contractor)));
   const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.location)));
 
@@ -109,22 +109,22 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
                   <div key={tarefa.id} className={`p-4 ${index !== tarefas.length - 1 ? 'border-b border-gray-200' : ''}`}>
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 text-sm truncate">{tarefa.activity}</h4>
+                        <h4 className="font-medium text-gray-900 text-sm truncate">{tarefa.activity?.name}</h4>
                         <div className="flex items-center space-x-2 mt-1">
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <MapPin className="w-3 h-3" />
-                            <span className="truncate">{tarefa.location.name}</span>
+                            <span className="truncate">{tarefa.location!.name}</span>
                           </div>
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <Building2 className="w-3 h-3" />
-                            <span className="truncate">{tarefa.contractor}</span>
+                            <span className="truncate">{tarefa.contractor?.name}</span>
                           </div>
                         </div>
                       </div>
                       <div className="ml-4 text-right">
-                        <p className="font-semibold text-green-600 text-sm">{formatCurrency(tarefa.totalAmount)}</p>
+                        <p className="font-semibold text-green-600 text-sm">{formatCurrency(tarefa.totalAmount!)}</p>
                         <p className="text-xs text-gray-500">
-                          {tarefa.quantity} {tarefa.unitOfMeasure}
+                          {tarefa.quantity} {tarefa.unitOfMeasure?.name}
                         </p>
                       </div>
                     </div>
@@ -141,8 +141,8 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
               </h3>
               <div className="flex flex-wrap gap-2">
                 {uniqueEmpreiteiras.map((empreiteira) => (
-                  <span key={empreiteira} className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
-                    {empreiteira}
+                  <span key={empreiteira?.id} className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                    {empreiteira?.name}
                   </span>
                 ))}
               </div>
@@ -156,8 +156,8 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
               </h3>
               <div className="flex flex-wrap gap-2">
                 {uniqueLocais.map((local) => (
-                  <span key={local.id} className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
-                    {local.name}
+                  <span key={local!.id} className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+                    {local!.name}
                   </span>
                 ))}
               </div>

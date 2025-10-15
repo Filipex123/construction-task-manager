@@ -13,7 +13,7 @@ const AtividadesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<Atividades | null>(null);
-  const [formData, setFormData] = useState({ descricao: '', complemento: '' });
+  const [formData, setFormData] = useState({ name: '', description: '' });
   const [errors, setErrors] = useState({ descricao: '', complemento: '' });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
@@ -25,7 +25,7 @@ const AtividadesPage: React.FC = () => {
 
   // Filtrar dados
   const filteredData = useMemo(() => {
-    return activities.filter((act) => searchTerm === '' || act.description.toLowerCase().includes(searchTerm.toLowerCase()) || act.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    return activities.filter((act) => searchTerm === '' || act.description!.toLowerCase().includes(searchTerm.toLowerCase()) || act.name!.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [activities, searchTerm]);
 
   // Paginação
@@ -36,24 +36,24 @@ const AtividadesPage: React.FC = () => {
   const validateForm = () => {
     const newErrors = { descricao: '', complemento: '' };
 
-    if (!formData.descricao.trim()) {
+    if (!formData.name.trim()) {
       newErrors.descricao = 'Descrição é obrigatória';
     }
 
-    if (!formData.complemento.trim()) {
+    if (!formData.description.trim()) {
       newErrors.complemento = 'Complemento é obrigatório';
     }
 
     // Verificar se já existe uma unidade com a mesma descrição ou complemento
     const existingActivity = activities.find(
-      (unit) => unit.id !== editingItem?.id && (unit.description.toLowerCase() === formData.descricao.toLowerCase() || unit.name.toLowerCase() === formData.complemento.toLowerCase())
+      (act) => act.id !== editingItem?.id && (act.description!.toLowerCase() === formData.name.toLowerCase() || act.name!.toLowerCase() === formData.description.toLowerCase())
     );
 
     if (existingActivity) {
-      if (existingActivity.description.toLowerCase() === formData.descricao.toLowerCase()) {
+      if (existingActivity.description!.toLowerCase() === formData.name.toLowerCase()) {
         newErrors.descricao = 'Já existe uma unidade com esta descrição';
       }
-      if (existingActivity.name.toLowerCase() === formData.complemento.toLowerCase()) {
+      if (existingActivity.name!.toLowerCase() === formData.description.toLowerCase()) {
         newErrors.complemento = 'Já existe uma unidade com este complemento';
       }
     }
@@ -65,10 +65,10 @@ const AtividadesPage: React.FC = () => {
   const handleOpenModal = (act?: Atividades) => {
     if (act) {
       setEditingItem(act);
-      setFormData({ descricao: act.description, complemento: act.name });
+      setFormData({ name: act.name!, description: act.description! });
     } else {
       setEditingItem(null);
-      setFormData({ descricao: '', complemento: '' });
+      setFormData({ name: '', description: '' });
     }
     setErrors({ descricao: '', complemento: '' });
     setShowModal(true);
@@ -77,7 +77,7 @@ const AtividadesPage: React.FC = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingItem(null);
-    setFormData({ descricao: '', complemento: '' });
+    setFormData({ name: '', description: '' });
     setErrors({ descricao: '', complemento: '' });
   };
 
@@ -87,13 +87,13 @@ const AtividadesPage: React.FC = () => {
     try {
       if (editingItem) {
         await atividadesService.atualizar(Number(editingItem.id), {
-          description: formData.descricao,
-          name: formData.complemento,
+          description: formData.name,
+          name: formData.description,
         });
       } else {
         await atividadesService.criar({
-          description: formData.descricao,
-          name: formData.complemento,
+          description: formData.name,
+          name: formData.description,
         });
       }
 
@@ -289,7 +289,7 @@ const AtividadesPage: React.FC = () => {
                   <input
                     id="descricao"
                     type="text"
-                    value={formData.descricao}
+                    value={formData.name}
                     onChange={(e) => setFormData((prev) => ({ ...prev, descricao: e.target.value }))}
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.descricao ? 'border-red-300' : 'border-gray-300'
@@ -306,7 +306,7 @@ const AtividadesPage: React.FC = () => {
                   <input
                     id="complemento"
                     type="text"
-                    value={formData.complemento}
+                    value={formData.description}
                     onChange={(e) => setFormData((prev) => ({ ...prev, complemento: e.target.value }))}
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.descricao ? 'border-red-300' : 'border-gray-300'

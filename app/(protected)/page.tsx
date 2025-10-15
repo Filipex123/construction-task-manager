@@ -13,7 +13,7 @@ function Home() {
   const [obras, setObras] = useState<Obra[]>([]);
 
   const filteredObras = useMemo(() => {
-    return obras.filter((obra) => obra.name.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    return obras.filter((obra) => obra.name!.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description!.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
   const handleEdit = (obraId: number, tarefaId: number, updated: Omit<Tarefa, 'id'>) => {

@@ -49,7 +49,7 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
   const getTotalValue = () => {
     console.log('Calculating total value for filteredTarefas:', filteredTarefas);
     if (filteredTarefas.length === 0) return 0;
-    return filteredTarefas.reduce((total, tarefa) => total + tarefa.totalAmount, 0);
+    return filteredTarefas.reduce((total, tarefa) => total + (tarefa.totalAmount ?? 0), 0);
   };
 
   const formatCurrency = (value: number) => {
@@ -190,11 +190,11 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
           setIsAddModalOpen(false);
           setEditTaskId(null);
         }}
-        onAddTask={(task) => onAddTask(obra.id, task)}
-        obraId={obra.id}
+        onAddTask={(task) => onAddTask(obra.id!, task)}
+        obraId={obra.id!}
         mode={editTaskId ? 'edit' : 'add'}
         initialTask={editTaskId ? filteredTarefas.find((t) => t.id === editTaskId) ?? null : null}
-        onUpdateTask={(tarefaId, task) => onUpdateTask(obra.id, tarefaId, task)}
+        onUpdateTask={(tarefaId, task) => onUpdateTask(obra.id!, tarefaId, task)}
       />
       <BatchPaymentModal isOpen={isBatchPaymentModalOpen} onClose={() => setIsBatchPaymentModalOpen(false)} onConfirm={handleBatchPayment} tarefas={filteredTarefas} />
     </div>

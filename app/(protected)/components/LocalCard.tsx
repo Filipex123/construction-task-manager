@@ -13,7 +13,7 @@ interface LocalCardProps {
 }
 
 export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal, onUpdateLocal, onLoadLocal }) => {
-  const [locais, setLocais] = React.useState(obra.tarefas.flatMap((t) => t.location));
+  const [locais, setLocais] = React.useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [editLocalId, setEditLocalId] = React.useState<string | null>(null);
   const [isExpanded, setIsExpanded] = React.useState(false);
