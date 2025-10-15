@@ -1,30 +1,32 @@
-import { Building, ChevronDown, ChevronUp, Loader2, Plus } from 'lucide-react';
+import { localService } from '@/app/services/localService';
+import { Building, ChevronDown, ChevronUp, Edit3, Loader2, Plus, Trash2 } from 'lucide-react';
 import React from 'react';
-import { Obra } from '../../types';
+import { Local, Obra } from '../../types';
+import { ConfirmModal } from './ConfirmModal';
 import { LocalTable } from './LocalTable';
 import { SimpleModal } from './SimpleModal';
 
 interface LocalCardProps {
   obra: Obra;
-  onDelete?: (tarefaId: string) => void;
-  onAddLocal: (obraId: string, task: any) => void;
-  onUpdateLocal: (obraId: string, tarefaId: string, task: any) => void;
-  onLoadLocal?: (obraId: string) => Promise<void>;
+  onDelete: (obraId: number) => void;
+  onUpdate: (obraId: number) => void;
 }
 
-export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal, onUpdateLocal, onLoadLocal }) => {
-  const [locais, setLocais] = React.useState([]);
+export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }) => {
+  const [locais, setLocais] = React.useState<Local[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
-  const [editLocalId, setEditLocalId] = React.useState<string | null>(null);
+  const [editLocation, setEditLocation] = React.useState<Local | null>({ name: '', fkObra: obra.id } as Local);
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [hasLoadedTasks, setHasLoadedTasks] = React.useState(locais.length > 0);
 
   const handleToggleExpand = async () => {
-    if (!isExpanded && !hasLoadedTasks && onLoadLocal) {
+    if (!isExpanded && !hasLoadedTasks) {
       setIsLoading(true);
       try {
-        await onLoadLocal(obra.id);
+        const data = await localService.listar(obra.id);
+        setLocais(data.items || []);
         setHasLoadedTasks(true);
       } catch (error) {
         console.error('Erro ao carregar tarefas:', error);
@@ -33,6 +35,38 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal
       }
     }
     setIsExpanded(!isExpanded);
+  };
+
+  const handleSave = async (obraId: number, name: string) => {
+    try {
+      const data = await localService.criar({ name: name, fkObra: obraId });
+      setLocais((prevLocais) => [...prevLocais, data]);
+    } catch (error) {
+      console.error('Erro ao adicionar local:', error);
+    }
+  };
+
+  const handleEdit = async (name: string) => {
+    if (editLocation) {
+      try {
+        const data = await localService.atualizar(editLocation.id!, { name: name });
+        console.log('Local atualizado:', data);
+        setLocais((prevLocais) => prevLocais.map((local) => (local.id === data.id ? data : local)));
+        setEditLocation(null);
+        setIsAddModalOpen(false);
+      } catch (error) {
+        console.error('Erro ao adicionar local:', error);
+      }
+    }
+  };
+
+  const handleDelete = async (localId: number) => {
+    try {
+      await localService.excluir(localId);
+      setLocais((prevLocais) => prevLocais.filter((local) => local.id !== localId));
+    } catch (error) {
+      console.error('Erro ao excluir local:', error);
+    }
   };
 
   return (
@@ -50,11 +84,35 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal
               <p className="text-blue-100 text-sm">{obra.description}</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4 text-sm">
-            <div className="flex items-center space-x-2">
-              <div className="bg-white/20 px-3 py-1 rounded-full">
-                <span className="font-medium">{obra.tarefas.length} Locais</span>
-              </div>
+          <div className="flex items-center space-x-4 text-sm justify-end">
+            <div className="flex items-center space-x-4 ">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUpdate(obra.id!);
+                }}
+                className="p-2 text-gray-200 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors"
+                title="Editar"
+              >
+                <Edit3 className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsConfirmModalOpen(true);
+                }}
+                className="p-2 text-red-400 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors"
+                title="Deletar"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+
+              {hasLoadedTasks && (
+                <div className="bg-white/20 px-3 py-1 rounded-full">
+                  <span className="font-medium">{locais.length} Locais</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -63,18 +121,10 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal
       {/* Expandable Content */}
       {isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
-          {/* Loading State */}
-          {isLoading && (
-            <div className="px-6 py-12 text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-              <p className="text-gray-600">Carregando Locais...</p>
-            </div>
-          )}
-
           {/* Content when not loading */}
           {!isLoading && (
             <>
-              {/* Tasks Table */}
+              {/* Location Table */}
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-800">Locais</h4>
@@ -88,7 +138,7 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal
                   </button>
                 </div>
 
-                {obra.tarefas.length === 0 ? (
+                {locais.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="text-gray-400 text-lg mb-2">Nenhum local encontrado</div>
                     <p className="text-gray-500">Adicione o primeiro local desta obra</p>
@@ -97,10 +147,12 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal
                   <LocalTable
                     locais={locais}
                     onEdit={(id) => {
-                      setEditLocalId(id);
+                      const locationToEdit = locais.find((local) => local.id === id) || null;
+                      setEditLocation(locationToEdit);
+                      console.log('Editando local:', locationToEdit);
                       setIsAddModalOpen(true);
                     }}
-                    onDelete={() => {}}
+                    onDelete={handleDelete}
                   />
                 )}
               </div>
@@ -113,12 +165,28 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal
         isOpen={isAddModalOpen}
         onClose={() => {
           setIsAddModalOpen(false);
-          setEditLocalId(null);
+          setEditLocation(null);
         }}
-        handleSave={() => {}}
+        handleSave={(info) => {
+          handleSave(obra.id!, info.value);
+        }}
+        handleEdit={(info) => {
+          handleEdit(info.value);
+        }}
         title={'Local'}
-        value={''}
-        description={''}
+        value={editLocation?.name ?? ''}
+        valuePlaceholder="Nome do local"
+        isEdit={editLocation?.name !== '' && editLocation?.id !== undefined}
+      />
+
+      {/*❌ Modal de confirmacao de delecao */}
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onConfirm={() => {
+          onDelete(obra.id!);
+          setIsConfirmModalOpen(false);
+        }}
+        onCancel={() => setIsConfirmModalOpen(false)}
       />
     </div>
   );

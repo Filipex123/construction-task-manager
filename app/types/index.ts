@@ -1,16 +1,16 @@
 export interface Tarefa {
   id: number;
-  location?: Local;
-  activity?: Atividades;
-  unitOfMeasure?: UnidadeMedida;
-  contractor?: Empreiteira;
-  quantity?: number;
-  totalAmount?: number;
-  paymentStatus?: 'em_andamento' | 'pendente' | 'pago' | 'atrasado';
-  measurementStatus?: 'em_andamento' | 'pendente' | 'medido' | 'retencao';
-  quantityExecuted?: number;
+  location: Local;
+  activity: Atividades;
+  unitOfMeasure: UnidadeMedida;
+  contractor: Empreiteira;
+  quantity: number;
+  totalAmount: number;
+  paymentStatus: 'em_andamento' | 'pendente' | 'pago' | 'atrasado';
+  measurementStatus: 'em_andamento' | 'pendente' | 'medido' | 'retencao';
+  quantityExecuted: number;
   measurementDate?: string;
-  dueDate?: string;
+  dueDate: string;
   paymentDate?: string;
   createdAt?: string;
   updatedAt?: string;

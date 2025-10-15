@@ -4,8 +4,8 @@ import React from 'react';
 
 interface LocalTableProps {
   locais: Local[];
-  onEdit: (tarefaId: string) => void;
-  onDelete: (tarefaId: string) => void;
+  onEdit: (localId: number) => void;
+  onDelete: (localId: number) => void;
 }
 
 type MobileView = 'table' | 'cards' | 'list';
@@ -47,18 +47,6 @@ export const LocalTable: React.FC<LocalTableProps> = ({ locais, onEdit, onDelete
     setCurrentPage(page);
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
-
-  const handleTaskClick = (tarefa: Tarefa) => {
-    setSelectedTask(tarefa);
-    setIsDetailModalOpen(true);
-  };
-
   const handleCloseDetailModal = () => {
     setIsDetailModalOpen(false);
     setSelectedTask(null);
@@ -66,11 +54,11 @@ export const LocalTable: React.FC<LocalTableProps> = ({ locais, onEdit, onDelete
 
   const ActionButtons = ({ local: local }: { local: Local }) => (
     <div className="flex space-x-2">
-      <button onClick={() => onEdit(local.id)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors" title="Editar">
+      <button onClick={() => onEdit(local.id!)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors" title="Editar">
         <Edit3 className="w-4 h-4" />
       </button>
 
-      <button onClick={() => onDelete(local.id)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors" title="Deletar">
+      <button onClick={() => onDelete(local.id!)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors" title="Deletar">
         <Trash2 className="w-4 h-4" />
       </button>
     </div>
@@ -143,11 +131,11 @@ export const LocalTable: React.FC<LocalTableProps> = ({ locais, onEdit, onDelete
               <td className="px-4 py-4 text-sm text-gray-900">{local.name}</td>
               <td className="px-4 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                 <div className="flex space-x-2">
-                  <button onClick={() => onEdit(local.id)} className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded transition-colors" title="Editar">
+                  <button onClick={() => onEdit(local.id!)} className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded transition-colors" title="Editar">
                     <Edit3 className="w-4 h-4" />
                   </button>
                   {onDelete && (
-                    <button onClick={() => onDelete(local.id)} className="p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors" title="Deletar">
+                    <button onClick={() => onDelete(local.id!)} className="p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors" title="Deletar">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}

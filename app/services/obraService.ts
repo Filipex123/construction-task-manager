@@ -19,31 +19,37 @@ export const obraService = {
     }
   },
 
-  async buscarPorId(id: string): Promise<Obra> {
+  async buscarPorId(id: number): Promise<Obra> {
     const res = await fetch(`${API_URL}/${id}`);
     if (!res.ok) throw new Error('Erro ao buscar obra');
     return res.json();
   },
 
-  async criar(dados: Omit<Obra, 'ID'>): Promise<void> {
+  async criar(dados: Omit<Obra, 'ID'>): Promise<Obra> {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dados),
     });
     if (!res.ok) throw new Error('Erro ao criar obra');
+
+    const data = await res.json();
+    return data.item;
   },
 
-  async atualizar(id: string, dados: Partial<Obra>): Promise<void> {
+  async atualizar(id: number, dados: Partial<Obra>): Promise<Obra> {
     const res = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dados),
     });
     if (!res.ok) throw new Error('Erro ao atualizar obra');
+
+    const { data } = await res.json();
+    return data;
   },
 
-  async excluir(id: string): Promise<void> {
+  async excluir(id: number): Promise<void> {
     const res = await fetch(`${API_URL}/${id}`, {
       method: 'DELETE',
     });
