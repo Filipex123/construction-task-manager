@@ -13,14 +13,14 @@ function TarefaPage() {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
 
   const filteredObras = useMemo(() => {
-    return obras.filter((obra) => obra.nome.toLowerCase().includes(searchTerm.toLowerCase()) || obra.descricao.toLowerCase().includes(searchTerm.toLowerCase()));
+    return obras.filter((obra) => obra.name.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
   const handleToggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const handleEdit = (obraId: string, tarefaId: string, updated: Omit<Tarefa, 'id'>) => {
+  const handleEdit = (obraId: number, tarefaId: number, updated: Omit<Tarefa, 'id'>) => {
     setObras((prevObras) =>
       prevObras.map((obra) => {
         if (obra.id !== obraId) return obra;
@@ -32,7 +32,7 @@ function TarefaPage() {
     );
   };
 
-  const handleDelete = (tarefaId: string) => {
+  const handleDelete = (tarefaId: number) => {
     setObras((prevObras) =>
       prevObras.map((obra) => ({
         ...obra,
@@ -41,24 +41,23 @@ function TarefaPage() {
     );
   };
 
-  const handlePay = (tarefaId: string) => {
+  const handlePay = (tarefaId: number) => {
     setObras((prev) =>
       prev.map((obra) => ({
         ...obra,
-        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, statusPagamento: 'pago' } : t)),
+        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, paymentStatus: 'pago' } : t)),
       }))
     );
   };
 
-  const handleAddTask = (obraId: string, newTask: Omit<Tarefa, 'id'>) => {
+  const handleAddTask = (obraId: number, newTask: Omit<Tarefa, 'id'>) => {
     setObras((prevObras) =>
       prevObras.map((obra) => {
         if (obra.id === obraId) {
-          const taskId = `${obraId}-${Date.now()}`;
-          const taskWithId: Tarefa = { ...newTask, id: taskId };
+          // const taskWithId: Tarefa = { ...newTask };
           return {
             ...obra,
-            tarefas: [...obra.tarefas, taskWithId],
+            tarefas: [...obra.tarefas, newTask as Tarefa],
           };
         }
         return obra;
@@ -106,7 +105,7 @@ function TarefaPage() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <ObraCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onAddTask={handleAddTask} />
+            <ObraCard key={obra.id} obraId={obra.id} onUpdateTask={handleEdit} onAddTask={handleAddTask} />
           ))}
         </div>
       )}

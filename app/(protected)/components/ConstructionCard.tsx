@@ -1,41 +1,42 @@
+import { tarefaService } from '@/app/services/tarefaService';
+import { Building, ChevronDown, ChevronUp, DollarSign, Loader2, Plus } from 'lucide-react';
 import React from 'react';
-import { Building, Plus, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
-import { DollarSign } from 'lucide-react';
-import { Obra } from '../../types';
-import { TaskTable } from './TaskTable';
+import { Obra, Tarefa } from '../../types';
 import { AddTaskModal } from './AddTaskModal';
-import { ObraFilters } from './ObraFilters';
 import { BatchPaymentModal } from './BatchPaymentModal';
+import { ObraFilters } from './ObraFilters';
+import { TaskTable } from './TaskTable';
 
 interface ObraCardProps {
   obra: Obra;
-  onDelete?: (tarefaId: string) => void;
-  onPay?: (tarefaId: string) => void;
-  onAddTask: (obraId: string, task: any) => void;
-  onUpdateTask: (obraId: string, tarefaId: string, task: any) => void;
-  onLoadTasks?: (obraId: string) => Promise<void>;
+  onDelete?: (tarefaId: number) => void;
+  onPay?: (tarefaId: number) => void;
+  onAddTask: (obraId: number, task: any) => void;
+  onUpdateTask: (obraId: number, tarefaId: number, task: any) => void;
 }
 
-export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAddTask, onUpdateTask, onLoadTasks }) => {
+export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAddTask, onUpdateTask }) => {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [isBatchPaymentModalOpen, setIsBatchPaymentModalOpen] = React.useState(false);
-  const [filteredTarefas, setFilteredTarefas] = React.useState(obra.tarefas);
-  const [editTaskId, setEditTaskId] = React.useState<string | null>(null);
+  const [editTaskId, setEditTaskId] = React.useState<number | null>(null);
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [hasLoadedTasks, setHasLoadedTasks] = React.useState(obra.tarefas.length > 0);
+  const [filteredTarefas, setFilteredTarefas] = React.useState<Tarefa[]>([]);
 
-  // Update filtered tasks when obra.tarefas changes
-  React.useEffect(() => {
-    setFilteredTarefas(obra.tarefas);
-  }, [obra.tarefas]);
+  // const [hasLoadedTasks, setHasLoadedTasks] = React.useState(obra.tarefas.length > 0);
+  const handleLoadTasks = async (obraId: number) => {
+    const data = await tarefaService.listar(obraId ?? 2);
+    setFilteredTarefas(data.items || []);
+    return data;
+  };
 
   const handleToggleExpand = async () => {
-    if (!isExpanded && !hasLoadedTasks && onLoadTasks) {
+    if (!isExpanded && filteredTarefas.length === 0 && obra.id) {
       setIsLoading(true);
       try {
-        await onLoadTasks(obra.id);
-        setHasLoadedTasks(true);
+        await handleLoadTasks(obra.id);
+        console.log('Tarefas carregadas para obra:', filteredTarefas);
+        // setHasLoadedTasks(true);
       } catch (error) {
         console.error('Erro ao carregar tarefas:', error);
       } finally {
@@ -46,7 +47,9 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
   };
 
   const getTotalValue = () => {
-    return filteredTarefas.reduce((total, tarefa) => total + tarefa.valor, 0);
+    console.log('Calculating total value for filteredTarefas:', filteredTarefas);
+    if (filteredTarefas.length === 0) return 0;
+    return filteredTarefas.reduce((total, tarefa) => total + tarefa.totalAmount, 0);
   };
 
   const formatCurrency = (value: number) => {
@@ -72,15 +75,18 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
               {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </div>
             <div>
-              <h3 className="text-xl font-bold">{obra.nome}</h3>
-              <p className="text-blue-100 text-sm">{obra.descricao}</p>
+              <h3 className="text-xl font-bold">{obra.name}</h3>
+              <p className="text-blue-100 text-sm">{obra.description}</p>
             </div>
           </div>
           <div className="flex items-center space-x-4 text-sm">
             <div className="flex items-center space-x-2">
-              <div className="bg-white/20 px-3 py-1 rounded-full">
-                <span className="font-medium">{obra.tarefas.length} tarefas</span>
-              </div>
+              {isExpanded && (
+                <div className="bg-white/20 px-3 py-1 rounded-full">
+                  <span className="font-medium">{filteredTarefas.length} tarefas</span>
+                </div>
+              )}
+
               {isExpanded && onPay && (
                 <button
                   onClick={(e) => {
@@ -94,7 +100,6 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
                   <span>Em Lote</span>
                 </button>
               )}
-              {/* <div className="text-sm opacity-75">{isExpanded ? 'Clique para recolher' : 'Clique para expandir'}</div> */}
             </div>
           </div>
         </div>
@@ -103,6 +108,14 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
       {/* Expandable Content */}
       {isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
+          {/* Loading State */}
+          {/* {isLoading && (
+            <div className="px-8 py-12 text-center">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+              <p className="text-gray-600">Carregando tarefas...</p>
+            </div>
+          )} */}
+
           {/* Summary */}
           {onPay && (
             <div className="px-8 py-5 bg-gray-50 border-b">
@@ -113,19 +126,19 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
                 </div>
                 <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
                   <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'pago').length} pago</span>
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus === 'pago').length} pago</span>
                     <div className="w-full h-1 bg-green-500 rounded-full" />
                   </span>
                   <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'em_andamento').length} em andamento</span>
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus === 'em_andamento').length} em andamento</span>
                     <div className="w-full h-1 bg-blue-500 rounded-full" />
                   </span>
                   <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'pendente').length} pendente</span>
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus === 'pendente').length} pendente</span>
                     <div className="w-full h-1 bg-yellow-500 rounded-full" />
                   </span>
                   <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.statusPagamento === 'atrasado').length} atrasado</span>
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus === 'atrasado').length} atrasado</span>
                     <div className="w-full h-1 bg-red-500 rounded-full" />
                   </span>
                 </div>
@@ -133,53 +146,42 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
             </div>
           )}
 
-          {/* Loading State */}
-          {isLoading && (
-            <div className="px-8 py-12 text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-              <p className="text-gray-600">Carregando tarefas...</p>
-            </div>
-          )}
-
           {/* Content when not loading */}
-          {!isLoading && (
-            <>
-              {/* Filters */}
-              <ObraFilters tarefas={obra.tarefas} onFilterChange={setFilteredTarefas} />
 
-              {/* Tasks Table */}
-              <div className="p-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-semibold text-gray-800">Tarefas</h4>
-                  <button
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span className="hidden sm:inline">Nova Tarefa</span>
-                    <span className="sm:hidden">Nova</span>
-                  </button>
-                </div>
+          {/* Filters */}
+          <ObraFilters tarefas={filteredTarefas} onFilterChange={setFilteredTarefas} />
 
-                {obra.tarefas.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="text-gray-400 text-lg mb-2">Nenhuma tarefa encontrada</div>
-                    <p className="text-gray-500">Adicione a primeira tarefa desta obra</p>
-                  </div>
-                ) : (
-                  <TaskTable
-                    tarefas={filteredTarefas}
-                    onEdit={(id) => {
-                      setEditTaskId(id);
-                      setIsAddModalOpen(true);
-                    }}
-                    onDelete={onDelete}
-                    onPay={onPay}
-                  />
-                )}
+          {/* Tasks Table */}
+          <div className="p-8">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-lg font-semibold text-gray-800">Tarefas</h4>
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">Nova Tarefa</span>
+                <span className="sm:hidden">Nova</span>
+              </button>
+            </div>
+
+            {filteredTarefas.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-400 text-lg mb-2">Nenhuma tarefa encontrada</div>
+                <p className="text-gray-500">Adicione a primeira tarefa desta obra</p>
               </div>
-            </>
-          )}
+            ) : (
+              <TaskTable
+                tarefas={filteredTarefas}
+                onEdit={(id) => {
+                  setEditTaskId(id);
+                  setIsAddModalOpen(true);
+                }}
+                onDelete={onDelete}
+                onPay={onPay}
+              />
+            )}
+          </div>
         </div>
       )}
       <AddTaskModal
@@ -191,7 +193,7 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
         onAddTask={(task) => onAddTask(obra.id, task)}
         obraId={obra.id}
         mode={editTaskId ? 'edit' : 'add'}
-        initialTask={editTaskId ? obra.tarefas.find((t) => t.id === editTaskId) ?? null : null}
+        initialTask={editTaskId ? filteredTarefas.find((t) => t.id === editTaskId) ?? null : null}
         onUpdateTask={(tarefaId, task) => onUpdateTask(obra.id, tarefaId, task)}
       />
       <BatchPaymentModal isOpen={isBatchPaymentModalOpen} onClose={() => setIsBatchPaymentModalOpen(false)} onConfirm={handleBatchPayment} tarefas={filteredTarefas} />

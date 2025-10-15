@@ -13,7 +13,7 @@ function Medicao() {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
 
   const filteredObras = useMemo(() => {
-    return obras.filter((obra) => obra.nome.toLowerCase().includes(searchTerm.toLowerCase()) || obra.descricao.toLowerCase().includes(searchTerm.toLowerCase()));
+    return obras.filter((obra) => obra.name.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
   const handleToggleSidebar = () => {
@@ -53,7 +53,7 @@ function Medicao() {
     setObras((prev) =>
       prev.map((obra) => ({
         ...obra,
-        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, statusPagamento: 'pago' } : t)),
+        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, paymentStatus: 'pago' } : t)),
       }))
     );
   };

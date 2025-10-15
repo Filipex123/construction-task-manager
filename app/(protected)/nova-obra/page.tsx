@@ -15,7 +15,7 @@ function LocalPage() {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
 
   const filteredObras = useMemo(() => {
-    return obras.filter((obra) => obra.nome.toLowerCase().includes(searchTerm.toLowerCase()) || obra.descricao.toLowerCase().includes(searchTerm.toLowerCase()));
+    return obras.filter((obra) => obra.name.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
   const handleToggleSidebar = () => {

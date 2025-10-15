@@ -1,17 +1,13 @@
+import { Building, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import React from 'react';
-import { Building, Plus, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
-import { DollarSign } from 'lucide-react';
 import { Obra } from '../../types';
-import { TaskTable } from './TaskTable';
-import { AddTaskModal } from './AddTaskModal';
-import { ObraMeasureFilter } from './ObraMeasureFilter';
-import { BatchPaymentModal } from './BatchPaymentModal';
 import { MedidaTable } from './MeasureTable';
+import { ObraMeasureFilter } from './ObraMeasureFilter';
 
 interface MedidaCardProps {
   obra: Obra;
   onDelete?: (tarefaId: string) => void;
-    onPay?: (tarefaId: string) => void;
+  onPay?: (tarefaId: string) => void;
   onUpdateTask: (obraId: string, tarefaId: string, task: any) => void;
   onLoadTasks?: (obraId: string) => Promise<void>;
 }
@@ -46,7 +42,7 @@ export const MedidaCard: React.FC<MedidaCardProps> = ({ obra, onDelete, onPay, o
   };
 
   const getTotalValue = () => {
-    return filteredTarefas.reduce((total, tarefa) => total + tarefa.valor, 0);
+    return filteredTarefas.reduce((total, tarefa) => total + tarefa.totalAmount, 0);
   };
 
   return (
@@ -60,15 +56,15 @@ export const MedidaCard: React.FC<MedidaCardProps> = ({ obra, onDelete, onPay, o
               {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </div>
             <div>
-              <h3 className="text-xl font-bold">{obra.nome}</h3>
-              <p className="text-blue-100 text-sm">{obra.descricao}</p>
+              <h3 className="text-xl font-bold">{obra.name}</h3>
+              <p className="text-blue-100 text-sm">{obra.description}</p>
             </div>
           </div>
           <div className="flex items-center space-x-4 text-sm">
             <div className="flex items-center space-x-2">
               <div className="bg-white/20 px-3 py-1 rounded-full">
                 <span className="font-medium">{obra.tarefas.length} tarefas</span>
-              </div>              
+              </div>
             </div>
           </div>
         </div>

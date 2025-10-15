@@ -9,13 +9,13 @@ export const atividadesService = {
     return res.json();
   },
 
-  async buscarPorId(id: string): Promise<Atividades> {
+  async buscarPorId(id: number): Promise<Atividades> {
     const res = await fetch(`${API_URL}/${id}`);
     if (!res.ok) throw new Error('Erro ao buscar unidade');
     return res.json();
   },
 
-  async criar(dados: Omit<Atividades, 'ID'>): Promise<void> {    
+  async criar(dados: Omit<Atividades, 'id'>): Promise<void> {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -24,7 +24,7 @@ export const atividadesService = {
     if (!res.ok) throw new Error('Erro ao criar unidade');
   },
 
-  async atualizar(id: string, dados: Partial<Atividades>): Promise<void> {
+  async atualizar(id: number, dados: Partial<Atividades>): Promise<void> {
     const res = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -33,7 +33,7 @@ export const atividadesService = {
     if (!res.ok) throw new Error('Erro ao atualizar unidade');
   },
 
-  async excluir(id: string): Promise<void> {
+  async excluir(id: number): Promise<void> {
     const res = await fetch(`${API_URL}/${id}`, {
       method: 'DELETE',
     });

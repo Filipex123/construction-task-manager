@@ -1,74 +1,83 @@
 export interface Tarefa {
-  id: string;
-  local: Local;
-  atividade: string;
-  unidade: string;
-  quantidade: number;
-  valor: number;
-  empreiteira: string;
-  status?: 'pendente' | 'em_andamento' | 'concluida' | 'atrasada';
-  statusPagamento: 'em_andamento' | 'pendente' | 'pago' | 'atrasado';
-  statusMedicao: 'em_andamento' | 'pendente' | 'medido' | 'retencao';
-  statusMedidor?: string;
-  quantidadeRealizada?: number;
-  dataMedicao?: string;
-  dataPagamentoPrevista?: string;
-  dataPagamentoRealizada?: string;
-  dataCriacao?: string;
-  dataLimite?: string;
-  dataAtualizacao?: string;
-  usuarioUltimaAtualizacao?: string;
+  id: number;
+  location: Local;
+  activity: Atividades;
+  unitOfMeasure: UnidadeMedida;
+  contractor: Empreiteira;
+  quantity: number;
+  totalAmount: number;
+  paymentStatus: 'em_andamento' | 'pendente' | 'pago' | 'atrasado';
+  measurementStatus: 'em_andamento' | 'pendente' | 'medido' | 'retencao';
+  quantityExecuted: number;
+  measurementDate?: string;
+  dueDate?: string;
+  paymentDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export interface Local {
-  id: string;
+  id?: number;
   name: string;
+  fkObra?: number;
+  updatedAt?: string;
+  updatedBy?: string;
+  createdAt?: string;
 }
 export interface Obra {
-  id: string;
-  nome: string;
-  descricao: string;
-  dataInicio: string;
-  tarefas: Tarefa[];
+  id?: number;
+  name?: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export interface Empreiteira {
-  id: string;
-  entity?:string;
-  name: string;
+  id?: number;
+  name?: string;
   cnpj?: string;
-  description: string;
+  description?: string;
   createdAt?: string;
   updatedAt?: string;
   updatedBy?: string;
 }
 
 export interface UnidadeMedida {
-  ID: string;
-  complement: string;  
-  description: string;
+  id?: number;
+  name?: string;
+  description?: string;
   createdAt?: string;
   updatedAt?: string;
   updatedBy?: string;
 }
 
 export interface Atividades {
-  ID: string;
-  complement: string;  
-  description: string;
+  id?: number;
+  name?: string;
+  description?: string;
   createdAt?: string;
   updatedAt?: string;
   updatedBy?: string;
 }
 
+export interface PageableResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  size: number;
+}
+
 export type StatusColor = {
-  [key in Tarefa['statusPagamento']]: string;
+  [key in Tarefa['paymentStatus']]: string;
 };
 
 export type StatusColorMedicao = {
-  [key in Tarefa['statusMedicao']]: string;
+  [key in Tarefa['measurementStatus']]: string;
 };
 
+// will be descontinued
 export interface PaymentData {
   id: number;
   local: string;

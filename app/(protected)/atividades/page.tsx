@@ -17,17 +17,16 @@ const AtividadesPage: React.FC = () => {
   const [errors, setErrors] = useState({ descricao: '', complemento: '' });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
-  const [units, setUnits] = useState<Atividades[]>([]);
+  const [activities, setActivities] = useState<Atividades[]>([]);
 
   const handleToggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  
   // Filtrar dados
   const filteredData = useMemo(() => {
-    return units.filter((unit) => searchTerm === '' || unit.description.toLowerCase().includes(searchTerm.toLowerCase()) || unit.complement.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [units, searchTerm]);
+    return activities.filter((act) => searchTerm === '' || act.description.toLowerCase().includes(searchTerm.toLowerCase()) || act.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [activities, searchTerm]);
 
   // Paginação
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -46,15 +45,15 @@ const AtividadesPage: React.FC = () => {
     }
 
     // Verificar se já existe uma unidade com a mesma descrição ou complemento
-    const existingUnit = units.find(
-      (unit) => unit.ID !== editingItem?.ID && (unit.description.toLowerCase() === formData.descricao.toLowerCase() || unit.complement.toLowerCase() === formData.complemento.toLowerCase())
+    const existingActivity = activities.find(
+      (unit) => unit.id !== editingItem?.id && (unit.description.toLowerCase() === formData.descricao.toLowerCase() || unit.name.toLowerCase() === formData.complemento.toLowerCase())
     );
 
-    if (existingUnit) {
-      if (existingUnit.description.toLowerCase() === formData.descricao.toLowerCase()) {
+    if (existingActivity) {
+      if (existingActivity.description.toLowerCase() === formData.descricao.toLowerCase()) {
         newErrors.descricao = 'Já existe uma unidade com esta descrição';
       }
-      if (existingUnit.complement.toLowerCase() === formData.complemento.toLowerCase()) {
+      if (existingActivity.name.toLowerCase() === formData.complemento.toLowerCase()) {
         newErrors.complemento = 'Já existe uma unidade com este complemento';
       }
     }
@@ -63,10 +62,10 @@ const AtividadesPage: React.FC = () => {
     return !newErrors.descricao && !newErrors.complemento;
   };
 
-  const handleOpenModal = (unit?: Atividades) => {
-    if (unit) {
-      setEditingItem(unit);
-      setFormData({ descricao: unit.description, complemento: unit.complement });
+  const handleOpenModal = (act?: Atividades) => {
+    if (act) {
+      setEditingItem(act);
+      setFormData({ descricao: act.description, complemento: act.name });
     } else {
       setEditingItem(null);
       setFormData({ descricao: '', complemento: '' });
@@ -82,45 +81,43 @@ const AtividadesPage: React.FC = () => {
     setErrors({ descricao: '', complemento: '' });
   };
 
-const handleSave = async () => {
-  if (!validateForm()) return;
+  const handleSave = async () => {
+    if (!validateForm()) return;
 
-  try {
-    if (editingItem) {
-      await atividadesService.atualizar(editingItem.ID, {
-        description: formData.descricao,
-        complement: formData.complemento,
-      });
-    } else {
-      await atividadesService.criar({
-        description: formData.descricao,
-        complement: formData.complemento,
-      });
-    }
-
-    const data = await atividadesService.listar();
-    setUnits(data);
-    handleCloseModal();
-  } catch (error) {
-    console.error(error);
-    alert('Erro ao salvar unidade.');
-  }
-};
-
-
-  const handleDelete = async (id: string) => {
-  if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
     try {
-      await atividadesService.excluir(id);
+      if (editingItem) {
+        await atividadesService.atualizar(Number(editingItem.id), {
+          description: formData.descricao,
+          name: formData.complemento,
+        });
+      } else {
+        await atividadesService.criar({
+          description: formData.descricao,
+          name: formData.complemento,
+        });
+      }
+
       const data = await atividadesService.listar();
-      setUnits(data);
+      setActivities(data);
+      handleCloseModal();
     } catch (error) {
       console.error(error);
-      alert('Erro ao excluir unidade.');
+      alert('Erro ao salvar unidade.');
     }
-  }
-};
+  };
 
+  const handleDelete = async (id: number) => {
+    if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
+      try {
+        await atividadesService.excluir(id);
+        const data = await atividadesService.listar();
+        setActivities(data);
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao excluir unidade.');
+      }
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR');
@@ -132,9 +129,9 @@ const handleSave = async () => {
     setDescription('Cadastro e Controle das Atividades');
 
     const carregar = async () => {
-      try {        
-        const data = await atividadesService.listar();        
-        setUnits(data);
+      try {
+        const data = await atividadesService.listar();
+        setActivities(data);
       } catch (error) {
         console.error(error);
         alert('Erro ao carregar unidades.');
@@ -178,18 +175,18 @@ const handleSave = async () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedData.map((unit) => (
-                  <tr key={unit.ID} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.ID}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{unit.complement}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.createdAt}</td>
+                {paginatedData.map((act) => (
+                  <tr key={act.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{act.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.description}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{act.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.createdAt}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex space-x-2">
-                        <button onClick={() => handleOpenModal(unit)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
+                        <button onClick={() => handleOpenModal(act)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button onClick={() => handleDelete(unit.ID)} className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded" title="Excluir">
+                        <button onClick={() => handleDelete(Number(act.id))} className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded" title="Excluir">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>

@@ -1,7 +1,7 @@
 'use client';
 import React, { useMemo, useState } from 'react';
 import { usePageTitle } from '../context/PageTitle.context';
-import { mockObras as initialMockObras } from '../mockData';
+import { obraService } from '../services/obraService';
 import { Obra, Tarefa } from '../types';
 import { ObraCard } from './components/ConstructionCard';
 import { SearchBar } from './components/SearchBar';
@@ -10,13 +10,13 @@ function Home() {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [obras, setObras] = useState<Obra[]>(initialMockObras);
+  const [obras, setObras] = useState<Obra[]>([]);
 
   const filteredObras = useMemo(() => {
-    return obras.filter((obra) => obra.nome.toLowerCase().includes(searchTerm.toLowerCase()) || obra.descricao.toLowerCase().includes(searchTerm.toLowerCase()));
+    return obras.filter((obra) => obra.name.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
-  const handleEdit = (obraId: string, tarefaId: string, updated: Omit<Tarefa, 'id'>) => {
+  const handleEdit = (obraId: number, tarefaId: number, updated: Omit<Tarefa, 'id'>) => {
     setObras((prevObras) =>
       prevObras.map((obra) => {
         if (obra.id !== obraId) return obra;
@@ -28,7 +28,7 @@ function Home() {
     );
   };
 
-  const handleDelete = (tarefaId: string) => {
+  const handleDelete = (tarefaId: number) => {
     setObras((prevObras) =>
       prevObras.map((obra) => ({
         ...obra,
@@ -37,16 +37,16 @@ function Home() {
     );
   };
 
-  const handlePay = (tarefaId: string) => {
+  const handlePay = (tarefaId: number) => {
     setObras((prev) =>
       prev.map((obra) => ({
         ...obra,
-        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, statusPagamento: 'pago' } : t)),
+        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, paymentStatus: 'pago' } : t)),
       }))
     );
   };
 
-  const handleAddTask = (obraId: string, newTask: Omit<Tarefa, 'id'>) => {
+  const handleAddTask = (obraId: number, newTask: Omit<Tarefa, 'id'>) => {
     setObras((prevObras) =>
       prevObras.map((obra) => {
         if (obra.id === obraId) {
@@ -62,30 +62,22 @@ function Home() {
     );
   };
 
-  const handleLoadTasks = async (obraId: string) => {
-    // Simula chamada para o backend
-    console.log('Carregando tarefas para obra:', obraId);
-
-    // Simula delay de rede
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Aqui você faria a chamada real para o backend:
-    // const response = await fetch(`/api/obras/${obraId}/tarefas`);
-    // const tarefas = await response.json();
-    //
-    // setObras(prevObras =>
-    //   prevObras.map(obra =>
-    //     obra.id === obraId ? { ...obra, tarefas } : obra
-    //   )
-    // );
-
-    console.log('Tarefas carregadas com sucesso');
-  };
-
   React.useEffect(() => {
     setTitle('Pagamento');
     setSubtitle('Controle de Obras');
     setDescription('Gerencie e monitore todas as atividades das suas obras em um só lugar.');
+
+    const carregarObras = async () => {
+      try {
+        const data = await obraService.listar();
+        console.log('Obras carregadas:', data);
+        setObras(data.items || []);
+      } catch (error) {
+        console.error('Erro ao carregar obras:', error);
+      }
+    };
+
+    carregarObras();
   }, []);
 
   return (

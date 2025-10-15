@@ -1,5 +1,5 @@
+import { ChevronDown, ChevronUp, Filter, Plus, Search, X } from 'lucide-react';
 import React, { useState } from 'react';
-import { Filter, X, ChevronDown, ChevronUp, Search, Plus } from 'lucide-react';
 import { Tarefa } from '../../types';
 
 interface ObraMeasureFilterProps {
@@ -18,10 +18,10 @@ export const ObraMeasureFilter: React.FC<ObraMeasureFilterProps> = ({ tarefas, o
   const [atividadeInput, setAtividadeInput] = useState('');
 
   // Extrair valores únicos
-  const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.statusMedicao)));
-  const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.local.name))).sort();
-  const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.empreiteira))).sort();
-  const uniqueAtividades = Array.from(new Set(tarefas.map((t) => t.atividade))).sort();
+  const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.measurementStatus)));
+  const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.location.name))).sort();
+  const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.contractor))).sort();
+  const uniqueAtividades = Array.from(new Set(tarefas.map((t) => t.activity))).sort();
 
   const statusLabels = {
     pendente: 'Pendente',
@@ -57,19 +57,19 @@ export const ObraMeasureFilter: React.FC<ObraMeasureFilterProps> = ({ tarefas, o
     let filtered = tarefas;
 
     if (status.length > 0) {
-      filtered = filtered.filter((t) => status.includes(t.statusMedicao));
+      filtered = filtered.filter((t) => status.includes(t.measurementStatus));
     }
 
     if (locais.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.local.name, locais));
+      filtered = filtered.filter((t) => matchesAnyFilter(t.location.name, locais));
     }
 
     if (empreiteiras.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.empreiteira, empreiteiras));
+      filtered = filtered.filter((t) => matchesAnyFilter(t.contractor, empreiteiras));
     }
 
     if (atividades.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.atividade, atividades));
+      filtered = filtered.filter((t) => matchesAnyFilter(t.activity, atividades));
     }
 
     onFilterChange(filtered);

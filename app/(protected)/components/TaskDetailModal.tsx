@@ -1,5 +1,5 @@
+import { AlertCircle, Building2, Calendar, CheckCircle, Clock, DollarSign, Package, User, X } from 'lucide-react';
 import React from 'react';
-import { X, Calendar, DollarSign, User, Package, MapPin, Building2, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { Tarefa } from '../../types';
 
 interface TaskDetailModalProps {
@@ -29,7 +29,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
     atrasado: { label: 'Atrasado', color: 'bg-red-100 text-red-800 border-red-200', icon: AlertCircle },
   };
 
-  const StatusIcon = statusConfig[tarefa.statusPagamento].icon;
+  const StatusIcon = statusConfig[tarefa.paymentStatus].icon;
 
   // Mock data for additional fields (in real app, these would come from the tarefa object)
   const mockData = {
@@ -70,8 +70,8 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <Package className="w-6 h-6" />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-lg sm:text-xl font-bold truncate">{tarefa.atividade}</h2>
-                <p className="text-blue-100 text-sm truncate">{tarefa.local.name}</p>
+                <h2 className="text-lg sm:text-xl font-bold truncate">{tarefa.activity}</h2>
+                <p className="text-blue-100 text-sm truncate">{tarefa.location.name}</p>
               </div>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors ml-2">
@@ -82,7 +82,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
           {/* Status Badge */}
           <div className="mt-3 flex items-center space-x-2">
             <StatusIcon className="w-5 h-5" />
-            <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${statusConfig[tarefa.statusPagamento].color}`}>{statusConfig[tarefa.statusPagamento].label}</span>
+            <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${statusConfig[tarefa.paymentStatus].color}`}>{statusConfig[tarefa.paymentStatus].label}</span>
           </div>
         </div>
 
@@ -96,10 +96,10 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <span>Informações Principais</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <InfoItem icon={Package} label="Unidade de Medida" value={tarefa.unidade} />
-                <InfoItem icon={Package} label="Quantidade" value={tarefa.quantidade} highlight />
+                <InfoItem icon={Package} label="Unidade de Medida" value={tarefa.unitOfMeasure} />
+                <InfoItem icon={Package} label="Quantidade" value={tarefa.quantity} highlight />
                 <InfoItem icon={CheckCircle} label="Quantidade Realizada" value={mockData.quantidadeRealizada} />
-                <InfoItem icon={DollarSign} label="Valor" value={formatCurrency(tarefa.valor)} highlight />
+                <InfoItem icon={DollarSign} label="Valor" value={formatCurrency(tarefa.totalAmount)} highlight />
               </div>
             </section>
 
@@ -113,7 +113,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <InfoItem icon={DollarSign} label="Status Pagamento" value={mockData.statusPagamento} />
                 <InfoItem icon={Package} label="Status Medidor" value={mockData.statusMedidor} />
                 <InfoItem icon={Calendar} label="Data Medição" value={formatDate(mockData.dataMedicao)} />
-                <InfoItem icon={Building2} label="Empreiteiro" value={tarefa.empreiteira} />
+                <InfoItem icon={Building2} label="Empreiteiro" value={tarefa.contractor} />
               </div>
             </section>
 

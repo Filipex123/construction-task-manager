@@ -1,6 +1,6 @@
-import React from 'react';
-import { Building, Clock, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
 import { Obra } from '@/app/types';
+import { AlertTriangle, Building, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import React from 'react';
 
 interface DashboardSummaryProps {
   obras: Obra[];
@@ -15,10 +15,10 @@ export const DashboardSummary: React.FC<DashboardSummaryProps> = ({ obras }) => 
     const tarefasConcluidas = obras.reduce((total, obra) => total + obra.tarefas.filter((t) => t.status === 'concluida').length, 0);
     const tarefasPendentes = obras.reduce((total, obra) => total + obra.tarefas.filter((t) => t.status === 'pendente').length, 0);
 
-    const valorTotal = obras.reduce((total, obra) => total + obra.tarefas.reduce((obraTotal, tarefa) => obraTotal + tarefa.valor, 0), 0);
-    const valorAtrasado = obras.reduce((total, obra) => total + obra.tarefas.filter((t) => t.status === 'atrasada').reduce((sum, t) => sum + t.valor, 0), 0);
-    const valorEmAndamento = obras.reduce((total, obra) => total + obra.tarefas.filter((t) => t.status === 'em_andamento').reduce((sum, t) => sum + t.valor, 0), 0);
-    const valorConcluido = obras.reduce((total, obra) => total + obra.tarefas.filter((t) => t.status === 'concluida').reduce((sum, t) => sum + t.valor, 0), 0);
+    const valorTotal = obras.reduce((total, obra) => total + obra.tarefas.reduce((obraTotal, tarefa) => obraTotal + tarefa.totalAmount, 0), 0);
+    const valorAtrasado = obras.reduce((total, obra) => total + obra.tarefas.filter((t) => t.status === 'atrasada').reduce((sum, t) => sum + t.totalAmount, 0), 0);
+    const valorEmAndamento = obras.reduce((total, obra) => total + obra.tarefas.filter((t) => t.status === 'em_andamento').reduce((sum, t) => sum + t.totalAmount, 0), 0);
+    const valorConcluido = obras.reduce((total, obra) => total + obra.tarefas.filter((t) => t.status === 'concluida').reduce((sum, t) => sum + t.totalAmount, 0), 0);
 
     return {
       totalTarefas,

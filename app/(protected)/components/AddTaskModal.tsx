@@ -1,27 +1,32 @@
+import { mockLocais } from '@/app/mockData';
+import { Building2, DollarSign, Edit3, Hash, MapPin, Package, Plus, Wrench, X } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { X, Plus, MapPin, Wrench, Package, Hash, DollarSign, Building2, Edit3 } from 'lucide-react';
 import { Tarefa } from '../../types';
-import { mockLocais, mockObras } from '@/app/mockData';
+
+interface idName {
+  id: number | string | undefined;
+  name: string;
+}
 
 interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddTask: (task: Omit<Tarefa, 'id'>) => void;
-  obraId: string;
+  obraId: number;
   mode?: 'add' | 'edit';
   initialTask?: Tarefa | null;
-  onUpdateTask?: (tarefaId: string, task: Omit<Tarefa, 'id'>) => void;
+  onUpdateTask?: (tarefaId: number, task: Omit<Tarefa, 'id'>) => void;
 }
 
 export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAddTask, obraId, mode = 'add', initialTask = null, onUpdateTask }) => {
   const [formData, setFormData] = useState({
-    local: { id: '', name: '' },
-    atividade: '',
-    unidade: 'm²',
+    local: { id: 0, name: '' },
+    atividade: { id: 0, name: '' },
+    unidade: { id: 0, name: '' },
+    empreiteira: { id: 0, name: '' },
     quantidade: '',
     valor: '',
-    empreiteira: '',
-    statusPagamento: 'pendente' as Tarefa['statusPagamento'],
+    statusPagamento: 'pendente' as Tarefa['paymentStatus'],
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -97,14 +102,14 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     const newErrors: Record<string, string> = {};
 
     if (!formData.local.name.trim()) newErrors.local = 'Local é obrigatório';
-    if (!formData.atividade.trim()) newErrors.atividade = 'Atividade é obrigatória';
+    if (!formData.atividade.name.trim()) newErrors.atividade = 'Atividade é obrigatória';
     if (!formData.quantidade || parseFloat(formData.quantidade) <= 0) {
       newErrors.quantidade = 'Quantidade deve ser maior que zero';
     }
     if (!formData.valor || parseFloat(formData.valor) <= 0) {
       newErrors.valor = 'Valor deve ser maior que zero';
     }
-    if (!formData.empreiteira.trim()) newErrors.empreiteira = 'Empreiteira é obrigatória';
+    if (!formData.empreiteira.name.trim()) newErrors.empreiteira = 'Empreiteira é obrigatória';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -116,14 +121,15 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     if (!validateForm()) return;
 
     const newTask: Omit<Tarefa, 'id'> = {
-      local: { id: formData.local.id, name: formData.local.name.trim() },
-      atividade: formData.atividade.trim(),
-      unidade: formData.unidade,
-      quantidade: parseFloat(formData.quantidade),
-      valor: parseFloat(formData.valor),
-      empreiteira: formData.empreiteira.trim(),
-      statusPagamento: formData.statusPagamento,
-      statusMedicao: 'pendente',
+      location: { id: Number(formData.local.id), name: formData.local.name.trim() },
+      activity: { id: Number(formData.atividade.id), name: formData.atividade.name.trim() },
+      unitOfMeasure: { id: Number(formData.unidade.id), name: formData.unidade.name.trim() },
+      contractor: { id: Number(formData.empreiteira.id), name: formData.empreiteira.name.trim() },
+      quantity: parseFloat(formData.quantidade),
+      totalAmount: parseFloat(formData.valor),
+      paymentStatus: formData.statusPagamento,
+      measurementStatus: 'pendente',
+      quantityExecuted: 0,
     };
 
     if (mode === 'edit' && initialTask && onUpdateTask) {
@@ -136,12 +142,12 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
   const handleClose = () => {
     setFormData({
-      local: { id: '', name: '' },
-      atividade: '',
-      unidade: 'm²',
+      local: { id: 0, name: '' },
+      atividade: { id: 0, name: '' },
+      unidade: { id: 0, name: '' },
+      empreiteira: { id: 0, name: '' },
       quantidade: '',
       valor: '',
-      empreiteira: '',
       statusPagamento: 'pendente',
     });
     setErrors({});
@@ -152,19 +158,19 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
   useEffect(() => {
     if (isOpen && mode === 'edit' && initialTask) {
       setFormData({
-        local: initialTask.local,
-        atividade: initialTask.atividade,
-        unidade: initialTask.unidade,
-        quantidade: String(initialTask.quantidade ?? ''),
-        valor: String(initialTask.valor ?? ''),
-        empreiteira: initialTask.empreiteira,
-        statusPagamento: initialTask.statusPagamento,
+        local: initialTask.location,
+        atividade: initialTask.activity,
+        unidade: initialTask.unitOfMeasure,
+        quantidade: String(initialTask.quantity ?? ''),
+        valor: String(initialTask.totalAmount ?? ''),
+        empreiteira: initialTask.contractor,
+        statusPagamento: initialTask.paymentStatus,
       });
       setErrors({});
     }
     if (isOpen && mode === 'add' && !initialTask) {
       setFormData({
-        local: { id: '', name: '' },
+        local: { id: 0, name: '' },
         atividade: '',
         unidade: 'm²',
         quantidade: '',
@@ -189,13 +195,13 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       statusPagamento: formData.statusPagamento,
     };
     return (
-      normalized.local !== initialTask.local ||
-      normalized.atividade !== initialTask.atividade ||
-      normalized.unidade !== initialTask.unidade ||
-      normalized.quantidade !== initialTask.quantidade ||
-      normalized.valor !== initialTask.valor ||
-      normalized.empreiteira !== initialTask.empreiteira ||
-      normalized.statusPagamento !== initialTask.statusPagamento
+      normalized.local !== initialTask.location ||
+      normalized.atividade !== initialTask.activity ||
+      normalized.unidade !== initialTask.unitOfMeasure ||
+      normalized.quantidade !== initialTask.quantity ||
+      normalized.valor !== initialTask.totalAmount ||
+      normalized.empreiteira !== initialTask.contractor ||
+      normalized.statusPagamento !== initialTask.paymentStatus
     );
   }, [mode, initialTask, formData]);
 

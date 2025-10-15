@@ -1,5 +1,5 @@
+import { Building, ChevronDown, ChevronUp, Loader2, Plus } from 'lucide-react';
 import React from 'react';
-import { Building, Plus, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { Obra } from '../../types';
 import { LocalTable } from './LocalTable';
 import { SimpleModal } from './SimpleModal';
@@ -13,7 +13,7 @@ interface LocalCardProps {
 }
 
 export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal, onUpdateLocal, onLoadLocal }) => {
-  const [locais, setLocais] = React.useState(obra.tarefas.flatMap((t) => t.local));
+  const [locais, setLocais] = React.useState(obra.tarefas.flatMap((t) => t.location));
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [editLocalId, setEditLocalId] = React.useState<string | null>(null);
   const [isExpanded, setIsExpanded] = React.useState(false);
@@ -46,8 +46,8 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onAddLocal
               {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </div>
             <div>
-              <h3 className="text-xl font-bold">{obra.nome}</h3>
-              <p className="text-blue-100 text-sm">{obra.descricao}</p>
+              <h3 className="text-xl font-bold">{obra.name}</h3>
+              <p className="text-blue-100 text-sm">{obra.description}</p>
             </div>
           </div>
           <div className="flex items-center space-x-4 text-sm">

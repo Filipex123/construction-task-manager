@@ -1,5 +1,5 @@
+import { ChevronDown, ChevronUp, Filter, Plus, Search, X } from 'lucide-react';
 import React, { useState } from 'react';
-import { Filter, X, ChevronDown, ChevronUp, Search, Plus } from 'lucide-react';
 import { Tarefa } from '../../types';
 
 interface ObraFiltersProps {
@@ -15,6 +15,9 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   const [selectedAtividades, setSelectedAtividades] = useState<string[]>([]);
   const [dataCriacaoInput, setDataCriacaoInput] = useState('');
   const [dataLimiteInput, setDataLimiteInput] = useState('');
+  const [localInput, setLocalInput] = useState('');
+  const [empreiteiraInput, setEmpreiteiraInput] = useState('');
+  const [atividadeInput, setAtividadeInput] = useState('');
 
   // Função para formatar data para DD/MM/YYYY
   const formatDateToDisplay = (dateString: string): string => {
@@ -60,15 +63,13 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
       return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
     }
   };
-  const [localInput, setLocalInput] = useState('');
-  const [empreiteiraInput, setEmpreiteiraInput] = useState('');
-  const [atividadeInput, setAtividadeInput] = useState('');
 
   // Extrair valores únicos
-  const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.statusPagamento)));
-  const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.local.name))).sort();
-  const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.empreiteira))).sort();
-  const uniqueAtividades = Array.from(new Set(tarefas.map((t) => t.atividade))).sort();
+  const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.paymentStatus)));
+  console.log('Unique tarefas:', tarefas);
+  const uniqueLocais = Array.from(new Set(tarefas.map((t) => 'nome a ser puxado de atividade'))).sort();
+  const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.contractor))).sort();
+  const uniqueAtividades = Array.from(new Set(tarefas.map((t) => t.activity))).sort();
 
   const statusLabels = {
     pendente: 'Pendente',
@@ -104,26 +105,26 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     let filtered = tarefas;
 
     if (status.length > 0) {
-      filtered = filtered.filter((t) => status.includes(t.statusPagamento));
+      filtered = filtered.filter((t) => status.includes(t.paymentStatus));
     }
 
     if (locais.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.local.name, locais));
+      filtered = filtered.filter((t) => matchesAnyFilter(t.location.name, locais));
     }
 
     if (empreiteiras.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.empreiteira, empreiteiras));
+      filtered = filtered.filter((t) => matchesAnyFilter(t.contractor, empreiteiras));
     }
 
     if (atividades.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.atividade, atividades));
+      filtered = filtered.filter((t) => matchesAnyFilter(t.activity, atividades));
     }
 
     if (dataCriacao.trim()) {
       const dataCriacaoFormatted = formatDateForInput(dataCriacao);
       if (dataCriacaoFormatted) {
         filtered = filtered.filter((t) => {
-          const dataCriacaoStr = t.dataCriacao ? new Date(t.dataCriacao).toISOString().split('T')[0] : '';
+          const dataCriacaoStr = t.createdAt ? new Date(t.createdAt).toISOString().split('T')[0] : '';
           return dataCriacaoStr === dataCriacaoFormatted;
         });
       }

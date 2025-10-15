@@ -23,10 +23,9 @@ const UnidadeMedidaPage: React.FC = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  
   // Filtrar dados
   const filteredData = useMemo(() => {
-    return units.filter((unit) => searchTerm === '' || unit.description.toLowerCase().includes(searchTerm.toLowerCase()) || unit.complement.toLowerCase().includes(searchTerm.toLowerCase()));
+    return units.filter((unit) => searchTerm === '' || unit.description.toLowerCase().includes(searchTerm.toLowerCase()) || unit.name.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [units, searchTerm]);
 
   // Paginação
@@ -47,14 +46,14 @@ const UnidadeMedidaPage: React.FC = () => {
 
     // Verificar se já existe uma unidade com a mesma descrição ou complemento
     const existingUnit = units.find(
-      (unit) => unit.ID !== editingItem?.ID && (unit.description.toLowerCase() === formData.descricao.toLowerCase() || unit.complement.toLowerCase() === formData.complemento.toLowerCase())
+      (unit) => unit.id !== editingItem?.id && (unit.description.toLowerCase() === formData.descricao.toLowerCase() || unit.name.toLowerCase() === formData.complemento.toLowerCase())
     );
 
     if (existingUnit) {
       if (existingUnit.description.toLowerCase() === formData.descricao.toLowerCase()) {
         newErrors.descricao = 'Já existe uma unidade com esta descrição';
       }
-      if (existingUnit.complement.toLowerCase() === formData.complemento.toLowerCase()) {
+      if (existingUnit.name.toLowerCase() === formData.complemento.toLowerCase()) {
         newErrors.complemento = 'Já existe uma unidade com este complemento';
       }
     }
@@ -66,7 +65,7 @@ const UnidadeMedidaPage: React.FC = () => {
   const handleOpenModal = (unit?: UnidadeMedida) => {
     if (unit) {
       setEditingItem(unit);
-      setFormData({ descricao: unit.description, complemento: unit.complement });
+      setFormData({ descricao: unit.description, complemento: unit.name });
     } else {
       setEditingItem(null);
       setFormData({ descricao: '', complemento: '' });
@@ -82,45 +81,43 @@ const UnidadeMedidaPage: React.FC = () => {
     setErrors({ descricao: '', complemento: '' });
   };
 
-const handleSave = async () => {
-  if (!validateForm()) return;
+  const handleSave = async () => {
+    if (!validateForm()) return;
 
-  try {
-    if (editingItem) {
-      await unidadesService.atualizar(editingItem.ID, {
-        description: formData.descricao,
-        complement: formData.complemento,
-      });
-    } else {
-      await unidadesService.criar({
-        description: formData.descricao,
-        complement: formData.complemento,
-      });
-    }
-
-    const data = await unidadesService.listar();
-    setUnits(data);
-    handleCloseModal();
-  } catch (error) {
-    console.error(error);
-    alert('Erro ao salvar unidade.');
-  }
-};
-
-
-  const handleDelete = async (id: string) => {
-  if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
     try {
-      await unidadesService.excluir(id);
+      if (editingItem) {
+        await unidadesService.atualizar(editingItem.id, {
+          description: formData.descricao,
+          name: formData.complemento,
+        });
+      } else {
+        await unidadesService.criar({
+          description: formData.descricao,
+          name: formData.complemento,
+        });
+      }
+
       const data = await unidadesService.listar();
       setUnits(data);
+      handleCloseModal();
     } catch (error) {
       console.error(error);
-      alert('Erro ao excluir unidade.');
+      alert('Erro ao salvar unidade.');
     }
-  }
-};
+  };
 
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
+      try {
+        await unidadesService.excluir(id);
+        const data = await unidadesService.listar();
+        setUnits(data);
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao excluir unidade.');
+      }
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR');
@@ -132,8 +129,8 @@ const handleSave = async () => {
     setDescription('Cadastro e Controle das Unidades de Medida');
 
     const carregar = async () => {
-      try {        
-        const data = await unidadesService.listar();        
+      try {
+        const data = await unidadesService.listar();
         setUnits(data);
       } catch (error) {
         console.error(error);
@@ -179,17 +176,17 @@ const handleSave = async () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedData.map((unit) => (
-                  <tr key={unit.ID} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.ID}</td>
+                  <tr key={unit.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.id}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{unit.complement}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{unit.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.createdAt}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex space-x-2">
                         <button onClick={() => handleOpenModal(unit)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button onClick={() => handleDelete(unit.ID)} className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded" title="Excluir">
+                        <button onClick={() => handleDelete(unit.id)} className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded" title="Excluir">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
