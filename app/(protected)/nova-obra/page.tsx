@@ -18,7 +18,7 @@ function LocalPage() {
   const [editObra, setEditObra] = useState<Obra | null>(null);
 
   const filteredObras = useMemo(() => {
-    return obras.filter((obra) => obra.name!.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description!.toLowerCase().includes(searchTerm.toLowerCase()));
+    return obras.filter((obra) => obra.name!.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description?.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
   const handleEdit = async (obraId: number, updatedObra: Partial<Obra>) => {
