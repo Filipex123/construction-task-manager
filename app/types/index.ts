@@ -6,8 +6,8 @@ export interface Tarefa {
   contractor: Empreiteira;
   quantity: number;
   totalAmount: number;
-  paymentStatus: 'em_andamento' | 'pendente' | 'pago' | 'atrasado';
-  measurementStatus: 'em_andamento' | 'pendente' | 'medido' | 'retencao';
+  paymentStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'PAGO' | 'ATRASADO';
+  measurementStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'MEDIDO' | 'RETIDO';
   quantityExecuted: number;
   measurementDate?: string;
   dueDate: string;
@@ -90,4 +90,18 @@ export interface PaymentData {
   dataPagamento: string;
   usuarioResponsavel: string;
   status: 'pago' | 'pendente' | 'atrasado';
+}
+
+export enum PaymentStatusEnum {
+  PAGO = 'PAGO',
+  PENDENTE = 'PENDENTE',
+  ATRASADO = 'ATRASADO',
+  EM_ANDAMENTO = 'EM_ANDAMENTO',
+}
+
+export enum MeasurementStatusEnum {
+  MEDIDO = 'MEDIDO',
+  PENDENTE = 'PENDENTE',
+  RETIDO = 'RETIDO',
+  EM_ANDAMENTO = 'EM_ANDAMENTO',
 }

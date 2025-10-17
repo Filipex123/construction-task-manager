@@ -2,18 +2,20 @@
 import React, { useMemo, useState } from 'react';
 import { usePageTitle } from '../context/PageTitle.context';
 import { obraService } from '../services/obraService';
-import { Obra, Tarefa } from '../types';
-import { ObraCard } from './components/ConstructionCard';
+import { Obra, PaymentStatusEnum, Tarefa } from '../types';
+import { Loader } from './components/Loader';
 import { SearchBar } from './components/SearchBar';
+import { TarefaCard } from './components/TarefaCard';
 
 function Home() {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [obras, setObras] = useState<Obra[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const filteredObras = useMemo(() => {
-    return obras.filter((obra) => obra.name!.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description!.toLowerCase().includes(searchTerm.toLowerCase()));
+    return obras.filter((obra) => obra.name?.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description?.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
   const handleEdit = (obraId: number, tarefaId: number, updated: Omit<Tarefa, 'id'>) => {
@@ -41,7 +43,7 @@ function Home() {
     setObras((prev) =>
       prev.map((obra) => ({
         ...obra,
-        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, paymentStatus: 'pago' } : t)),
+        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, paymentStatus: PaymentStatusEnum.PAGO } : t)),
       }))
     );
   };
@@ -68,12 +70,14 @@ function Home() {
     setDescription('Gerencie e monitore todas as atividades das suas obras em um só lugar.');
 
     const carregarObras = async () => {
+      setIsLoading(true);
       try {
         const data = await obraService.listar();
-        console.log('Obras carregadas:', data);
         setObras(data.items || []);
       } catch (error) {
         console.error('Erro ao carregar obras:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -82,13 +86,13 @@ function Home() {
 
   return (
     <>
-      {/* <DashboardSummary obras={obras} /> */}
-
       <div className="mb-6">
         <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
       </div>
 
-      {filteredObras.length === 0 ? (
+      {isLoading && <Loader message={'Carregando Obras'} />}
+
+      {!isLoading && filteredObras.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-gray-400 text-lg mb-2">Nenhuma obra encontrada</div>
           <p className="text-gray-500">{searchTerm ? 'Tente ajustar sua pesquisa' : 'Não há obras cadastradas'}</p>
@@ -96,7 +100,7 @@ function Home() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <ObraCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onDelete={handleDelete} onPay={handlePay} onAddTask={handleAddTask} />
+            <TarefaCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onDelete={handleDelete} onPay={handlePay} onAddTask={handleAddTask} />
           ))}
         </div>
       )}

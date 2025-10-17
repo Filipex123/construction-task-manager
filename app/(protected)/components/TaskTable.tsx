@@ -14,17 +14,17 @@ interface TaskTableProps {
 type MobileView = 'table' | 'cards' | 'list';
 
 const statusConfig: StatusColor = {
-  pendente: 'bg-yellow-100 text-yellow-800',
-  em_andamento: 'bg-blue-100 text-blue-800',
-  pago: 'bg-green-100 text-green-800',
-  atrasado: 'bg-red-100 text-red-800',
+  PENDENTE: 'bg-yellow-100 text-yellow-800',
+  EM_ANDAMENTO: 'bg-blue-100 text-blue-800',
+  PAGO: 'bg-green-100 text-green-800',
+  ATRASADO: 'bg-red-100 text-red-800',
 };
 
 const statusLabels = {
-  pendente: 'Pendente',
-  em_andamento: 'Em Andamento',
-  pago: 'Pago',
-  atrasado: 'Atrasado',
+  PENDENTE: 'Pendente',
+  EM_ANDAMENTO: 'Em Andamento',
+  PAGO: 'Pago',
+  ATRASADO: 'Atrasado',
 };
 
 export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete, onPay }) => {
@@ -93,7 +93,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
   };
 
   const handlePayClick = (tarefa: Tarefa) => {
-    if (tarefa.paymentStatus != 'pago') {
+    if (tarefa.paymentStatus != 'PAGO') {
       setTaskToPay(tarefa);
       setIsPaymentModalOpen(true);
     }
@@ -123,7 +123,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
       {onPay && (
         <button
           onClick={() => handlePayClick(tarefa)}
-          disabled={tarefa.paymentStatus === 'pago'}
+          disabled={tarefa.paymentStatus === 'PAGO'}
           className="p-2 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title="Pagar"
         >
@@ -140,7 +140,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
               <h5 className="font-medium text-gray-900 text-sm mb-1">{tarefa.location.name}</h5>
-              <p className="text-gray-600 text-sm">{tarefa.activity}</p>
+              <p className="text-gray-600 text-sm">{tarefa.activity.name}</p>
             </div>
             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.paymentStatus]}`}>{statusLabels[tarefa.paymentStatus]}</span>
           </div>
@@ -149,7 +149,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
             <div>
               <span className="text-gray-500">Quantidade:</span>
               <p className="font-medium text-black">
-                {tarefa.quantity} {tarefa.unitOfMeasure}
+                {tarefa.quantity} {tarefa.unitOfMeasure.name}
               </p>
             </div>
             <div>
@@ -160,7 +160,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
 
           <div className="mb-3">
             <span className="text-gray-500 text-sm">Empreiteira:</span>
-            <p className="font-medium text-sm text-black">{tarefa.contractor}</p>
+            <p className="font-medium text-sm text-black">{tarefa.contractor.name}</p>
           </div>
 
           <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
@@ -181,14 +181,14 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
                 <h5 className="font-medium text-gray-900 text-sm">{tarefa.location.name}</h5>
                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.paymentStatus]}`}>{statusLabels[tarefa.paymentStatus]}</span>
               </div>
-              <p className="text-gray-600 text-sm mb-2">{tarefa.activity}</p>
+              <p className="text-gray-600 text-sm mb-2">{tarefa.activity.name}</p>
             </div>
           </div>
 
           <div className="flex justify-between items-center text-sm" onClick={(e) => e.stopPropagation()}>
             <div className="flex space-x-4">
               <span className="text-gray-500">
-                {tarefa.quantity} {tarefa.unitOfMeasure}
+                {tarefa.quantity} {tarefa.unitOfMeasure.name}
               </span>
               <span className="font-medium text-green-600">{formatCurrency(tarefa.totalAmount)}</span>
             </div>
@@ -196,7 +196,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
           </div>
 
           <div className="mt-2 pt-2 border-t border-gray-100">
-            <span className="text-xs text-gray-500">{tarefa.contractor}</span>
+            <span className="text-xs text-gray-500">{tarefa.contractor.name}</span>
           </div>
         </div>
       ))}
@@ -224,13 +224,13 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
           {currentTarefas.map((tarefa) => (
             <tr key={tarefa.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleTaskClick(tarefa)}>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.location.name}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.activity}</td>
-              <td className="px-4 py-4 text-sm text-gray-500">{tarefa.unitOfMeasure}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.activity.name}</td>
+              <td className="px-4 py-4 text-sm text-gray-500">{tarefa.unitOfMeasure.name}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.quantity}</td>
               <td className="px-4 py-4 text-sm font-medium text-gray-900">{formatCurrency(tarefa.totalAmount)}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.contractor}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.contractor.name}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{formatDate(tarefa.createdAt)}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{formatDate(tarefa.dataLimite)}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{formatDate(tarefa.dueDate)}</td>
               <td className="px-4 py-4 text-sm">
                 <span className={`inline-flex  w-[100px] h-[40px] items-center justify-center px-2 py-1 text-xs font-semibold rounded-full text-center ${statusConfig[tarefa.paymentStatus]}`}>
                   {statusLabels[tarefa.paymentStatus]}
@@ -249,7 +249,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
                   {onPay && (
                     <button
                       onClick={() => handlePayClick(tarefa)}
-                      disabled={tarefa.paymentStatus === 'pago'}
+                      disabled={tarefa.paymentStatus === 'PAGO'}
                       className="p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Pagar"
                     >

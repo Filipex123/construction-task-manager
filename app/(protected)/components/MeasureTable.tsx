@@ -12,17 +12,17 @@ interface TaskTableProps {
 type MobileView = 'table' | 'cards' | 'list';
 
 const statusConfig: StatusColorMedicao = {
-  pendente: 'bg-yellow-100 text-yellow-800',
-  em_andamento: 'bg-blue-100 text-blue-800',
-  medido: 'bg-green-100 text-green-800',
-  retencao: 'bg-red-100 text-red-800',
+  PENDENTE: 'bg-yellow-100 text-yellow-800',
+  EM_ANDAMENTO: 'bg-blue-100 text-blue-800',
+  MEDIDO: 'bg-green-100 text-green-800',
+  RETIDO: 'bg-red-100 text-red-800',
 };
 
 const statusLabels = {
-  pendente: 'Pendente',
-  em_andamento: 'Em Andamento',
-  medido: 'Medido',
-  retencao: 'Retenção',
+  PENDENTE: 'Pendente',
+  EM_ANDAMENTO: 'Em Andamento',
+  MEDIDO: 'Medido',
+  RETIDO: 'Retenção',
 };
 
 export const MedidaTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete }) => {

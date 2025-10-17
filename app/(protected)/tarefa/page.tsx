@@ -3,8 +3,8 @@ import { usePageTitle } from '@/app/context/PageTitle.context';
 import { mockObras as initialMockObras } from '@/app/mockData';
 import { Obra, Tarefa } from '@/app/types';
 import React, { useMemo, useState } from 'react';
-import { ObraCard } from '../components/ConstructionCard';
 import { SearchBar } from '../components/SearchBar';
+import { TarefaCard } from '../components/TarefaCard';
 
 function TarefaPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -65,26 +65,6 @@ function TarefaPage() {
     );
   };
 
-  const handleLoadTasks = async (obraId: string) => {
-    // Simula chamada para o backend
-    console.log('Carregando tarefas para obra:', obraId);
-
-    // Simula delay de rede
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Aqui você faria a chamada real para o backend:
-    // const response = await fetch(`/api/obras/${obraId}/tarefas`);
-    // const tarefas = await response.json();
-    //
-    // setObras(prevObras =>
-    //   prevObras.map(obra =>
-    //     obra.id === obraId ? { ...obra, tarefas } : obra
-    //   )
-    // );
-
-    console.log('Tarefas carregadas com sucesso');
-  };
-
   React.useEffect(() => {
     setTitle('Cadastro de Tarefas');
     setSubtitle('Gerenciar Tarefas');
@@ -105,7 +85,7 @@ function TarefaPage() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <ObraCard key={obra.id} obraId={obra.id} onUpdateTask={handleEdit} onAddTask={handleAddTask} />
+            <TarefaCard key={obra.id} obraId={obra.id} onUpdateTask={handleEdit} onAddTask={handleAddTask} />
           ))}
         </div>
       )}

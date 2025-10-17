@@ -50,7 +50,6 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }
     if (editLocation) {
       try {
         const data = await localService.atualizar(editLocation.id!, { name: name });
-        console.log('Local atualizado:', data);
         setLocais((prevLocais) => prevLocais.map((local) => (local.id === data.id ? data : local)));
         setEditLocation(null);
         setIsAddModalOpen(false);
@@ -149,7 +148,6 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }
                     onEdit={(id) => {
                       const locationToEdit = locais.find((local) => local.id === id) || null;
                       setEditLocation(locationToEdit);
-                      console.log('Editando local:', locationToEdit);
                       setIsAddModalOpen(true);
                     }}
                     onDelete={handleDelete}

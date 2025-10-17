@@ -4,9 +4,22 @@ const API_URL = 'https://116vebee4l.execute-api.us-east-1.amazonaws.com/prod/tar
 
 export const tarefaService = {
   async listar(obraId: number): Promise<PageableResponse<Tarefa>> {
-    const res = await fetch(`${API_URL}?idObra=${obraId}`, { cache: 'no-store' });
-    if (!res.ok) throw new Error('Erro ao listar tarefas');
-    return res.json();
+    try {
+      const res = await fetch(`${API_URL}?idObra=${obraId}`, { cache: 'no-store' });
+
+      if (!res.ok) throw new Error('Erro ao listar tarefas');
+
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error('Erro ao listar tarefas:', error);
+      return {
+        items: [],
+        total: 0,
+        page: 0,
+        size: 0,
+      };
+    }
   },
 
   async buscarPorId(id: string): Promise<Tarefa> {

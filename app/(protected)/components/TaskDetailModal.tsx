@@ -23,10 +23,10 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
   };
 
   const statusConfig = {
-    pendente: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: Clock },
-    em_andamento: { label: 'Em Andamento', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: AlertCircle },
-    pago: { label: 'Pago', color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle },
-    atrasado: { label: 'Atrasado', color: 'bg-red-100 text-red-800 border-red-200', icon: AlertCircle },
+    PENDENTE: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: Clock },
+    EM_ANDAMENTO: { label: 'Em Andamento', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: AlertCircle },
+    PAGO: { label: 'Pago', color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle },
+    ATRASADO: { label: 'Atrasado', color: 'bg-red-100 text-red-800 border-red-200', icon: AlertCircle },
   };
 
   const StatusIcon = statusConfig[tarefa.paymentStatus].icon;

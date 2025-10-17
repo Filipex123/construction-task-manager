@@ -1,7 +1,5 @@
-import { mockLocais } from '@/app/mockData';
-import { Building2, DollarSign, Edit3, Hash, MapPin, Package, Plus, Wrench, X } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Tarefa } from '../../types';
+import { useState } from 'react';
+import { PaymentStatusEnum, Tarefa } from '../../types';
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -19,10 +17,10 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
   const unidadeOptions = ['m²', 'm³', 'm', 'unidade', 'kg', 'ton', 'ponto', 'peça', 'conjunto', 'verba'];
   const statusOptions = [
-    { value: 'pendente', label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'em_andamento', label: 'Em Andamento', color: 'bg-blue-100 text-blue-800' },
-    { value: 'pago', label: 'Pago', color: 'bg-green-100 text-green-800' },
-    { value: 'atrasado', label: 'Atrasado', color: 'bg-red-100 text-red-800' },
+    { value: PaymentStatusEnum.PENDENTE, label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
+    { value: PaymentStatusEnum.EM_ANDAMENTO, label: 'Em Andamento', color: 'bg-blue-100 text-blue-800' },
+    { value: PaymentStatusEnum.PAGO, label: 'Pago', color: 'bg-green-100 text-green-800' },
+    { value: PaymentStatusEnum.ATRASADO, label: 'Atrasado', color: 'bg-red-100 text-red-800' },
   ];
   const empreiteiraOptions = [
     {

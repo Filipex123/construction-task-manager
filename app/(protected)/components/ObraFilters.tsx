@@ -33,6 +33,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
 
   // Função para converter DD/MM/YYYY para YYYY-MM-DD (formato do input date)
   const formatDateForInput = (dateString: string): string => {
+    console.log('formatDateForInput received:', dateString);
     if (!dateString) return '';
 
     // Se já está no formato YYYY-MM-DD, retorna como está
@@ -66,27 +67,28 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
 
   // Extrair valores únicos
   const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.paymentStatus)));
-  console.log('Unique tarefas:', tarefas);
-  const uniqueLocais = Array.from(new Set(tarefas.map((t) => 'nome a ser puxado de atividade'))).sort();
+  const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.location.name))).sort();
   const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.contractor))).sort();
   const uniqueAtividades = Array.from(new Set(tarefas.map((t) => t.activity))).sort();
 
   const statusLabels = {
-    pendente: 'Pendente',
-    em_andamento: 'Em Andamento',
-    pago: 'Pago',
-    atrasado: 'Atrasado',
+    PENDENTE: 'Pendente',
+    EM_ANDAMENTO: 'Em Andamento',
+    PAGO: 'Pago',
+    ATRASADO: 'Atrasado',
   };
 
   const statusColors = {
-    pendente: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    em_andamento: 'bg-blue-100 text-blue-800 border-blue-200 text-center',
-    pago: 'bg-green-100 text-green-800 border-green-200',
-    atrasado: 'bg-red-100 text-red-800 border-red-200',
+    PENDENTE: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    EM_ANDAMENTO: 'bg-blue-100 text-blue-800 border-blue-200 text-center',
+    PAGO: 'bg-green-100 text-green-800 border-green-200',
+    ATRASADO: 'bg-red-100 text-red-800 border-red-200',
   };
 
   // Função para busca incremental por múltiplas palavras
-  const matchesIncrementalSearch = (text: string, searchTerm: string): boolean => {
+  const matchesIncrementalSearch = (text?: string, searchTerm?: string): boolean => {
+    if (!text || !searchTerm) return true;
+
     if (!searchTerm.trim()) return true;
 
     const searchWords = searchTerm.toLowerCase().trim().split(/\s+/);
@@ -96,8 +98,9 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   };
 
   // Função para verificar se um item corresponde a qualquer filtro selecionado
-  const matchesAnyFilter = (text: string, selectedFilters: string[]): boolean => {
-    if (selectedFilters.length === 0) return true;
+  const matchesAnyFilter = (text?: string, selectedFilters?: string[]): boolean => {
+    if (!text || !selectedFilters) return true;
+    if (selectedFilters.length === 0 || !text) return true;
     return selectedFilters.some((filter) => matchesIncrementalSearch(text, filter));
   };
 
@@ -109,15 +112,15 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     }
 
     if (locais.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.location.name, locais));
+      filtered = filtered.filter((t) => matchesAnyFilter(t.location?.name, locais));
     }
 
     if (empreiteiras.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.contractor, empreiteiras));
+      filtered = filtered.filter((t) => matchesAnyFilter(t.contractor.name, empreiteiras));
     }
 
     if (atividades.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.activity, atividades));
+      filtered = filtered.filter((t) => matchesAnyFilter(t.activity.name, atividades));
     }
 
     if (dataCriacao.trim()) {
@@ -134,7 +137,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
       const dataLimiteFormatted = formatDateForInput(dataLimite);
       if (dataLimiteFormatted) {
         filtered = filtered.filter((t) => {
-          const dataLimiteStr = t.dataLimite ? new Date(t.dataLimite).toISOString().split('T')[0] : '';
+          const dataLimiteStr = t.dueDate ? new Date(t.dueDate).toISOString().split('T')[0] : '';
           return dataLimiteStr === dataLimiteFormatted;
         });
       }
@@ -212,6 +215,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     // Se o valor é do input date (YYYY-MM-DD), converte para DD/MM/YYYY para exibição
     const displayValue = value.includes('-') ? formatDateToDisplay(value) : applyDateMask(value);
     setDataCriacaoInput(displayValue);
+    console.log('Data Criação Input set to:', displayValue);
     applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, displayValue, dataLimiteInput);
   };
 
@@ -230,17 +234,17 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   // Filtrar sugestões baseadas no texto digitado
   const getFilteredLocais = () => {
     if (!localInput.trim()) return uniqueLocais.slice(0, 5);
-    return uniqueLocais.filter((local) => matchesIncrementalSearch(local, localInput) && !selectedLocais.includes(local)).slice(0, 5);
+    return uniqueLocais.filter((local) => matchesIncrementalSearch(local, localInput) && !selectedLocais.includes(local || '')).slice(0, 5);
   };
 
   const getFilteredEmpreiteiras = () => {
     if (!empreiteiraInput.trim()) return uniqueEmpreiteiras.slice(0, 5);
-    return uniqueEmpreiteiras.filter((emp) => matchesIncrementalSearch(emp, empreiteiraInput) && !selectedEmpreiteiras.includes(emp)).slice(0, 5);
+    return uniqueEmpreiteiras.filter((emp) => matchesIncrementalSearch(emp.name, empreiteiraInput) && !selectedEmpreiteiras.includes(emp.name || '')).slice(0, 5);
   };
 
   const getFilteredAtividades = () => {
     if (!atividadeInput.trim()) return uniqueAtividades.slice(0, 5);
-    return uniqueAtividades.filter((ativ) => matchesIncrementalSearch(ativ, atividadeInput) && !selectedAtividades.includes(ativ)).slice(0, 5);
+    return uniqueAtividades.filter((ativ) => matchesIncrementalSearch(ativ.name, atividadeInput) && !selectedAtividades.includes(ativ.name || '')).slice(0, 5);
   };
 
   return (
@@ -279,9 +283,9 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
               {uniqueStatus.map((status) => (
                 <button
                   key={status}
-                  onClick={() => handleStatusToggle(status ?? 'pendente')}
+                  onClick={() => handleStatusToggle(status ?? 'PENDENTE')}
                   className={`px-3 py-2 rounded-full text-xs font-medium border-2 transition-all ${
-                    selectedStatus.includes(status ?? 'pendente') ? statusColors[status as keyof typeof statusColors] : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                    selectedStatus.includes(status ?? 'PENDENTE') ? statusColors[status as keyof typeof statusColors] : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   {statusLabels[status as keyof typeof statusLabels]}
@@ -321,7 +325,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                     }
                   }}
                   placeholder="Digite palavras para filtrar locais..."
-                  className="w-full text-gray-900 placeholder-gray-400 pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all text-sm"
+                  className="w-full bg-white text-gray-900 placeholder-gray-400 pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all text-sm"
                 />
                 {localInput.trim() && (
                   <button onClick={() => addLocalFilter(localInput)} className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-green-600 hover:text-green-800 transition-colors">
@@ -334,7 +338,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   {getFilteredLocais().map((local) => (
                     <button
                       key={local}
-                      onClick={() => addLocalFilter(local)}
+                      onClick={() => addLocalFilter(local || '')}
                       className="w-full text-black text-left px-3 py-2 text-sm hover:bg-green-50 transition-colors border-b border-gray-100 last:border-b-0"
                     >
                       {local}
@@ -390,11 +394,11 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                 <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-sm max-h-32 overflow-y-auto">
                   {getFilteredEmpreiteiras().map((empreiteira) => (
                     <button
-                      key={empreiteira}
-                      onClick={() => addEmpreiteiraFilter(empreiteira)}
+                      key={empreiteira.id}
+                      onClick={() => addEmpreiteiraFilter(empreiteira.name ?? '')}
                       className="w-full text-black text-left px-3 py-2 text-sm hover:bg-purple-50 transition-colors border-b border-gray-100 last:border-b-0"
                     >
-                      {empreiteira}
+                      {empreiteira.name}
                     </button>
                   ))}
                 </div>
@@ -448,11 +452,11 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                 <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-sm max-h-32 overflow-y-auto">
                   {getFilteredAtividades().map((atividade) => (
                     <button
-                      key={atividade}
-                      onClick={() => addAtividadeFilter(atividade)}
+                      key={atividade.id}
+                      onClick={() => addAtividadeFilter(atividade.name ?? '')}
                       className="w-full text-black text-left px-3 py-2 text-sm hover:bg-indigo-50 transition-colors border-b border-gray-100 last:border-b-0"
                     >
-                      {atividade}
+                      {atividade.name}
                     </button>
                   ))}
                 </div>
@@ -467,11 +471,11 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
               <div className="relative">
                 <input
                   type="date"
-                  value={formatDateForInput(dataCriacaoInput)}
+                  value={formatDateForInput(dataCriacaoInput) != '' ? formatDateForInput(dataCriacaoInput) : undefined}
                   onChange={(e) => handleDataCriacaoChange(e.target.value)}
                   className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all text-sm"
                 />
-                {dataCriacaoInput && <div className="mt-2 text-xs text-gray-500">Filtrado por: {dataCriacaoInput}</div>}
+                {dataCriacaoInput != '' && <div className="mt-2 text-xs text-gray-500">Filtrado por: {dataCriacaoInput}</div>}
               </div>
             </div>
 

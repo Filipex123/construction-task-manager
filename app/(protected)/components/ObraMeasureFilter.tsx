@@ -24,17 +24,17 @@ export const ObraMeasureFilter: React.FC<ObraMeasureFilterProps> = ({ tarefas, o
   const uniqueAtividades = Array.from(new Set(tarefas.map((t) => t.activity))).sort();
 
   const statusLabels = {
-    pendente: 'Pendente',
-    em_andamento: 'Em Andamento',
-    medido: 'Medido',
-    retencao: 'Retenção',
+    PENDENTE: 'Pendente',
+    EM_ANDAMENTO: 'Em Andamento',
+    MEDIDO: 'Medido',
+    RETIDO: 'Retenção',
   };
 
   const statusColors = {
-    pendente: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    em_andamento: 'bg-blue-100 text-blue-800 border-blue-200',
-    medido: 'bg-green-100 text-green-800 border-green-200',
-    retencao: 'bg-red-100 text-red-800 border-red-200',
+    PENDENTE: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    EM_ANDAMENTO: 'bg-blue-100 text-blue-800 border-blue-200',
+    MEDIDO: 'bg-green-100 text-green-800 border-green-200',
+    RETIDO: 'bg-red-100 text-red-800 border-red-200',
   };
 
   // Função para busca incremental por múltiplas palavras

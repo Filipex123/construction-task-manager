@@ -2,12 +2,11 @@ import { tarefaService } from '@/app/services/tarefaService';
 import { Building, ChevronDown, ChevronUp, DollarSign, Loader2, Plus } from 'lucide-react';
 import React from 'react';
 import { Obra, Tarefa } from '../../types';
-import { AddTaskModal } from './AddTaskModal';
 import { BatchPaymentModal } from './BatchPaymentModal';
 import { ObraFilters } from './ObraFilters';
 import { TaskTable } from './TaskTable';
 
-interface ObraCardProps {
+interface TarefaCardProps {
   obra: Obra;
   onDelete?: (tarefaId: number) => void;
   onPay?: (tarefaId: number) => void;
@@ -15,39 +14,32 @@ interface ObraCardProps {
   onUpdateTask: (obraId: number, tarefaId: number, task: any) => void;
 }
 
-export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAddTask, onUpdateTask }) => {
+export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onDelete, onPay, onAddTask, onUpdateTask }) => {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [isBatchPaymentModalOpen, setIsBatchPaymentModalOpen] = React.useState(false);
   const [editTaskId, setEditTaskId] = React.useState<number | null>(null);
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState<Tarefa[]>([]);
-
-  // const [hasLoadedTasks, setHasLoadedTasks] = React.useState(obra.tarefas.length > 0);
-  const handleLoadTasks = async (obraId: number) => {
-    const data = await tarefaService.listar(obraId ?? 2);
-    setFilteredTarefas(data.items || []);
-    return data;
-  };
+  const [hasLoadedTasks, setHasLoadedTasks] = React.useState(filteredTarefas.length > 0);
 
   const handleToggleExpand = async () => {
-    if (!isExpanded && filteredTarefas.length === 0 && obra.id) {
+    if (!isExpanded && !hasLoadedTasks) {
       setIsLoading(true);
       try {
-        await handleLoadTasks(obra.id);
-        console.log('Tarefas carregadas para obra:', filteredTarefas);
-        // setHasLoadedTasks(true);
+        const data = await tarefaService.listar(obra.id!);
+        setFilteredTarefas(data.items);
+        setHasLoadedTasks(true);
       } catch (error) {
         console.error('Erro ao carregar tarefas:', error);
       } finally {
         setIsLoading(false);
+        setIsExpanded(!isExpanded);
       }
     }
-    setIsExpanded(!isExpanded);
   };
 
   const getTotalValue = () => {
-    console.log('Calculating total value for filteredTarefas:', filteredTarefas);
     if (filteredTarefas.length === 0) return 0;
     return filteredTarefas.reduce((total, tarefa) => total + (tarefa.totalAmount ?? 0), 0);
   };
@@ -81,7 +73,7 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
           </div>
           <div className="flex items-center space-x-4 text-sm">
             <div className="flex items-center space-x-2">
-              {isExpanded && (
+              {hasLoadedTasks && (
                 <div className="bg-white/20 px-3 py-1 rounded-full">
                   <span className="font-medium">{filteredTarefas.length} tarefas</span>
                 </div>
@@ -106,16 +98,8 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
       </div>
 
       {/* Expandable Content */}
-      {isExpanded && (
+      {isExpanded && !isLoading && (
         <div className="animate-in slide-in-from-top-2 duration-300">
-          {/* Loading State */}
-          {/* {isLoading && (
-            <div className="px-8 py-12 text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-              <p className="text-gray-600">Carregando tarefas...</p>
-            </div>
-          )} */}
-
           {/* Summary */}
           {onPay && (
             <div className="px-8 py-5 bg-gray-50 border-b">
@@ -126,27 +110,25 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
                 </div>
                 <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
                   <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus === 'pago').length} pago</span>
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'PAGO').length} pago</span>
                     <div className="w-full h-1 bg-green-500 rounded-full" />
                   </span>
                   <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus === 'em_andamento').length} em andamento</span>
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'EM_ANDAMENTO').length} em andamento</span>
                     <div className="w-full h-1 bg-blue-500 rounded-full" />
                   </span>
                   <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus === 'pendente').length} pendente</span>
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'PENDENTE').length} pendente</span>
                     <div className="w-full h-1 bg-yellow-500 rounded-full" />
                   </span>
                   <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus === 'atrasado').length} atrasado</span>
+                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'ATRASADO').length} atrasado</span>
                     <div className="w-full h-1 bg-red-500 rounded-full" />
                   </span>
                 </div>
               </div>
             </div>
           )}
-
-          {/* Content when not loading */}
 
           {/* Filters */}
           <ObraFilters tarefas={filteredTarefas} onFilterChange={setFilteredTarefas} />
@@ -184,18 +166,7 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onPay, onAdd
           </div>
         </div>
       )}
-      <AddTaskModal
-        isOpen={isAddModalOpen}
-        onClose={() => {
-          setIsAddModalOpen(false);
-          setEditTaskId(null);
-        }}
-        onAddTask={(task) => onAddTask(obra.id!, task)}
-        obraId={obra.id!}
-        mode={editTaskId ? 'edit' : 'add'}
-        initialTask={editTaskId ? filteredTarefas.find((t) => t.id === editTaskId) ?? null : null}
-        onUpdateTask={(tarefaId, task) => onUpdateTask(obra.id!, tarefaId, task)}
-      />
+
       <BatchPaymentModal isOpen={isBatchPaymentModalOpen} onClose={() => setIsBatchPaymentModalOpen(false)} onConfirm={handleBatchPayment} tarefas={filteredTarefas} />
     </div>
   );
