@@ -9,6 +9,12 @@ interface TaskTableProps {
   onEdit: (tarefaId: number) => void;
   onDelete?: (tarefaId: number) => void;
   onPay?: (tarefaId: number) => void;
+  // server-side pagination props:
+  serverSide?: boolean;
+  totalItems?: number;
+  currentPage?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
 }
 
 type MobileView = 'table' | 'cards' | 'list';
@@ -27,13 +33,13 @@ const statusLabels = {
   ATRASADO: 'Atrasado',
 };
 
-export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete, onPay }) => {
+export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete, onPay, serverSide = false, totalItems = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
   const [mobileView, setMobileView] = React.useState<MobileView>('cards');
   const [selectedTask, setSelectedTask] = React.useState<Tarefa | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = React.useState(false);
   const [taskToPay, setTaskToPay] = React.useState<Tarefa | null>(null);
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentPageState, setCurrentPage] = React.useState(1);
   const [isMobile, setIsMobile] = React.useState(false);
 
   // Detectar se é mobile
@@ -53,15 +59,22 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
     setCurrentPage(1);
   }, [tarefas.length, mobileView]);
 
-  // Configuração de paginação
+  // se serverSide, assumimos 'tarefas' já contém apenas a página atual
+  // se não serverSide, mantenha paginação local (existing logic)
   const itemsPerPage = isMobile ? 5 : 10;
-  const totalPages = Math.ceil(tarefas.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentTarefas = tarefas.slice(startIndex, endIndex);
+  let currentTarefas = tarefas;
+  if (!serverSide) {
+    const totalPages = Math.ceil(tarefas.length / itemsPerPage);
+    const startIndex = (currentPageState - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    currentTarefas = tarefas.slice(startIndex, endIndex);
+  }
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    if (onPageChange) {
+      onPageChange(page);
+    }
   };
 
   const formatCurrency = (value: number) => {
@@ -265,7 +278,33 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
     </div>
   );
 
+  // const PaginationControls = () => {
+  //   if (serverSide) {
+  //     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  //     return (
+  //       <div className="flex items-center justify-end space-x-2">
+  //         {/* Simplificado: previous / next */}
+  //         <button disabled={currentPage <= 1} onClick={() => onPageChange && onPageChange(currentPage - 1)} className="px-3 py-1 bg-white border rounded">
+  //           Prev
+  //         </button>
+  //         <span className="px-2">
+  //           Página {currentPage} de {totalPages}
+  //         </span>
+  //         <button disabled={currentPage >= totalPages} onClick={() => onPageChange && onPageChange(currentPage + 1)} className="px-3 py-1 bg-white border rounded">
+  //           Next
+  //         </button>
+  //       </div>
+  //     );
+  //   }
+  //   // else render existing pagination (local)
+  //   return null; // manter implementação anterior se necessário
+  // };
+
   const PaginationControls = () => {
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
     if (totalPages <= 1) return null;
 
     const getVisiblePages = () => {

@@ -1,11 +1,13 @@
-import { PageableResponse, Tarefa } from '@/app/types';
+import { AddTarefaRequest, PageableResponse, Tarefa } from '@/app/types';
 
 const API_URL = 'https://116vebee4l.execute-api.us-east-1.amazonaws.com/prod/tarefas';
 
 export const tarefaService = {
-  async listar(obraId: number): Promise<PageableResponse<Tarefa>> {
+  async listar(obraId: number, params: string): Promise<PageableResponse<Tarefa>> {
     try {
-      const res = await fetch(`${API_URL}?idObra=${obraId}`, { cache: 'no-store' });
+      const urlParams = new URLSearchParams(params);
+
+      const res = await fetch(`${API_URL}?idObra=${obraId}` + `&${urlParams.toString()}`, { cache: 'no-store' });
 
       if (!res.ok) throw new Error('Erro ao listar tarefas');
 
@@ -28,16 +30,19 @@ export const tarefaService = {
     return res.json();
   },
 
-  async criar(dados: Omit<Tarefa, 'ID'>): Promise<void> {
+  async criar(dados: AddTarefaRequest): Promise<Tarefa> {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dados),
     });
     if (!res.ok) throw new Error('Erro ao criar tarefa');
+
+    const data = await res.json();
+    return data.item;
   },
 
-  async atualizar(id: string, dados: Partial<Tarefa>): Promise<void> {
+  async atualizar(id: number, dados: Partial<AddTarefaRequest>): Promise<void> {
     const res = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

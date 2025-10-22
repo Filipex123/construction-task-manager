@@ -1,119 +1,95 @@
-import { useState } from 'react';
-import { PaymentStatusEnum, Tarefa } from '../../types';
+import { Building2, DollarSign, Edit3, Hash, MapPin, Package, Plus, Wrench, X } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Atividades, Empreiteira, Local, MeasurementStatusEnum, PaymentStatusEnum, Tarefa, UnidadeMedida } from '../../types';
+
+import { atividadesService } from '@/app/services/atividadesService';
+import { empreiteraService } from '@/app/services/empreiteiraService';
+import { localService } from '@/app/services/localService';
+import { unidadesService } from '@/app/services/unidadesService';
 
 interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddTask: (task: Omit<Tarefa, 'id'>) => void;
+  onAddTask: (task: AddTarefaFormData) => void;
   obraId: number;
   mode?: 'add' | 'edit';
   initialTask?: Tarefa | null;
   onUpdateTask?: (tarefaId: number, task: Omit<Tarefa, 'id'>) => void;
 }
 
+export type AddTarefaFormData = {
+  location: Local | null;
+  activity: Atividades | null;
+  unitOfMeasure: UnidadeMedida | null;
+  contractor: Empreiteira | null;
+  quantity: number;
+  totalAmount: number;
+  paymentStatus: Tarefa['paymentStatus'];
+  dueDate?: string;
+};
+
 export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAddTask, obraId, mode = 'add', initialTask = null, onUpdateTask }) => {
-  const [formData, setFormData] = useState<Omit<Tarefa, 'id'>>();
+  const [locais, setLocais] = useState<Local[]>([]);
+  const [atividades, setAtividades] = useState<Atividades[]>([]);
+  const [units, setUnits] = useState<UnidadeMedida[]>([]);
+  const [contractors, setContractors] = useState<Empreiteira[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(false);
+
+  const [formData, setFormData] = useState<AddTarefaFormData>({
+    location: null,
+    activity: null,
+    unitOfMeasure: null,
+    contractor: null,
+    quantity: 0,
+    totalAmount: 0,
+    paymentStatus: PaymentStatusEnum.PENDENTE,
+    dueDate: undefined,
+  });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const unidadeOptions = ['m²', 'm³', 'm', 'unidade', 'kg', 'ton', 'ponto', 'peça', 'conjunto', 'verba'];
   const statusOptions = [
     { value: PaymentStatusEnum.PENDENTE, label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
     { value: PaymentStatusEnum.EM_ANDAMENTO, label: 'Em Andamento', color: 'bg-blue-100 text-blue-800' },
     { value: PaymentStatusEnum.PAGO, label: 'Pago', color: 'bg-green-100 text-green-800' },
     { value: PaymentStatusEnum.ATRASADO, label: 'Atrasado', color: 'bg-red-100 text-red-800' },
   ];
-  const empreiteiraOptions = [
-    {
-      id: 1,
-      descricao: 'Especializada em fundações e terraplanagem',
-      nome: 'SoloFirme',
-      createdAt: '2024-02-01',
-    },
-    {
-      id: 2,
-      descricao: 'Serviços de alvenaria estrutural e acabamentos',
-      nome: 'Constrular',
-      createdAt: '2024-02-02',
-    },
-    {
-      id: 3,
-      descricao: 'Instalações elétricas prediais e industriais',
-      nome: 'EletroMax',
-      createdAt: '2024-02-03',
-    },
-    {
-      id: 4,
-      descricao: 'Tubulações hidráulicas e sistemas de esgoto',
-      nome: 'Hidrosul',
-      createdAt: '2024-02-04',
-    },
-    {
-      id: 5,
-      descricao: 'Montagem de estruturas metálicas e soldagem',
-      nome: 'MetalAr',
-      createdAt: '2024-02-05',
-    },
-    {
-      id: 6,
-      descricao: 'Revestimentos cerâmicos, pisos e azulejos',
-      nome: 'RevestLar',
-      createdAt: '2024-02-06',
-    },
-    {
-      id: 7,
-      descricao: 'Serviços de pintura residencial e predial',
-      nome: 'Pintart',
-      createdAt: '2024-02-07',
-    },
-    {
-      id: 8,
-      descricao: 'Instalação de vidros temperados e esquadrias',
-      nome: 'VidroReal',
-      createdAt: '2024-02-08',
-    },
-  ];
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = <K extends keyof AddTarefaFormData>(field: K, value: AddTarefaFormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }));
-    }
+    if (errors[field as string]) setErrors((prev) => ({ ...prev, [field as string]: '' }));
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-
-    if (!formData?.location?.name?.trim()) newErrors.local = 'Local é obrigatório';
-    if (!formData?.activity?.name?.trim()) newErrors.atividade = 'Atividade é obrigatória';
-    if (!formData?.quantity || formData.quantity <= 0) {
-      newErrors.quantidade = 'Quantidade deve ser maior que zero';
-    }
-    if (!formData?.totalAmount || formData.totalAmount <= 0) {
-      newErrors.valor = 'Valor deve ser maior que zero';
-    }
-    if (!formData?.contractor?.name?.trim()) newErrors.empreiteira = 'Empreiteira é obrigatória';
-
+    if (!formData?.location?.name?.trim()) newErrors.location = 'Local é obrigatório';
+    if (!formData?.activity?.name?.trim()) newErrors.activity = 'Atividade é obrigatória';
+    if (!formData?.quantity || formData.quantity <= 0) newErrors.quantity = 'Quantidade deve ser maior que zero';
+    if (!formData?.totalAmount || formData.totalAmount <= 0) newErrors.totalAmount = 'Valor deve ser maior que zero';
+    if (!formData?.contractor?.name?.trim()) newErrors.contractor = 'Empreiteira é obrigatória';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const buildSubmitTask = (): Omit<Tarefa, 'id'> => {
+    return {
+      location: { id: Number(formData.location!.id), name: formData.location!.name },
+      activity: { id: Number(formData.activity!.id), name: formData.activity!.name },
+      unitOfMeasure: { id: Number(formData.unitOfMeasure!.id), name: formData.unitOfMeasure!.name },
+      contractor: { id: Number(formData.contractor!.id), name: formData.contractor!.name },
+      quantity: Number(formData.quantity),
+      totalAmount: Number(formData.totalAmount),
+      paymentStatus: formData.paymentStatus,
+      measurementStatus: MeasurementStatusEnum.PENDENTE,
+      quantityExecuted: 0,
+      dueDate: formData.dueDate ?? new Date().toISOString().slice(0, 10), // default today if not provided
+    };
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
-
-    const newTask: Omit<Tarefa, 'id'> = {
-      location: { id: Number(formData?.location?.id), name: formData?.location?.name?.trim() },
-      activity: { id: Number(formData?.activity?.id), name: formData?.activity?.name?.trim() },
-      unitOfMeasure: { id: Number(formData?.unitOfMeasure?.id), name: formData?.unitOfMeasure?.name?.trim() },
-      contractor: { id: Number(formData?.contractor?.id), name: formData?.contractor?.name?.trim() },
-      quantity: formData?.quantity,
-      totalAmount: formData?.totalAmount,
-      paymentStatus: formData?.paymentStatus,
-      measurementStatus: 'pendente',
-      quantityExecuted: 0,
-    };
-
+    const newTask = buildSubmitTask();
     if (mode === 'edit' && initialTask && onUpdateTask) {
       onUpdateTask(initialTask.id, newTask);
     } else {
@@ -124,68 +100,115 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
   const handleClose = () => {
     setFormData({
-      location: { id: 0, name: '' },
-      activity: { id: 0, name: '' },
-      unitOfMeasure: { id: 0, name: '' },
-      contractor: { id: 0, name: '' },
+      location: null,
+      activity: null,
+      unitOfMeasure: null,
+      contractor: null,
       quantity: 0,
       totalAmount: 0,
-      paymentStatus: 'pendente',
+      paymentStatus: PaymentStatusEnum.PENDENTE,
+      dueDate: undefined,
     });
     setErrors({});
     onClose();
   };
 
-  // Populate form when opening in edit mode
+  // busca opções de selects via services quando abrir o modal (ou obraId mudar)
   useEffect(() => {
-    if (isOpen && mode === 'edit' && initialTask) {
-      setFormData({
+    if (!isOpen) return;
+
+    let mounted = true;
+    const loadOptions = async () => {
+      setLoadingOptions(true);
+      try {
+        const [fLocais, fAtividades, fUnits, fContractors] = await Promise.all([
+          // ajustes: use os métodos reais do seu service; esses nomes são exemplos
+          localService?.listar(obraId),
+          atividadesService?.listar(),
+          unidadesService?.listar(),
+          empreiteraService?.listar(),
+        ]);
+
+        if (!mounted) return;
+        // alguns services retornam { items } ou array direto — normalize
+        const normalize = <T,>(r: any) => {
+          if (Array.isArray(r)) return r as T[];
+          if (r && Array.isArray(r.items)) return r.items as T[];
+          return [];
+        };
+
+        const locaisArr = normalize<Local>(fLocais);
+        const atividadesArr = normalize<Atividades>(fAtividades);
+        const unitsArr = normalize<UnidadeMedida>(fUnits);
+        const contractorsArr = normalize<Empreiteira>(fContractors);
+
+        setLocais(locaisArr);
+        setAtividades(atividadesArr);
+        setUnits(unitsArr);
+        setContractors(contractorsArr);
+
+        // set defaults / preencher se for edição
+        if (mode === 'edit' && initialTask) {
+          setFormData({
+            location: initialTask.location ?? locaisArr[0],
+            activity: initialTask.activity ?? atividadesArr[0],
+            unitOfMeasure: initialTask.unitOfMeasure ?? unitsArr[0],
+            contractor: initialTask.contractor ?? contractorsArr[0],
+            quantity: initialTask.quantity ?? 0,
+            totalAmount: initialTask.totalAmount ?? 0,
+            paymentStatus: initialTask.paymentStatus ?? PaymentStatusEnum.PENDENTE,
+            dueDate: initialTask.dueDate,
+          });
+        } else {
+          // add mode: keep selects unselected (null) and only keep defaults for simple fields
+          setFormData((prev) => ({
+            ...prev,
+            location: null,
+            activity: null,
+            unitOfMeasure: null,
+            contractor: null,
+            // preserve quantity/total/paymentStatus as they already have defaults
+          }));
+        }
+      } catch (err) {
+        console.error('Erro ao carregar opções do modal de tarefa:', err);
+        // fallback já definido via mocks
+      } finally {
+        if (mounted) setLoadingOptions(false);
+      }
+    };
+
+    loadOptions();
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, obraId, mode, initialTask]);
+
+  const isDirty = useMemo(() => {
+    if (mode !== 'edit' || !initialTask) return true;
+    // simple deep compare
+    return (
+      JSON.stringify({
         location: initialTask.location,
         activity: initialTask.activity,
         unitOfMeasure: initialTask.unitOfMeasure,
-        quantity: initialTask.quantity ?? 0,
-        totalAmount: initialTask.totalAmount ?? 0,
         contractor: initialTask.contractor,
+        quantity: initialTask.quantity,
+        totalAmount: initialTask.totalAmount,
         paymentStatus: initialTask.paymentStatus,
-      });
-      setErrors({});
-    }
-    if (isOpen && mode === 'add' && !initialTask) {
-      setFormData({
-        location: { id: 0, name: '' },
-        activity: { id: 0, name: '' },
-        unitOfMeasure: { id: 0, name: '' },
-        contractor: { id: 0, name: '' },
-        quantity: 0,
-        totalAmount: 0,
-        paymentStatus: 'pendente',
-      });
-      setErrors({});
-    }
-  }, [isOpen, mode, initialTask]);
-
-  // Detect if form changed in edit mode
-  const isDirty = useMemo(() => {
-    if (mode !== 'edit' || !initialTask) return true; // allow add mode
-    const normalized = {
-      location: { id: Number(formData?.location?.id), name: formData?.location?.name?.trim() },
-      activity: { id: Number(formData?.activity?.id), name: formData?.activity?.name?.trim() },
-      unitOfMeasure: { id: Number(formData?.unitOfMeasure?.id), name: formData?.unitOfMeasure?.name?.trim() },
-      contractor: { id: Number(formData?.contractor?.id), name: formData?.contractor?.name?.trim() },
-      quantity: formData?.quantity,
-      totalAmount: formData?.totalAmount,
-      paymentStatus: formData?.paymentStatus,
-      measurementStatus: 'pendente',
-      quantityExecuted: 0,
-    };
-    return (
-      normalized.location !== initialTask.location ||
-      normalized.activity !== initialTask.activity ||
-      normalized.unitOfMeasure !== initialTask.unitOfMeasure ||
-      normalized.quantity !== initialTask.quantity ||
-      normalized.totalAmount !== initialTask.totalAmount ||
-      normalized.contractor !== initialTask.contractor ||
-      normalized.paymentStatus !== initialTask.paymentStatus
+        dueDate: initialTask.dueDate,
+      }) !==
+      JSON.stringify({
+        location: formData.location,
+        activity: formData.activity,
+        unitOfMeasure: formData.unitOfMeasure,
+        contractor: formData.contractor,
+        quantity: formData.quantity,
+        totalAmount: formData.totalAmount,
+        paymentStatus: formData.paymentStatus,
+        dueDate: formData.dueDate,
+      })
     );
   }, [mode, initialTask, formData]);
 
@@ -207,159 +230,194 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-4 space-y-4 overflow-y-auto max-h-[calc(90vh-80px)]">
-          {/* Local */}
-          <div>
-            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-              <MapPin className="w-4 h-4" />
-              <span>Local</span>
-            </label>
-            <select
-              value={formData?.location?.id}
-              onChange={(e) => {
-                const selected = mockLocais.find((l) => l.id === e.target.value) || { id: '', name: '' };
-                setFormData((prev) => ({ ...prev, local: selected }));
-                if (errors.local) setErrors((prev) => ({ ...prev, local: '' }));
-              }}
-              className={`w-full text-gray-900 px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
-                errors.local ? 'border-red-300 bg-red-50' : 'border-gray-300'
-              }`}
-            >
-              <option value="" className="text-gray-500">
-                Selecione um local
-              </option>
-              {mockLocais.map((l) => (
-                <option key={l.id} value={l.id} className="text-gray-900">
-                  {l.name}
-                </option>
-              ))}
-            </select>
-            {errors.local && <p className="text-red-600 text-sm mt-1">{errors.local}</p>}
-          </div>
-
-          {/* Atividade */}
-          <div>
-            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-              <Wrench className="w-4 h-4" />
-              <span>Atividade</span>
-            </label>
-            <input
-              type="text"
-              value={formData?.activity?.name}
-              onChange={(e) => handleInputChange('atividade', e.target.value)}
-              placeholder="Ex: Instalação de piso cerâmico"
-              className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
-                errors.atividade ? 'border-red-300 bg-red-50' : 'border-gray-300'
-              }`}
-            />
-            {errors.atividade && <p className="text-red-600 text-sm mt-1">{errors.atividade}</p>}
-          </div>
-
-          {/* Unidade e Quantidade */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-                <Package className="w-4 h-4" />
-                <span>Unidade</span>
-              </label>
-              <select
-                value={formData?.unitOfMeasure?.name}
-                onChange={(e) => handleInputChange('unidade', e.target.value)}
-                className="w-full text-gray-900 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-              >
-                {unidadeOptions.map((unidade) => (
-                  <option className="text-gray-900" key={unidade} value={unidade}>
-                    {unidade}
-                  </option>
-                ))}
-              </select>
+          {loadingOptions ? (
+            <div className="text-center py-12">
+              <div className="loader mx-auto w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+              <p className="text-gray-500 mt-3">Carregando opções...</p>
             </div>
-
-            <div>
-              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-                <Hash className="w-4 h-4" />
-                <span>Quantidade</span>
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData?.quantity}
-                onChange={(e) => handleInputChange('quantidade', e.target.value)}
-                placeholder="0"
-                className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
-                  errors.quantidade ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
-              />
-              {errors.quantidade && <p className="text-red-600 text-sm mt-1">{errors.quantidade}</p>}
-            </div>
-          </div>
-
-          {/* Valor */}
-          <div>
-            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-              <DollarSign className="w-4 h-4" />
-              <span>Valor (R$)</span>
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={formData?.totalAmount}
-              onChange={(e) => handleInputChange('valor', e.target.value)}
-              placeholder="0,00"
-              className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
-                errors.valor ? 'border-red-300 bg-red-50' : 'border-gray-300'
-              }`}
-            />
-            {errors.valor && <p className="text-red-600 text-sm mt-1">{errors.valor}</p>}
-          </div>
-
-          {/* Empreiteira */}
-          <div>
-            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-              <Building2 className="w-4 h-4" />
-              <span>Empreiteira</span>
-            </label>
-            <select
-              value={formData?.contractor?.name}
-              onChange={(e) => {
-                setFormData((prev) => ({ ...prev, empreiteira: e.target.value }));
-                if (errors.empreiteira) setErrors((prev) => ({ ...prev, empreiteira: '' }));
-              }}
-              className={`w-full text-gray-900 px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
-                errors.empreiteira ? 'border-red-300 bg-red-50' : 'border-gray-300'
-              }`}
-            >
-              <option value="" className="text-gray-500">
-                Selecione uma empreiteira
-              </option>
-              {empreiteiraOptions.map((eOpt) => (
-                <option key={eOpt.id} value={eOpt.nome} className="text-gray-900">
-                  {eOpt.nome}
-                </option>
-              ))}
-            </select>
-            {errors.empreiteira && <p className="text-red-600 text-sm mt-1">{errors.empreiteira}</p>}
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">Status</label>
-            <div className="grid grid-cols-2 gap-2">
-              {statusOptions.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => handleInputChange('status', option.value)}
-                  className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
-                    formData?.paymentStatus === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+          ) : (
+            <>
+              {/* Local */}
+              <div>
+                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                  <MapPin className="w-4 h-4" />
+                  <span>Local</span>
+                </label>
+                <select
+                  value={formData.location?.id ?? ''}
+                  onChange={(e) => {
+                    const selected = locais.find((l) => String(l.id) === e.target.value) ?? locais[0];
+                    handleInputChange('location', selected);
+                  }}
+                  className={`w-full text-gray-900 px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
+                    errors.location ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                 >
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${option.color}`}>{option.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+                  <option value="" className="text-gray-200">
+                    Selecione um local
+                  </option>
+                  {locais.map((l) => (
+                    <option key={l.id} value={l.id} className="text-gray-900">
+                      {l.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.location && <p className="text-red-600 text-sm mt-1">{errors.location}</p>}
+              </div>
+
+              {/* Atividade */}
+              <div>
+                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                  <Wrench className="w-4 h-4" />
+                  <span>Atividade</span>
+                </label>
+                <select
+                  value={formData.activity?.id ?? ''}
+                  onChange={(e) => {
+                    const selected = atividades.find((a) => String(a.id) === e.target.value) ?? ({ id: 0, name: '' } as Atividades);
+                    handleInputChange('activity', selected);
+                  }}
+                  className={`w-full px-3 py-3 text-gray-900 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
+                    errors.activity ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="" className="text-gray-200">
+                    Selecione uma atividade
+                  </option>
+                  {atividades.map((a) => (
+                    <option key={a.id} value={a.id} className="text-gray-900">
+                      {a.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.activity && <p className="text-red-600 text-sm mt-1">{errors.activity}</p>}
+              </div>
+
+              {/* Unidade e Quantidade */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                    <Package className="w-4 h-4" />
+                    <span>Unidade</span>
+                  </label>
+                  <select
+                    value={formData.unitOfMeasure?.id ?? ''}
+                    onChange={(e) => {
+                      const selected = units.find((u) => String(u.id) === e.target.value) ?? units[0];
+                      handleInputChange('unitOfMeasure', selected);
+                    }}
+                    className="w-full text-gray-900 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  >
+                    <option value="" className="text-gray-200">
+                      Selecione uma unidade
+                    </option>
+                    {units.map((u) => (
+                      <option className="text-gray-900" key={u.id} value={u.id}>
+                        {u.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                    <Hash className="w-4 h-4" />
+                    <span>Quantidade</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.quantity ?? ''}
+                    onChange={(e) => handleInputChange('quantity', Number(e.target.value))}
+                    placeholder="0"
+                    className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
+                      errors.quantity ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.quantity && <p className="text-red-600 text-sm mt-1">{errors.quantity}</p>}
+                </div>
+              </div>
+
+              {/* Valor */}
+              <div>
+                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                  <DollarSign className="w-4 h-4" />
+                  <span>Valor (R$)</span>
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.totalAmount ?? ''}
+                  onChange={(e) => handleInputChange('totalAmount', Number(e.target.value))}
+                  placeholder="0,00"
+                  className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
+                    errors.totalAmount ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
+                />
+                {errors.totalAmount && <p className="text-red-600 text-sm mt-1">{errors.totalAmount}</p>}
+              </div>
+
+              {/* Empreiteira */}
+              <div>
+                <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                  <Building2 className="w-4 h-4" />
+                  <span>Empreiteira</span>
+                </label>
+                <select
+                  value={formData.contractor?.id ?? ''}
+                  onChange={(e) => {
+                    const selected = contractors.find((c) => String(c.id) === e.target.value) ?? contractors[0];
+                    handleInputChange('contractor', selected);
+                  }}
+                  className={`w-full text-gray-900 px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
+                    errors.contractor ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="" className="text-gray-500">
+                    Selecione uma empreiteira
+                  </option>
+                  {contractors.map((c) => (
+                    <option key={c.id} value={c.id} className="text-gray-900">
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.contractor && <p className="text-red-600 text-sm mt-1">{errors.contractor}</p>}
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Status</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {statusOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handleInputChange('paymentStatus', option.value as Tarefa['paymentStatus'])}
+                      className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                        formData.paymentStatus === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${option.color}`}>{option.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Due Date (opcional) */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Data Limite</label>
+                <input
+                  type="date"
+                  value={formData.dueDate ?? ''}
+                  onChange={(e) => handleInputChange('dueDate', e.target.value)}
+                  className="w-full text-gray-900 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                />
+              </div>
+            </>
+          )}
 
           {/* Buttons */}
           <div className="flex space-x-3 pt-4 border-t border-gray-200">

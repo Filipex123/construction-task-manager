@@ -17,6 +17,22 @@ export interface Tarefa {
   updatedBy?: string;
 }
 
+export interface AddTarefaRequest {
+  quantity: number;
+  totalAmount: number;
+  paymentStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'PAGO' | 'ATRASADO';
+  measurementStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'MEDIDO' | 'RETIDO';
+  quantityExecuted: number;
+  measurementDate?: string;
+  dueDate: string;
+  paymentDate?: string;
+  updatedBy?: string;
+  fkAtividade: number;
+  fkLocal: number;
+  fkUnidadeMedida: number;
+  fkEmpreiteiro: number;
+}
+
 export interface Local {
   id?: number;
   name?: string;

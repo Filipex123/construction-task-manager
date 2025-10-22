@@ -1,11 +1,36 @@
 import { ChevronDown, ChevronUp, Filter, Plus, Search, X } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Tarefa } from '../../types';
 
+export type TarefaFilterParams = {
+  status?: string[];
+  locais?: string[];
+  empreiteiras?: string[];
+  atividades?: string[];
+  dataCriacao?: string; // YYYY-MM-DD
+  dataLimite?: string; // YYYY-MM-DD
+  page?: number;
+  pageSize?: number;
+};
+
 interface ObraFiltersProps {
-  tarefas: Tarefa[];
-  onFilterChange: (filteredTarefas: Tarefa[]) => void;
+  tarefas: Tarefa[]; // usado só para listar sugestões (pode ser page ou full list)
+  onFilterChange: (filters: TarefaFilterParams) => void; // agora envia filtros, não array filtrado
 }
+
+const statusLabels = {
+  PENDENTE: 'Pendente',
+  EM_ANDAMENTO: 'Em Andamento',
+  PAGO: 'Pago',
+  ATRASADO: 'Atrasado',
+};
+
+const statusColors = {
+  PENDENTE: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  EM_ANDAMENTO: 'bg-blue-100 text-blue-800 border-blue-200 text-center',
+  PAGO: 'bg-green-100 text-green-800 border-green-200',
+  ATRASADO: 'bg-red-100 text-red-800 border-red-200',
+};
 
 export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChange }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -18,6 +43,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   const [localInput, setLocalInput] = useState('');
   const [empreiteiraInput, setEmpreiteiraInput] = useState('');
   const [atividadeInput, setAtividadeInput] = useState('');
+  const initialTarefasRef = useRef<Tarefa[]>(tarefas);
 
   // Função para formatar data para DD/MM/YYYY
   const formatDateToDisplay = (dateString: string): string => {
@@ -71,20 +97,6 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.contractor))).sort();
   const uniqueAtividades = Array.from(new Set(tarefas.map((t) => t.activity))).sort();
 
-  const statusLabels = {
-    PENDENTE: 'Pendente',
-    EM_ANDAMENTO: 'Em Andamento',
-    PAGO: 'Pago',
-    ATRASADO: 'Atrasado',
-  };
-
-  const statusColors = {
-    PENDENTE: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    EM_ANDAMENTO: 'bg-blue-100 text-blue-800 border-blue-200 text-center',
-    PAGO: 'bg-green-100 text-green-800 border-green-200',
-    ATRASADO: 'bg-red-100 text-red-800 border-red-200',
-  };
-
   // Função para busca incremental por múltiplas palavras
   const matchesIncrementalSearch = (text?: string, searchTerm?: string): boolean => {
     if (!text || !searchTerm) return true;
@@ -104,46 +116,24 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     return selectedFilters.some((filter) => matchesIncrementalSearch(text, filter));
   };
 
+  // helper: monta filtro transformando datas para YYYY-MM-DD
+  const buildFiltersAndEmit = (status: string[], locais: string[], empreiteiras: string[], atividades: string[], dataCriacao: string, dataLimite: string) => {
+    const f: TarefaFilterParams = {
+      status: status.length ? status : undefined,
+      locais: locais.length ? locais : undefined,
+      empreiteiras: empreiteiras.length ? empreiteiras : undefined,
+      atividades: atividades.length ? atividades : undefined,
+      dataCriacao: dataCriacao.trim() ? formatDateForInput(dataCriacao) : undefined,
+      dataLimite: dataLimite.trim() ? formatDateForInput(dataLimite) : undefined,
+      page: 1,
+      pageSize: 10,
+    };
+    onFilterChange(f);
+  };
+
+  // substitui applyFilters para apenas emitir filtros
   const applyFilters = (status: string[], locais: string[], empreiteiras: string[], atividades: string[], dataCriacao: string, dataLimite: string) => {
-    let filtered = tarefas;
-
-    if (status.length > 0) {
-      filtered = filtered.filter((t) => status.includes(t.paymentStatus));
-    }
-
-    if (locais.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.location?.name, locais));
-    }
-
-    if (empreiteiras.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.contractor.name, empreiteiras));
-    }
-
-    if (atividades.length > 0) {
-      filtered = filtered.filter((t) => matchesAnyFilter(t.activity.name, atividades));
-    }
-
-    if (dataCriacao.trim()) {
-      const dataCriacaoFormatted = formatDateForInput(dataCriacao);
-      if (dataCriacaoFormatted) {
-        filtered = filtered.filter((t) => {
-          const dataCriacaoStr = t.createdAt ? new Date(t.createdAt).toISOString().split('T')[0] : '';
-          return dataCriacaoStr === dataCriacaoFormatted;
-        });
-      }
-    }
-
-    if (dataLimite.trim()) {
-      const dataLimiteFormatted = formatDateForInput(dataLimite);
-      if (dataLimiteFormatted) {
-        filtered = filtered.filter((t) => {
-          const dataLimiteStr = t.dueDate ? new Date(t.dueDate).toISOString().split('T')[0] : '';
-          return dataLimiteStr === dataLimiteFormatted;
-        });
-      }
-    }
-
-    onFilterChange(filtered);
+    buildFiltersAndEmit(status, locais, empreiteiras, atividades, dataCriacao, dataLimite);
   };
 
   const handleStatusToggle = (status: string) => {
@@ -208,14 +198,13 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     setLocalInput('');
     setEmpreiteiraInput('');
     setAtividadeInput('');
-    onFilterChange(tarefas);
+    onFilterChange({});
   };
 
   const handleDataCriacaoChange = (value: string) => {
     // Se o valor é do input date (YYYY-MM-DD), converte para DD/MM/YYYY para exibição
     const displayValue = value.includes('-') ? formatDateToDisplay(value) : applyDateMask(value);
     setDataCriacaoInput(displayValue);
-    console.log('Data Criação Input set to:', displayValue);
     applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, displayValue, dataLimiteInput);
   };
 
@@ -251,7 +240,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     <div className="border-b border-gray-200 bg-gray-50">
       {/* Filter Toggle Button */}
       <div className="px-6 py-3">
-        <button onClick={() => setIsExpanded(!isExpanded)} className="flex items-center justify-between w-full text-left">
+        <button type="button" onClick={() => setIsExpanded(!isExpanded)} className="flex items-center justify-between w-full text-left">
           <div className="flex items-center space-x-2">
             <Filter className="w-4 h-4 text-gray-600" />
             <span className="text-sm font-medium text-gray-700">
@@ -269,7 +258,14 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
           {/* Clear All Button */}
           {hasActiveFilters && (
             <div className="flex justify-end">
-              <button onClick={clearAllFilters} className="flex items-center space-x-1 text-sm text-red-600 hover:text-red-800 transition-colors">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  clearAllFilters();
+                }}
+                className="flex items-center space-x-1 text-sm text-red-600 hover:text-red-800 transition-colors"
+              >
                 <X className="w-3 h-3" />
                 <span>Limpar filtros</span>
               </button>
@@ -283,7 +279,11 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
               {uniqueStatus.map((status) => (
                 <button
                   key={status}
-                  onClick={() => handleStatusToggle(status ?? 'PENDENTE')}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleStatusToggle(status ?? 'PENDENTE');
+                  }}
                   className={`px-3 py-2 rounded-full text-xs font-medium border-2 transition-all ${
                     selectedStatus.includes(status ?? 'PENDENTE') ? statusColors[status as keyof typeof statusColors] : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
                   }`}
@@ -304,7 +304,14 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                 {selectedLocais.map((local) => (
                   <span key={local} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
                     {local}
-                    <button onClick={() => removeLocalFilter(local)} className="ml-2 hover:text-green-600 transition-colors">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeLocalFilter(local);
+                      }}
+                      className="ml-2 hover:text-green-600 transition-colors"
+                    >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -319,8 +326,9 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   type="text"
                   value={localInput}
                   onChange={(e) => setLocalInput(e.target.value)}
-                  onKeyPress={(e) => {
+                  onKeyDown={(e) => {
                     if (e.key === 'Enter') {
+                      e.preventDefault();
                       addLocalFilter(localInput);
                     }
                   }}
@@ -328,7 +336,14 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   className="w-full bg-white text-gray-900 placeholder-gray-400 pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all text-sm"
                 />
                 {localInput.trim() && (
-                  <button onClick={() => addLocalFilter(localInput)} className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-green-600 hover:text-green-800 transition-colors">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addLocalFilter(localInput);
+                    }}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-green-600 hover:text-green-800 transition-colors"
+                  >
                     <Plus className="w-4 h-4" />
                   </button>
                 )}
@@ -338,7 +353,11 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   {getFilteredLocais().map((local) => (
                     <button
                       key={local}
-                      onClick={() => addLocalFilter(local || '')}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        addLocalFilter(local || '');
+                      }}
                       className="w-full text-black text-left px-3 py-2 text-sm hover:bg-green-50 transition-colors border-b border-gray-100 last:border-b-0"
                     >
                       {local}
@@ -358,7 +377,14 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                 {selectedEmpreiteiras.map((empreiteira) => (
                   <span key={empreiteira} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
                     {empreiteira}
-                    <button onClick={() => removeEmpreiteiraFilter(empreiteira)} className="ml-2 hover:text-purple-600 transition-colors">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeEmpreiteiraFilter(empreiteira);
+                      }}
+                      className="ml-2 hover:text-purple-600 transition-colors"
+                    >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -373,8 +399,9 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   type="text"
                   value={empreiteiraInput}
                   onChange={(e) => setEmpreiteiraInput(e.target.value)}
-                  onKeyPress={(e) => {
+                  onKeyDown={(e) => {
                     if (e.key === 'Enter') {
+                      e.preventDefault();
                       addEmpreiteiraFilter(empreiteiraInput);
                     }
                   }}
@@ -383,7 +410,11 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                 />
                 {empreiteiraInput.trim() && (
                   <button
-                    onClick={() => addEmpreiteiraFilter(empreiteiraInput)}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addEmpreiteiraFilter(empreiteiraInput);
+                    }}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-purple-600 hover:text-purple-800 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
@@ -395,7 +426,11 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   {getFilteredEmpreiteiras().map((empreiteira) => (
                     <button
                       key={empreiteira.id}
-                      onClick={() => addEmpreiteiraFilter(empreiteira.name ?? '')}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        addEmpreiteiraFilter(empreiteira.name ?? '');
+                      }}
                       className="w-full text-black text-left px-3 py-2 text-sm hover:bg-purple-50 transition-colors border-b border-gray-100 last:border-b-0"
                     >
                       {empreiteira.name}
@@ -416,7 +451,14 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                 {selectedAtividades.map((atividade) => (
                   <span key={atividade} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 border border-indigo-200">
                     {atividade.length > 20 ? `${atividade.substring(0, 20)}...` : atividade}
-                    <button onClick={() => removeAtividadeFilter(atividade)} className="ml-2 hover:text-indigo-600 transition-colors">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeAtividadeFilter(atividade);
+                      }}
+                      className="ml-2 hover:text-indigo-600 transition-colors"
+                    >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -431,8 +473,9 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   type="text"
                   value={atividadeInput}
                   onChange={(e) => setAtividadeInput(e.target.value)}
-                  onKeyPress={(e) => {
+                  onKeyDown={(e) => {
                     if (e.key === 'Enter') {
+                      e.preventDefault();
                       addAtividadeFilter(atividadeInput);
                     }
                   }}
@@ -441,7 +484,11 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                 />
                 {atividadeInput.trim() && (
                   <button
-                    onClick={() => addAtividadeFilter(atividadeInput)}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addAtividadeFilter(atividadeInput);
+                    }}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-indigo-600 hover:text-indigo-800 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
@@ -453,7 +500,11 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   {getFilteredAtividades().map((atividade) => (
                     <button
                       key={atividade.id}
-                      onClick={() => addAtividadeFilter(atividade.name ?? '')}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        addAtividadeFilter(atividade.name ?? '');
+                      }}
                       className="w-full text-black text-left px-3 py-2 text-sm hover:bg-indigo-50 transition-colors border-b border-gray-100 last:border-b-0"
                     >
                       {atividade.name}
@@ -471,8 +522,11 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
               <div className="relative">
                 <input
                   type="date"
-                  value={formatDateForInput(dataCriacaoInput) != '' ? formatDateForInput(dataCriacaoInput) : undefined}
+                  value={formatDateForInput(dataCriacaoInput)}
                   onChange={(e) => handleDataCriacaoChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') e.preventDefault();
+                  }}
                   className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all text-sm"
                 />
                 {dataCriacaoInput != '' && <div className="mt-2 text-xs text-gray-500">Filtrado por: {dataCriacaoInput}</div>}
@@ -487,6 +541,9 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   type="date"
                   value={formatDateForInput(dataLimiteInput)}
                   onChange={(e) => handleDataLimiteChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') e.preventDefault();
+                  }}
                   className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all text-sm"
                 />
                 {dataLimiteInput && <div className="mt-2 text-xs text-gray-500">Filtrado por: {dataLimiteInput}</div>}

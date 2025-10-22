@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from 'react';
 import { usePageTitle } from '../context/PageTitle.context';
 import { obraService } from '../services/obraService';
-import { Obra, PaymentStatusEnum, Tarefa } from '../types';
+import { Obra, PaymentStatusEnum } from '../types';
 import { Loader } from './components/Loader';
 import { SearchBar } from './components/SearchBar';
 import { TarefaCard } from './components/TarefaCard';
@@ -18,49 +18,12 @@ function Home() {
     return obras.filter((obra) => obra.name?.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description?.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
-  const handleEdit = (obraId: number, tarefaId: number, updated: Omit<Tarefa, 'id'>) => {
-    setObras((prevObras) =>
-      prevObras.map((obra) => {
-        if (obra.id !== obraId) return obra;
-        return {
-          ...obra,
-          tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, ...updated } : t)),
-        };
-      })
-    );
-  };
-
-  const handleDelete = (tarefaId: number) => {
-    setObras((prevObras) =>
-      prevObras.map((obra) => ({
-        ...obra,
-        tarefas: obra.tarefas.filter((tarefa) => tarefa.id !== tarefaId),
-      }))
-    );
-  };
-
   const handlePay = (tarefaId: number) => {
     setObras((prev) =>
       prev.map((obra) => ({
         ...obra,
         tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, paymentStatus: PaymentStatusEnum.PAGO } : t)),
       }))
-    );
-  };
-
-  const handleAddTask = (obraId: number, newTask: Omit<Tarefa, 'id'>) => {
-    setObras((prevObras) =>
-      prevObras.map((obra) => {
-        if (obra.id === obraId) {
-          const taskId = `${obraId}-${Date.now()}`;
-          const taskWithId: Tarefa = { ...newTask, id: taskId };
-          return {
-            ...obra,
-            tarefas: [...obra.tarefas, taskWithId],
-          };
-        }
-        return obra;
-      })
     );
   };
 
@@ -100,7 +63,7 @@ function Home() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <TarefaCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onDelete={handleDelete} onPay={handlePay} onAddTask={handleAddTask} />
+            <TarefaCard key={obra.id} obra={obra} onPay={handlePay} />
           ))}
         </div>
       )}
