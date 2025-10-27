@@ -1,6 +1,6 @@
 import { Building2, CheckCircle, DollarSign, MapPin, Package, X } from 'lucide-react';
 import React from 'react';
-import { Tarefa } from '../../types';
+import { IdName, Tarefa } from '../../types';
 
 interface BatchPaymentModalProps {
   isOpen: boolean;
@@ -19,9 +19,35 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
     }).format(value);
   };
 
+  // helper: normaliza um campo (string | object) para {id, name}
+  const toIdName = (val: any): IdName | null => {
+    if (val == null) return null;
+    if (typeof val === 'string') return { id: val, name: val };
+    if (typeof val === 'object') {
+      const id = String(val.id ?? val._id ?? val.value ?? val.uuid ?? val.key ?? val.name ?? val.label ?? '');
+      const name = String(val.name ?? val.label ?? val.title ?? val.value ?? id);
+      return { id: id || name, name };
+    }
+    return { id: String(val), name: String(val) };
+  };
+
   const totalValue = tarefas.reduce((sum, tarefa) => sum + (tarefa.totalAmount ?? 0), 0);
-  const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.contractor)));
-  const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.location)));
+  const uniqueLocais = (() => {
+    const map = new Map<string, IdName>();
+    tarefas.forEach((t) => {
+      const pair = toIdName((t as any).location);
+      if (pair && !map.has(pair.id)) map.set(pair.id, pair);
+    });
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  })();
+  const uniqueEmpreiteiras = (() => {
+    const map = new Map<string, IdName>();
+    tarefas.forEach((t) => {
+      const pair = toIdName((t as any).contractor);
+      if (pair && !map.has(pair.id)) map.set(pair.id, pair);
+    });
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  })();
 
   const handleConfirm = () => {
     onConfirm();

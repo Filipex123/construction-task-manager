@@ -1,11 +1,13 @@
 import { AddTarefaRequest, PageableResponse, Tarefa } from '@/app/types';
+import { TarefaFilterParams } from '../(protected)/components/ObraFilters';
+import { buildQueryString } from '../utils/buildQUeryStringParams';
 
 const API_URL = 'https://116vebee4l.execute-api.us-east-1.amazonaws.com/prod/tarefas';
 
 export const tarefaService = {
-  async listar(obraId: number, params: string): Promise<PageableResponse<Tarefa>> {
+  async listar(obraId: number, params: TarefaFilterParams): Promise<PageableResponse<Tarefa>> {
     try {
-      const urlParams = new URLSearchParams(params);
+      const urlParams = buildQueryString(params);
 
       const res = await fetch(`${API_URL}?idObra=${obraId}` + `&${urlParams.toString()}`, { cache: 'no-store' });
 

@@ -1,7 +1,7 @@
 import { tarefaService } from '@/app/services/tarefaService';
 import { Building, ChevronDown, ChevronUp, DollarSign, Loader2, Plus } from 'lucide-react';
-import React from 'react';
-import { AddTarefaRequest, Obra, Tarefa } from '../../types';
+import React, { useCallback, useMemo } from 'react';
+import { AddTarefaRequest, Obra, PaymentStatusEnum, Tarefa } from '../../types';
 import { AddTarefaFormData, AddTaskModal } from './AddTaskModal';
 import { BatchPaymentModal } from './BatchPaymentModal';
 import { ObraFilters, TarefaFilterParams } from './ObraFilters';
@@ -9,7 +9,7 @@ import { TaskTable } from './TaskTable';
 
 interface TarefaCardProps {
   obra: Obra;
-  onPay?: (tarefaId: number) => void;
+  onPay?: (tarefaId: number) => Promise<void>;
 }
 
 export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
@@ -26,12 +26,14 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize] = React.useState(10);
   const [totalItems, setTotalItems] = React.useState(0);
-  const [isFetching, setIsFetching] = React.useState(false);
+
+  const filterPayableTasks = () => {
+    return filteredTarefas.filter((t) => t.paymentStatus !== PaymentStatusEnum.PAGO && t.paymentStatus !== PaymentStatusEnum.EM_ANDAMENTO);
+  };
 
   const fetchTasks = React.useCallback(
     async (page = 1, incomingFilters: Partial<TarefaFilterParams> = {}) => {
       setIsLoading(true);
-      setIsFetching(true);
       try {
         // ajustar chamada de acordo com sua tarefaService API
         const params = {
@@ -39,8 +41,8 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
           pageSize,
           ...incomingFilters,
         };
-        const data = await tarefaService.listar(obra.id!, JSON.stringify(params));
-        // garantir array mesmo que backend retorne undefined
+        const data = await tarefaService.listar(obra.id!, params);
+        console.log('Tarefas carregadas:', data.items);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
         setTotalItems(typeof data.total === 'number' ? data.total : Array.isArray(data.items) ? data.items.length : 0);
         setHasLoadedTasks(true);
@@ -49,7 +51,6 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
         setFilteredTarefas([]);
         setTotalItems(0);
       } finally {
-        setIsFetching(false);
         setIsLoading(false);
       }
     },
@@ -57,91 +58,144 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
   );
 
   const handleToggleExpand = async () => {
+    // abrir imediatamente e buscar em background para evitar desmontagem/remontagem
     if (!isExpanded && !hasLoadedTasks) {
-      await fetchTasks(1, filters);
+      setIsExpanded(true);
+      // disparar fetch em background sem await para não bloquear UI
+      fetchTasks(1, filters).catch((err) => {
+        console.error('Erro ao carregar tarefas no background:', err);
+      });
+      return;
     }
     setIsExpanded((s) => !s);
   };
 
   // quando filtros mudam (vem do ObraFilters), reset página e buscar
-  const handleFilterChange = (f: Partial<TarefaFilterParams>) => {
-    setFilters(f);
-    setCurrentPage(1);
-    fetchTasks(1, f);
-  };
+  const handleFilterChange = useCallback(
+    (f: Partial<TarefaFilterParams>) => {
+      setFilters(f);
+      setCurrentPage(1);
+      return fetchTasks(1, f);
+    },
+    [fetchTasks]
+  );
 
   // quando usuário troca página via TaskTable (server-side), refetch
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    fetchTasks(page, filters);
-  };
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setCurrentPage(page);
+      return fetchTasks(page, filters);
+    },
+    [fetchTasks, filters]
+  );
 
   // --- NEW: handlers para criar, atualizar e excluir tarefas ---
-  const handleAdd = async (task: AddTarefaFormData) => {
+  const handleAdd = useCallback(
+    async (task: AddTarefaFormData) => {
+      try {
+        setIsLoading(true);
+        // incluir obraId no payload caso o backend precise
+        const payload: AddTarefaRequest = {
+          quantity: task.quantity,
+          totalAmount: task.totalAmount,
+          paymentStatus: task.paymentStatus,
+          measurementStatus: 'PENDENTE',
+          quantityExecuted: 0,
+          dueDate: task.dueDate ?? Date.now().toString(),
+          updatedBy: 'system', //TODO: ajustar usuário
+          fkAtividade: task.activity!.id!,
+          fkLocal: task.location!.id!,
+          fkUnidadeMedida: task.unitOfMeasure!.id!,
+          fkEmpreiteiro: task.contractor!.id!,
+        };
+        await tarefaService.criar(payload);
+        await fetchTasks(1, filters);
+        setCurrentPage(1);
+        setIsAddModalOpen(false);
+      } catch (err) {
+        console.error('Erro ao adicionar tarefa:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [fetchTasks, filters]
+  );
+
+  const handleUpdate = useCallback(
+    async (tarefaId: number, task: AddTarefaFormData) => {
+      try {
+        setIsLoading(true);
+        const payload: Partial<AddTarefaRequest> = {
+          quantity: task.quantity,
+          totalAmount: task.totalAmount,
+          paymentStatus: task.paymentStatus,
+          dueDate: task.dueDate ?? Date.now().toString(),
+          fkAtividade: task.activity!.id!,
+          fkLocal: task.location!.id!,
+          fkUnidadeMedida: task.unitOfMeasure!.id!,
+          fkEmpreiteiro: task.contractor!.id!,
+        };
+        await tarefaService.atualizar(tarefaId, payload);
+        // recarregar página atual para refletir alterações
+        await fetchTasks(currentPage, filters);
+        setEditTaskId(null);
+        setIsAddModalOpen(false);
+      } catch (err) {
+        console.error('Erro ao atualizar tarefa:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [fetchTasks, currentPage, filters]
+  );
+
+  const handleDelete = useCallback(
+    async (tarefaId: number) => {
+      try {
+        setIsLoading(true);
+        await tarefaService.excluir(String(tarefaId));
+        // após exclusão, recarregar página atual (pode ajustar para buscar página 1 se necessário)
+        await fetchTasks(currentPage, filters);
+      } catch (err) {
+        console.error('Erro ao excluir tarefa:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [fetchTasks, currentPage, filters]
+  );
+
+  const handleBatchPayment = useCallback(async () => {
+    if (!onPay) return;
     try {
-      setIsFetching(true);
-      // incluir obraId no payload caso o backend precise
-      const payload: AddTarefaRequest = {
-        quantity: task.quantity,
-        totalAmount: task.totalAmount,
-        paymentStatus: task.paymentStatus,
-        measurementStatus: 'PENDENTE',
-        quantityExecuted: 0,
-        dueDate: task.dueDate ?? Date.now().toString(),
-        updatedBy: 'system', //TODO: ajustar usuário
-        fkAtividade: task.activity!.id!,
-        fkLocal: task.location!.id!,
-        fkUnidadeMedida: task.unitOfMeasure!.id!,
-        fkEmpreiteiro: task.contractor!.id!,
-      };
-      await tarefaService.criar(payload);
+      setIsLoading(true);
+      await Promise.all(filterPayableTasks().map((tarefa) => onPay(tarefa.id)));
       await fetchTasks(1, filters);
       setCurrentPage(1);
-      setIsAddModalOpen(false);
     } catch (err) {
       console.error('Erro ao adicionar tarefa:', err);
     } finally {
-      setIsFetching(false);
+      setIsLoading(false);
     }
-  };
+  }, [fetchTasks, filters, onPay]);
 
-  const handleUpdate = async (tarefaId: number, task: AddTarefaFormData) => {
-    try {
-      setIsFetching(true);
-      const payload: Partial<AddTarefaRequest> = {
-        quantity: task.quantity,
-        totalAmount: task.totalAmount,
-        paymentStatus: task.paymentStatus,
-        dueDate: task.dueDate ?? Date.now().toString(),
-        fkAtividade: task.activity!.id!,
-        fkLocal: task.location!.id!,
-        fkUnidadeMedida: task.unitOfMeasure!.id!,
-        fkEmpreiteiro: task.contractor!.id!,
-      };
-      await tarefaService.atualizar(tarefaId, payload);
-      // recarregar página atual para refletir alterações
-      await fetchTasks(currentPage, filters);
-      setEditTaskId(null);
-      setIsAddModalOpen(false);
-    } catch (err) {
-      console.error('Erro ao atualizar tarefa:', err);
-    } finally {
-      setIsFetching(false);
-    }
-  };
+  const handlePayment = useCallback(
+    async (taskId: number) => {
+      if (!onPay) return;
+      try {
+        setIsLoading(true);
+        await onPay(taskId);
+        await fetchTasks(1, filters);
+        setCurrentPage(1);
+      } catch (err) {
+        console.error('Erro ao adicionar tarefa:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [fetchTasks, filters, onPay]
+  );
 
-  const handleDelete = async (tarefaId: number) => {
-    try {
-      setIsFetching(true);
-      await tarefaService.excluir(String(tarefaId));
-      // após exclusão, recarregar página atual (pode ajustar para buscar página 1 se necessário)
-      await fetchTasks(currentPage, filters);
-    } catch (err) {
-      console.error('Erro ao excluir tarefa:', err);
-    } finally {
-      setIsFetching(false);
-    }
-  };
   // --- END NEW handlers ---
 
   const getTotalValue = () => {
@@ -156,15 +210,34 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
     }).format(value);
   };
 
-  const handleBatchPayment = () => {
-    if (!onPay) return;
-    filteredTarefas.forEach((tarefa) => onPay(tarefa.id));
+  // memoize derived values
+  const tarefasCount = useMemo(() => filteredTarefas.length, [filteredTarefas]);
+  const totalValue = useMemo(() => getTotalValue(), [filteredTarefas]);
+
+  // estabilizar callbacks passados para filhos (corrige erro de referência)
+  const handleEdit = useCallback((id: number) => {
+    setEditTaskId(id);
+    setIsAddModalOpen(true);
+  }, []);
+
+  const handleOpenBatch = useCallback(() => {
+    setIsBatchPaymentModalOpen(true);
+  }, []);
+
+  // Header extraído para fora do componente para não recriar o tipo em cada render
+  type HeaderProps = {
+    obra: Obra;
+    isLoading: boolean;
+    isExpanded: boolean;
+    hasLoadedTasks: boolean;
+    tarefasCount: number;
+    onToggle: () => void;
+    onOpenBatch: () => void;
   };
 
-  return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hover:shadow-xl transition-shadow duration-300 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-5 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-all duration-200" onClick={handleToggleExpand}>
+  const HeaderComponent: React.FC<HeaderProps> = React.memo(({ obra, isLoading, isExpanded, hasLoadedTasks, tarefasCount, onToggle, onOpenBatch }) => {
+    return (
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-5 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-all duration-200" onClick={onToggle}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-3 mb-2 sm:mb-0">
             <div className="flex items-center space-x-2">
@@ -180,15 +253,15 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
             <div className="flex items-center space-x-2">
               {hasLoadedTasks && (
                 <div className="bg-white/20 px-3 py-1 rounded-full">
-                  <span className="font-medium">{filteredTarefas.length} tarefas</span>
+                  <span className="font-medium">{tarefasCount} tarefas</span>
                 </div>
               )}
 
-              {isExpanded && onPay && (
+              {isExpanded && !isLoading && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setIsBatchPaymentModalOpen(true);
+                    onOpenBatch();
                   }}
                   className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors font-medium text-sm"
                   title="Pagamento em Lote"
@@ -201,9 +274,23 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
           </div>
         </div>
       </div>
+    );
+  });
 
-      {/* Expandable Content */}
-      {isExpanded && !isLoading && (
+  // render
+  return (
+    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hover:shadow-xl transition-shadow duration-300 max-w-7xl mx-auto">
+      <HeaderComponent
+        obra={obra}
+        isLoading={isLoading}
+        isExpanded={isExpanded}
+        hasLoadedTasks={hasLoadedTasks}
+        tarefasCount={tarefasCount}
+        onToggle={handleToggleExpand}
+        onOpenBatch={handleOpenBatch}
+      />
+      {/* Expandable Content: manter aberto mesmo durante fetch, mostrar overlay de loading */}
+      {isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
           {/* Summary */}
           {onPay && (
@@ -211,7 +298,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div className="mb-2 sm:mb-0">
                   <span className="text-sm text-gray-600">Valor Total:</span>
-                  <span className="ml-2 text-xl font-bold text-green-600">{formatCurrency(getTotalValue())}</span>
+                  <span className="ml-2 text-xl font-bold text-green-600">{formatCurrency(totalValue)}</span>
                 </div>
                 <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
                   <span className="flex flex-col items-center space-y-1">
@@ -235,58 +322,52 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
             </div>
           )}
 
-          {/* Filters -> envia somente critérios, não faz filtro local */}
-          <ObraFilters tarefas={filteredTarefas} onFilterChange={handleFilterChange} />
+          <ObraFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} />
 
-          {/* Tasks Table: enviamos page items e informação de paginação */}
           <div className="p-8 relative">
-            {/* loading overlay while fetching (add/update/delete) */}
-            {isFetching ? (
+            {/* overlay de loading: aparece por cima do conteúdo sem desmontar o painel */}
+            {isLoading && (
               <div className="absolute inset-0 bg-white/60 z-50 flex items-center justify-center">
                 <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
               </div>
-            ) : (
-              <>
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-semibold text-gray-800">Tarefas</h4>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditTaskId(null);
-                      setIsAddModalOpen(true);
-                    }}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span className="hidden sm:inline">Nova Tarefa</span>
-                    <span className="sm:hidden">Nova</span>
-                  </button>
-                </div>
-
-                {filteredTarefas.length === 0 ? (
-                  // mensagem quando zero
-                  <div className="text-center py-12">
-                    <div className="text-gray-400 text-lg mb-2">Nenhuma tarefa encontrada</div>
-                    <p className="text-gray-500">Adicione a primeira tarefa desta obra</p>
-                  </div>
-                ) : (
-                  <TaskTable
-                    tarefas={filteredTarefas}
-                    onEdit={(id) => {
-                      setEditTaskId(id);
-                      setIsAddModalOpen(true);
-                    }}
-                    onDelete={handleDelete}
-                    onPay={onPay}
-                    serverSide
-                    totalItems={totalItems}
-                    currentPage={currentPage}
-                    pageSize={pageSize}
-                    onPageChange={handlePageChange}
-                  />
-                )}
-              </>
             )}
+
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-semibold text-gray-800">Tarefas</h4>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditTaskId(null);
+                    setIsAddModalOpen(true);
+                  }}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Nova Tarefa</span>
+                  <span className="sm:hidden">Nova</span>
+                </button>
+              </div>
+
+              {filteredTarefas.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-400 text-lg mb-2">Nenhuma tarefa encontrada</div>
+                  <p className="text-gray-500">Adicione a primeira tarefa desta obra</p>
+                </div>
+              ) : (
+                <TaskTable
+                  tarefas={filteredTarefas}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onPay={handlePayment}
+                  serverSide
+                  totalItems={totalItems}
+                  currentPage={currentPage}
+                  pageSize={pageSize}
+                  onPageChange={handlePageChange}
+                />
+              )}
+            </>
           </div>
         </div>
       )}
@@ -304,7 +385,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
         onUpdateTask={(id, task) => handleUpdate(id, task)}
       />
 
-      <BatchPaymentModal isOpen={isBatchPaymentModalOpen} onClose={() => setIsBatchPaymentModalOpen(false)} onConfirm={handleBatchPayment} tarefas={filteredTarefas} />
+      <BatchPaymentModal isOpen={isBatchPaymentModalOpen} onClose={() => setIsBatchPaymentModalOpen(false)} onConfirm={handleBatchPayment} tarefas={filterPayableTasks()} />
     </div>
   );
 };

@@ -26,7 +26,7 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
     ATRASADO: { label: 'Atrasado', color: 'bg-red-100 text-red-800 border-red-200' },
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     onConfirm();
     onClose();
   };
@@ -67,7 +67,7 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
               <div className="bg-green-50 p-4 rounded-lg border border-green-200 mb-4">
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-green-900 text-lg mb-1">{tarefa.activity}</h4>
+                    <h4 className="font-semibold text-green-900 text-lg mb-1">{tarefa.activity.name}</h4>
                     <div className="flex items-center space-x-2">
                       <div className="flex items-center space-x-1 text-sm text-green-700">
                         <MapPin className="w-4 h-4" />
@@ -84,7 +84,7 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
                     <div>
                       <span className="text-green-700">Quantidade:</span>
                       <p className="font-medium text-green-900">
-                        {tarefa.quantity} {tarefa.unitOfMeasure}
+                        {tarefa.quantity} {tarefa.unitOfMeasure.name}
                       </p>
                     </div>
                   </div>
@@ -92,7 +92,7 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
                     <Building2 className="w-4 h-4 text-green-600" />
                     <div>
                       <span className="text-green-700">Empreiteira:</span>
-                      <p className="font-medium text-green-900">{tarefa.contractor}</p>
+                      <p className="font-medium text-green-900">{tarefa.contractor.name}</p>
                     </div>
                   </div>
                 </div>
@@ -134,7 +134,7 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-600 mb-1">Empreiteira</p>
-                      <p className="text-base font-semibold text-gray-900">{tarefa.contractor}</p>
+                      <p className="text-base font-semibold text-gray-900">{tarefa.contractor.name}</p>
                     </div>
                   </div>
                 </div>
@@ -146,7 +146,7 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-600 mb-1">Unidade</p>
-                      <p className="text-base font-semibold text-gray-900">{tarefa.unitOfMeasure}</p>
+                      <p className="text-base font-semibold text-gray-900">{tarefa.unitOfMeasure.name}</p>
                     </div>
                   </div>
                 </div>

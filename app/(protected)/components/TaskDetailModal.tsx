@@ -18,7 +18,8 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
     }).format(value);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Não informado';
     return new Intl.DateTimeFormat('pt-BR').format(new Date(dateString));
   };
 
@@ -30,19 +31,6 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
   };
 
   const StatusIcon = statusConfig[tarefa.paymentStatus].icon;
-
-  // Mock data for additional fields (in real app, these would come from the tarefa object)
-  const mockData = {
-    statusPagamento: 'Pendente',
-    statusMedidor: 'Não Medido',
-    quantidadeRealizada: 0,
-    dataMedicao: '2024-01-20',
-    dataPagamentoPrevista: '2024-01-25',
-    dataPagamentoRealizada: null,
-    dataCriacao: '2024-01-15',
-    dataAtualizacao: '2024-01-18',
-    usuarioUltimaAtualizacao: 'João Silva',
-  };
 
   const InfoItem = ({ icon: Icon, label, value, highlight = false }: { icon: React.ElementType; label: string; value: string | number | null; highlight?: boolean }) => (
     <div className={`p-4 rounded-lg border ${highlight ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}`}>
@@ -70,7 +58,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <Package className="w-6 h-6" />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-lg sm:text-xl font-bold truncate">{tarefa.activity}</h2>
+                <h2 className="text-lg sm:text-xl font-bold truncate">{tarefa.activity.name}</h2>
                 <p className="text-blue-100 text-sm truncate">{tarefa.location.name}</p>
               </div>
             </div>
@@ -96,9 +84,9 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <span>Informações Principais</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <InfoItem icon={Package} label="Unidade de Medida" value={tarefa.unitOfMeasure} />
+                <InfoItem icon={Package} label="Unidade de Medida" value={tarefa.unitOfMeasure.name!} />
                 <InfoItem icon={Package} label="Quantidade" value={tarefa.quantity} highlight />
-                <InfoItem icon={CheckCircle} label="Quantidade Realizada" value={mockData.quantidadeRealizada} />
+                <InfoItem icon={CheckCircle} label="Quantidade Realizada" value={tarefa.quantityExecuted} />
                 <InfoItem icon={DollarSign} label="Valor" value={formatCurrency(tarefa.totalAmount)} highlight />
               </div>
             </section>
@@ -110,10 +98,10 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <span>Status e Medição</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <InfoItem icon={DollarSign} label="Status Pagamento" value={mockData.statusPagamento} />
-                <InfoItem icon={Package} label="Status Medidor" value={mockData.statusMedidor} />
-                <InfoItem icon={Calendar} label="Data Medição" value={formatDate(mockData.dataMedicao)} />
-                <InfoItem icon={Building2} label="Empreiteiro" value={tarefa.contractor} />
+                <InfoItem icon={DollarSign} label="Status Pagamento" value={tarefa.paymentStatus} />
+                <InfoItem icon={Package} label="Status Medidor" value={tarefa.measurementStatus} />
+                <InfoItem icon={Calendar} label="Data Medição" value={formatDate(tarefa.measurementDate ?? '')} />
+                <InfoItem icon={Building2} label="Empreiteiro" value={tarefa.contractor.name!} />
               </div>
             </section>
 
@@ -124,8 +112,8 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <span>Cronograma de Pagamento</span>
               </h3>
               <div className="grid grid-cols-1 gap-4">
-                <InfoItem icon={Calendar} label="Data Prevista para Pagamento" value={formatDate(mockData.dataPagamentoPrevista)} highlight />
-                <InfoItem icon={CheckCircle} label="Data do Pagamento Realizado" value={mockData.dataPagamentoRealizada ? formatDate(mockData.dataPagamentoRealizada) : 'Não realizado'} />
+                <InfoItem icon={Calendar} label="Data Prevista para Pagamento" value={formatDate(tarefa.dueDate)} highlight />
+                <InfoItem icon={CheckCircle} label="Data do Pagamento Realizado" value={tarefa.paymentDate ? formatDate(tarefa.paymentDate) : 'Não realizado'} />
               </div>
             </section>
 
@@ -136,10 +124,10 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <span>Informações do Sistema</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <InfoItem icon={Calendar} label="Data de Criação" value={formatDate(mockData.dataCriacao)} />
-                <InfoItem icon={Calendar} label="Data de Atualização" value={formatDate(mockData.dataAtualizacao)} />
+                <InfoItem icon={Calendar} label="Data de Criação" value={formatDate(tarefa.createdAt!)} />
+                <InfoItem icon={Calendar} label="Data de Atualização" value={formatDate(tarefa.updatedAt!)} />
                 <div className="sm:col-span-2">
-                  <InfoItem icon={User} label="Usuário Última Atualização" value={mockData.usuarioUltimaAtualizacao} />
+                  <InfoItem icon={User} label="Usuário Última Atualização" value={tarefa.updatedBy ?? 'system'} />
                 </div>
               </div>
             </section>

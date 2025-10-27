@@ -1,21 +1,22 @@
 import { ChevronDown, ChevronUp, Filter, Plus, Search, X } from 'lucide-react';
-import React, { useRef, useState } from 'react';
-import { Tarefa } from '../../types';
+import React, { useState } from 'react';
+import { IdName, Tarefa } from '../../types';
 
 export type TarefaFilterParams = {
   status?: string[];
-  locais?: string[];
-  empreiteiras?: string[];
-  atividades?: string[];
-  dataCriacao?: string; // YYYY-MM-DD
-  dataLimite?: string; // YYYY-MM-DD
+  location?: string[]; // agora contêm ids
+  contractor?: string[];
+  activity?: string[];
+  createdAt?: string; // YYYY-MM-DD
+  dueDate?: string; // YYYY-MM-DD
   page?: number;
   pageSize?: number;
 };
 
 interface ObraFiltersProps {
   tarefas: Tarefa[]; // usado só para listar sugestões (pode ser page ou full list)
-  onFilterChange: (filters: TarefaFilterParams) => void; // agora envia filtros, não array filtrado
+  // agora onFilterClick retorna Promise — aguarde no componente de filtros
+  onFilterClick: (result: any) => Promise<any>;
 }
 
 const statusLabels = {
@@ -32,18 +33,19 @@ const statusColors = {
   ATRASADO: 'bg-red-100 text-red-800 border-red-200',
 };
 
-export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChange }) => {
+export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ tarefas, onFilterClick }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
-  const [selectedLocais, setSelectedLocais] = useState<string[]>([]);
-  const [selectedEmpreiteiras, setSelectedEmpreiteiras] = useState<string[]>([]);
-  const [selectedAtividades, setSelectedAtividades] = useState<string[]>([]);
+  // agora armazenamos arrays de objetos {id, name} para exibição, mas enviaremos só ids
+  const [selectedLocais, setSelectedLocais] = useState<IdName[]>([]);
+  const [selectedEmpreiteiras, setSelectedEmpreiteiras] = useState<IdName[]>([]);
+  const [selectedAtividades, setSelectedAtividades] = useState<IdName[]>([]);
   const [dataCriacaoInput, setDataCriacaoInput] = useState('');
   const [dataLimiteInput, setDataLimiteInput] = useState('');
   const [localInput, setLocalInput] = useState('');
   const [empreiteiraInput, setEmpreiteiraInput] = useState('');
   const [atividadeInput, setAtividadeInput] = useState('');
-  const initialTarefasRef = useRef<Tarefa[]>(tarefas);
+  const [isApplying, setIsApplying] = useState(false); // novo: loading do botão Filtrar
 
   // Função para formatar data para DD/MM/YYYY
   const formatDateToDisplay = (dateString: string): string => {
@@ -59,7 +61,6 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
 
   // Função para converter DD/MM/YYYY para YYYY-MM-DD (formato do input date)
   const formatDateForInput = (dateString: string): string => {
-    console.log('formatDateForInput received:', dateString);
     if (!dateString) return '';
 
     // Se já está no formato YYYY-MM-DD, retorna como está
@@ -91,104 +92,126 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     }
   };
 
-  // Extrair valores únicos
-  const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.paymentStatus)));
-  const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.location.name))).sort();
-  const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.contractor))).sort();
-  const uniqueAtividades = Array.from(new Set(tarefas.map((t) => t.activity))).sort();
+  // helper: normaliza um campo (string | object) para {id, name}
+  const toIdName = (val: any): IdName | null => {
+    if (val == null) return null;
+    if (typeof val === 'string') return { id: val, name: val };
+    if (typeof val === 'object') {
+      const id = String(val.id ?? val._id ?? val.value ?? val.uuid ?? val.key ?? val.name ?? val.label ?? '');
+      const name = String(val.name ?? val.label ?? val.title ?? val.value ?? id);
+      return { id: id || name, name };
+    }
+    return { id: String(val), name: String(val) };
+  };
 
-  // Função para busca incremental por múltiplas palavras
+  // Extrair valores únicos (como {id,name})
+  const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.paymentStatus)));
+  const uniqueLocais = (() => {
+    const map = new Map<string, IdName>();
+    tarefas.forEach((t) => {
+      const pair = toIdName((t as any).location);
+      if (pair && !map.has(pair.id)) map.set(pair.id, pair);
+    });
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  })();
+  const uniqueEmpreiteiras = (() => {
+    const map = new Map<string, IdName>();
+    tarefas.forEach((t) => {
+      const pair = toIdName((t as any).contractor);
+      if (pair && !map.has(pair.id)) map.set(pair.id, pair);
+    });
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  })();
+  const uniqueAtividades = (() => {
+    const map = new Map<string, IdName>();
+    tarefas.forEach((t) => {
+      const pair = toIdName((t as any).activity);
+      if (pair && !map.has(pair.id)) map.set(pair.id, pair);
+    });
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  })();
+
+  // Função para busca incremental por múltiplas palavras (aplica em name)
   const matchesIncrementalSearch = (text?: string, searchTerm?: string): boolean => {
     if (!text || !searchTerm) return true;
-
     if (!searchTerm.trim()) return true;
-
     const searchWords = searchTerm.toLowerCase().trim().split(/\s+/);
     const targetText = text.toLowerCase();
-
     return searchWords.every((word) => targetText.includes(word));
   };
 
-  // Função para verificar se um item corresponde a qualquer filtro selecionado
-  const matchesAnyFilter = (text?: string, selectedFilters?: string[]): boolean => {
-    if (!text || !selectedFilters) return true;
-    if (selectedFilters.length === 0 || !text) return true;
-    return selectedFilters.some((filter) => matchesIncrementalSearch(text, filter));
-  };
-
-  // helper: monta filtro transformando datas para YYYY-MM-DD
-  const buildFiltersAndEmit = (status: string[], locais: string[], empreiteiras: string[], atividades: string[], dataCriacao: string, dataLimite: string) => {
-    const f: TarefaFilterParams = {
+  // Função que monta e retorna o objeto de filtros (sem emitir)
+  const buildFiltersObject = (status: string[], locais: IdName[], empreiteiras: IdName[], atividades: IdName[], dataCriacao: string, dataLimite: string): TarefaFilterParams => {
+    return {
       status: status.length ? status : undefined,
-      locais: locais.length ? locais : undefined,
-      empreiteiras: empreiteiras.length ? empreiteiras : undefined,
-      atividades: atividades.length ? atividades : undefined,
-      dataCriacao: dataCriacao.trim() ? formatDateForInput(dataCriacao) : undefined,
-      dataLimite: dataLimite.trim() ? formatDateForInput(dataLimite) : undefined,
+      location: locais.length ? locais.map((l) => l.id) : undefined,
+      contractor: empreiteiras.length ? empreiteiras.map((e) => e.id) : undefined,
+      activity: atividades.length ? atividades.map((a) => a.id) : undefined,
+      createdAt: dataCriacao.trim() ? formatDateForInput(dataCriacao) : undefined,
+      dueDate: dataLimite.trim() ? formatDateForInput(dataLimite) : undefined,
       page: 1,
       pageSize: 10,
     };
-    onFilterChange(f);
   };
 
-  // substitui applyFilters para apenas emitir filtros
-  const applyFilters = (status: string[], locais: string[], empreiteiras: string[], atividades: string[], dataCriacao: string, dataLimite: string) => {
-    buildFiltersAndEmit(status, locais, empreiteiras, atividades, dataCriacao, dataLimite);
+  // Função que chama o serviço com os filtros e emite o resultado via onFilterChange
+  const handleApplyFilters = async () => {
+    const filters = buildFiltersObject(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, dataLimiteInput);
+    try {
+      setIsApplying(true);
+      // aguarda o parent (TarefaCard) aplicar os filtros e retornar a promise do fetch
+      await onFilterClick(filters);
+      // manter filtros abertos
+    } catch (err) {
+      console.error('Erro ao aplicar filtros:', err);
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   const handleStatusToggle = (status: string) => {
     const newSelected = selectedStatus.includes(status) ? selectedStatus.filter((s) => s !== status) : [...selectedStatus, status];
-
     setSelectedStatus(newSelected);
-    applyFilters(newSelected, selectedLocais, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, dataLimiteInput);
   };
 
-  const addLocalFilter = (value: string) => {
-    if (value.trim() && !selectedLocais.includes(value.trim())) {
-      const newSelected = [...selectedLocais, value.trim()];
-      setSelectedLocais(newSelected);
+  // ADD / REMOVE para Locais/Eempreiteiras/Atividades — recebem name ou pair
+  const addLocalFilter = (valueOrPair: string | IdName) => {
+    const pair = typeof valueOrPair === 'string' ? uniqueLocais.find((u) => u.name.toLowerCase() === valueOrPair.toLowerCase()) ?? { id: valueOrPair, name: valueOrPair } : valueOrPair;
+    if (!selectedLocais.find((s) => s.id === pair.id)) {
+      setSelectedLocais((prev) => [...prev, pair]);
       setLocalInput('');
-      applyFilters(selectedStatus, newSelected, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, dataLimiteInput);
     }
   };
 
-  const removeLocalFilter = (value: string) => {
-    const newSelected = selectedLocais.filter((item) => item !== value);
-    setSelectedLocais(newSelected);
-    applyFilters(selectedStatus, newSelected, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, dataLimiteInput);
+  const removeLocalFilter = (id: string) => {
+    setSelectedLocais((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const addEmpreiteiraFilter = (value: string) => {
-    if (value.trim() && !selectedEmpreiteiras.includes(value.trim())) {
-      const newSelected = [...selectedEmpreiteiras, value.trim()];
-      setSelectedEmpreiteiras(newSelected);
+  const addEmpreiteiraFilter = (valueOrPair: string | IdName) => {
+    const pair = typeof valueOrPair === 'string' ? uniqueEmpreiteiras.find((u) => u.name.toLowerCase() === valueOrPair.toLowerCase()) ?? { id: valueOrPair, name: valueOrPair } : valueOrPair;
+    if (!selectedEmpreiteiras.find((s) => s.id === pair.id)) {
+      setSelectedEmpreiteiras((prev) => [...prev, pair]);
       setEmpreiteiraInput('');
-      applyFilters(selectedStatus, selectedLocais, newSelected, selectedAtividades, dataCriacaoInput, dataLimiteInput);
     }
   };
 
-  const removeEmpreiteiraFilter = (value: string) => {
-    const newSelected = selectedEmpreiteiras.filter((item) => item !== value);
-    setSelectedEmpreiteiras(newSelected);
-    applyFilters(selectedStatus, selectedLocais, newSelected, selectedAtividades, dataCriacaoInput, dataLimiteInput);
+  const removeEmpreiteiraFilter = (id: string) => {
+    setSelectedEmpreiteiras((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const addAtividadeFilter = (value: string) => {
-    if (value.trim() && !selectedAtividades.includes(value.trim())) {
-      const newSelected = [...selectedAtividades, value.trim()];
-      setSelectedAtividades(newSelected);
+  const addAtividadeFilter = (valueOrPair: string | IdName) => {
+    const pair = typeof valueOrPair === 'string' ? uniqueAtividades.find((u) => u.name.toLowerCase() === valueOrPair.toLowerCase()) ?? { id: valueOrPair, name: valueOrPair } : valueOrPair;
+    if (!selectedAtividades.find((s) => s.id === pair.id)) {
+      setSelectedAtividades((prev) => [...prev, pair]);
       setAtividadeInput('');
-      applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, newSelected, dataCriacaoInput, dataLimiteInput);
     }
   };
 
-  const removeAtividadeFilter = (value: string) => {
-    const newSelected = selectedAtividades.filter((item) => item !== value);
-    setSelectedAtividades(newSelected);
-    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, newSelected, dataCriacaoInput, dataLimiteInput);
+  const removeAtividadeFilter = (id: string) => {
+    setSelectedAtividades((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const clearAllFilters = () => {
+  const clearAllFilters = async () => {
     setSelectedStatus([]);
     setSelectedLocais([]);
     setSelectedEmpreiteiras([]);
@@ -198,21 +221,29 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
     setLocalInput('');
     setEmpreiteiraInput('');
     setAtividadeInput('');
-    onFilterChange({});
+
+    const resetFilters = buildFiltersObject([], [], [], [], '', '');
+
+    try {
+      setIsApplying(true);
+      await onFilterClick(resetFilters);
+    } catch (err) {
+      console.error('Erro ao limpar e buscar todas as tarefas:', err);
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   const handleDataCriacaoChange = (value: string) => {
     // Se o valor é do input date (YYYY-MM-DD), converte para DD/MM/YYYY para exibição
     const displayValue = value.includes('-') ? formatDateToDisplay(value) : applyDateMask(value);
     setDataCriacaoInput(displayValue);
-    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, displayValue, dataLimiteInput);
   };
 
   const handleDataLimiteChange = (value: string) => {
     // Se o valor é do input date (YYYY-MM-DD), converte para DD/MM/YYYY para exibição
     const displayValue = value.includes('-') ? formatDateToDisplay(value) : applyDateMask(value);
     setDataLimiteInput(displayValue);
-    applyFilters(selectedStatus, selectedLocais, selectedEmpreiteiras, selectedAtividades, dataCriacaoInput, displayValue);
   };
 
   const hasActiveFilters =
@@ -220,20 +251,23 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
   const activeFiltersCount =
     selectedStatus.length + selectedLocais.length + selectedEmpreiteiras.length + selectedAtividades.length + (dataCriacaoInput.trim() ? 1 : 0) + (dataLimiteInput.trim() ? 1 : 0);
 
-  // Filtrar sugestões baseadas no texto digitado
+  // Filtrar sugestões baseadas no texto digitado (filtra por name e exclui já selecionados)
   const getFilteredLocais = () => {
-    if (!localInput.trim()) return uniqueLocais.slice(0, 5);
-    return uniqueLocais.filter((local) => matchesIncrementalSearch(local, localInput) && !selectedLocais.includes(local || '')).slice(0, 5);
+    const filtered = localInput.trim() ? uniqueLocais.filter((local) => matchesIncrementalSearch(local.name, localInput)) : uniqueLocais;
+    const selectedIds = new Set(selectedLocais.map((s) => s.id));
+    return filtered.filter((f) => !selectedIds.has(f.id)).slice(0, 5);
   };
 
   const getFilteredEmpreiteiras = () => {
-    if (!empreiteiraInput.trim()) return uniqueEmpreiteiras.slice(0, 5);
-    return uniqueEmpreiteiras.filter((emp) => matchesIncrementalSearch(emp.name, empreiteiraInput) && !selectedEmpreiteiras.includes(emp.name || '')).slice(0, 5);
+    const filtered = empreiteiraInput.trim() ? uniqueEmpreiteiras.filter((emp) => matchesIncrementalSearch(emp.name, empreiteiraInput)) : uniqueEmpreiteiras;
+    const selectedIds = new Set(selectedEmpreiteiras.map((s) => s.id));
+    return filtered.filter((f) => !selectedIds.has(f.id)).slice(0, 5);
   };
 
   const getFilteredAtividades = () => {
-    if (!atividadeInput.trim()) return uniqueAtividades.slice(0, 5);
-    return uniqueAtividades.filter((ativ) => matchesIncrementalSearch(ativ.name, atividadeInput) && !selectedAtividades.includes(ativ.name || '')).slice(0, 5);
+    const filtered = atividadeInput.trim() ? uniqueAtividades.filter((ativ) => matchesIncrementalSearch(ativ.name, atividadeInput)) : uniqueAtividades;
+    const selectedIds = new Set(selectedAtividades.map((s) => s.id));
+    return filtered.filter((f) => !selectedIds.has(f.id)).slice(0, 5);
   };
 
   return (
@@ -282,10 +316,10 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
-                    handleStatusToggle(status ?? 'PENDENTE');
+                    handleStatusToggle(status ?? 'EM_ANDAMENTO');
                   }}
                   className={`px-3 py-2 rounded-full text-xs font-medium border-2 transition-all ${
-                    selectedStatus.includes(status ?? 'PENDENTE') ? statusColors[status as keyof typeof statusColors] : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                    selectedStatus.includes(status ?? 'EM_ANDAMENTO') ? statusColors[status as keyof typeof statusColors] : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   {statusLabels[status as keyof typeof statusLabels]}
@@ -302,13 +336,13 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
             {selectedLocais.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
                 {selectedLocais.map((local) => (
-                  <span key={local} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
-                    {local}
+                  <span key={local.id} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                    {local.name}
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        removeLocalFilter(local);
+                        removeLocalFilter(local.id);
                       }}
                       className="ml-2 hover:text-green-600 transition-colors"
                     >
@@ -352,15 +386,15 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                 <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-sm max-h-32 overflow-y-auto">
                   {getFilteredLocais().map((local) => (
                     <button
-                      key={local}
+                      key={local.id}
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
-                        addLocalFilter(local || '');
+                        addLocalFilter(local);
                       }}
                       className="w-full text-black text-left px-3 py-2 text-sm hover:bg-green-50 transition-colors border-b border-gray-100 last:border-b-0"
                     >
-                      {local}
+                      {local.name}
                     </button>
                   ))}
                 </div>
@@ -375,13 +409,13 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
             {selectedEmpreiteiras.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
                 {selectedEmpreiteiras.map((empreiteira) => (
-                  <span key={empreiteira} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
-                    {empreiteira}
+                  <span key={empreiteira.id} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                    {empreiteira.name}
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        removeEmpreiteiraFilter(empreiteira);
+                        removeEmpreiteiraFilter(empreiteira.id);
                       }}
                       className="ml-2 hover:text-purple-600 transition-colors"
                     >
@@ -429,7 +463,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
-                        addEmpreiteiraFilter(empreiteira.name ?? '');
+                        addEmpreiteiraFilter(empreiteira);
                       }}
                       className="w-full text-black text-left px-3 py-2 text-sm hover:bg-purple-50 transition-colors border-b border-gray-100 last:border-b-0"
                     >
@@ -449,13 +483,13 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
             {selectedAtividades.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
                 {selectedAtividades.map((atividade) => (
-                  <span key={atividade} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 border border-indigo-200">
-                    {atividade.length > 20 ? `${atividade.substring(0, 20)}...` : atividade}
+                  <span key={atividade.id} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 border border-indigo-200">
+                    {atividade.name.length > 20 ? `${atividade.name.substring(0, 20)}...` : atividade.name}
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        removeAtividadeFilter(atividade);
+                        removeAtividadeFilter(atividade.id);
                       }}
                       className="ml-2 hover:text-indigo-600 transition-colors"
                     >
@@ -503,7 +537,7 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
-                        addAtividadeFilter(atividade.name ?? '');
+                        addAtividadeFilter(atividade);
                       }}
                       className="w-full text-black text-left px-3 py-2 text-sm hover:bg-indigo-50 transition-colors border-b border-gray-100 last:border-b-0"
                     >
@@ -550,8 +584,34 @@ export const ObraFilters: React.FC<ObraFiltersProps> = ({ tarefas, onFilterChang
               </div>
             </div>
           </div>
+
+          <div className="flex justify-end space-x-2">
+            {/* Botão Filtrar: chama o serviço */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                handleApplyFilters();
+              }}
+              disabled={isApplying}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium rounded-md"
+            >
+              {isApplying ? 'Filtrando...' : 'Filtrar'}
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 };
+
+export const ObraFilters = React.memo(ObraFiltersInner, (prev, next) => {
+  // avoid re-render if tarefas reference didn't change and callback stable
+  if (prev.tarefas === next.tarefas && prev.onFilterClick === next.onFilterClick) return true;
+  // fallback to shallow id comparison
+  if (prev.tarefas.length !== next.tarefas.length) return false;
+  for (let i = 0; i < prev.tarefas.length; i++) {
+    if (prev.tarefas[i].id !== next.tarefas[i].id) return false;
+  }
+  return prev.onFilterClick === next.onFilterClick;
+});

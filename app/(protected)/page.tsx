@@ -2,6 +2,7 @@
 import React, { useMemo, useState } from 'react';
 import { usePageTitle } from '../context/PageTitle.context';
 import { obraService } from '../services/obraService';
+import { tarefaService } from '../services/tarefaService';
 import { Obra, PaymentStatusEnum } from '../types';
 import { Loader } from './components/Loader';
 import { SearchBar } from './components/SearchBar';
@@ -18,13 +19,14 @@ function Home() {
     return obras.filter((obra) => obra.name?.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description?.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
-  const handlePay = (tarefaId: number) => {
-    setObras((prev) =>
-      prev.map((obra) => ({
-        ...obra,
-        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, paymentStatus: PaymentStatusEnum.PAGO } : t)),
-      }))
-    );
+  const handlePay = async (tarefaId: number) => {
+    console.log('Iniciando pagamento para a tarefa com ID:', tarefaId);
+    try {
+      await tarefaService.atualizar(tarefaId, { paymentStatus: PaymentStatusEnum.PAGO, paymentDate: new Date().toISOString().slice(0, 10), updatedBy: 'system' });
+      console.log(`Processando pagamento para a tarefa com ID: ${tarefaId}`);
+    } catch (error) {
+      console.error('Erro ao processar o pagamento:', error);
+    }
   };
 
   React.useEffect(() => {

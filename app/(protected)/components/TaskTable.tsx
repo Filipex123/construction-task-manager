@@ -33,7 +33,7 @@ const statusLabels = {
   ATRASADO: 'Atrasado',
 };
 
-export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete, onPay, serverSide = false, totalItems = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
+export const TaskTableInner: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete, onPay, serverSide = false, totalItems = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
   const [mobileView, setMobileView] = React.useState<MobileView>('cards');
   const [selectedTask, setSelectedTask] = React.useState<Tarefa | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
@@ -41,6 +41,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
   const [taskToPay, setTaskToPay] = React.useState<Tarefa | null>(null);
   const [currentPageState, setCurrentPage] = React.useState(1);
   const [isMobile, setIsMobile] = React.useState(false);
+  const [localTarefas, setLocalTarefas] = React.useState<Tarefa[]>(tarefas);
+
+  // Atualizar tarefas locais quando props mudam
+  React.useEffect(() => {
+    setLocalTarefas(tarefas);
+  }, [tarefas]);
 
   // Detectar se é mobile
   React.useEffect(() => {
@@ -54,20 +60,19 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
-  // Reset página quando mudar o número de tarefas ou view
+  // Reset página somente quando mudar o número de tarefas locais ou view
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [tarefas.length, mobileView]);
+  }, [localTarefas.length, mobileView]);
 
   // se serverSide, assumimos 'tarefas' já contém apenas a página atual
   // se não serverSide, mantenha paginação local (existing logic)
   const itemsPerPage = isMobile ? 5 : 10;
-  let currentTarefas = tarefas;
+  let currentTarefas = localTarefas;
   if (!serverSide) {
-    const totalPages = Math.ceil(tarefas.length / itemsPerPage);
     const startIndex = (currentPageState - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    currentTarefas = tarefas.slice(startIndex, endIndex);
+    currentTarefas = localTarefas.slice(startIndex, endIndex);
   }
 
   const handlePageChange = (page: number) => {
@@ -112,7 +117,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
     }
   };
 
-  const handlePaymentConfirm = () => {
+  const handlePaymentConfirm = async () => {
     if (taskToPay && onPay) {
       onPay(taskToPay.id);
     }
@@ -136,7 +141,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
       {onPay && (
         <button
           onClick={() => handlePayClick(tarefa)}
-          disabled={tarefa.paymentStatus === 'PAGO'}
+          disabled={tarefa.paymentStatus === 'PAGO' || tarefa.paymentStatus === 'EM_ANDAMENTO'}
           className="p-2 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title="Pagar"
         >
@@ -262,7 +267,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
                   {onPay && (
                     <button
                       onClick={() => handlePayClick(tarefa)}
-                      disabled={tarefa.paymentStatus === 'PAGO'}
+                      disabled={tarefa.paymentStatus === 'PAGO' || tarefa.paymentStatus === 'EM_ANDAMENTO'}
                       className="p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Pagar"
                     >
@@ -277,28 +282,6 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
       </table>
     </div>
   );
-
-  // const PaginationControls = () => {
-  //   if (serverSide) {
-  //     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-  //     return (
-  //       <div className="flex items-center justify-end space-x-2">
-  //         {/* Simplificado: previous / next */}
-  //         <button disabled={currentPage <= 1} onClick={() => onPageChange && onPageChange(currentPage - 1)} className="px-3 py-1 bg-white border rounded">
-  //           Prev
-  //         </button>
-  //         <span className="px-2">
-  //           Página {currentPage} de {totalPages}
-  //         </span>
-  //         <button disabled={currentPage >= totalPages} onClick={() => onPageChange && onPageChange(currentPage + 1)} className="px-3 py-1 bg-white border rounded">
-  //           Next
-  //         </button>
-  //       </div>
-  //     );
-  //   }
-  //   // else render existing pagination (local)
-  //   return null; // manter implementação anterior se necessário
-  // };
 
   const PaginationControls = () => {
     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
@@ -421,3 +404,39 @@ export const TaskTable: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete,
     </div>
   );
 };
+
+const areEqual = (prev: TaskTableProps, next: TaskTableProps) => {
+  // If same reference, skip
+  if (
+    prev.tarefas === next.tarefas &&
+    prev.totalItems === next.totalItems &&
+    prev.currentPage === next.currentPage &&
+    prev.pageSize === next.pageSize &&
+    prev.serverSide === next.serverSide &&
+    prev.onEdit === next.onEdit &&
+    prev.onDelete === next.onDelete &&
+    prev.onPay === next.onPay &&
+    prev.onPageChange === next.onPageChange
+  ) {
+    return true;
+  }
+
+  // Quick length check
+  if (prev.tarefas.length !== next.tarefas.length) return false;
+
+  // Compare ids and a few key fields to detect status/amount/quantity changes
+  for (let i = 0; i < prev.tarefas.length; i++) {
+    const p = prev.tarefas[i];
+    const n = next.tarefas[i];
+    if (p.id !== n.id) return false;
+    if (p.paymentStatus !== n.paymentStatus) return false;
+    if (p.totalAmount !== n.totalAmount) return false;
+    if (p.quantity !== n.quantity) return false;
+  }
+
+  // compare basic pagination props
+  return prev.totalItems === next.totalItems && prev.currentPage === next.currentPage && prev.pageSize === next.pageSize && prev.serverSide === next.serverSide;
+};
+
+// export memoized component
+export const TaskTable = React.memo(TaskTableInner, areEqual);

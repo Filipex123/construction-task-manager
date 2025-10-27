@@ -42,7 +42,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     contractor: null,
     quantity: 0,
     totalAmount: 0,
-    paymentStatus: PaymentStatusEnum.PENDENTE,
+    paymentStatus: PaymentStatusEnum.EM_ANDAMENTO,
     dueDate: undefined,
   });
 
@@ -106,7 +106,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       contractor: null,
       quantity: 0,
       totalAmount: 0,
-      paymentStatus: PaymentStatusEnum.PENDENTE,
+      paymentStatus: PaymentStatusEnum.EM_ANDAMENTO,
       dueDate: undefined,
     });
     setErrors({});
@@ -156,7 +156,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
             contractor: initialTask.contractor ?? contractorsArr[0],
             quantity: initialTask.quantity ?? 0,
             totalAmount: initialTask.totalAmount ?? 0,
-            paymentStatus: initialTask.paymentStatus ?? PaymentStatusEnum.PENDENTE,
+            paymentStatus: initialTask.paymentStatus ?? PaymentStatusEnum.EM_ANDAMENTO,
             dueDate: initialTask.dueDate,
           });
         } else {

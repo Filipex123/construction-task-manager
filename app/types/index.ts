@@ -121,3 +121,5 @@ export enum MeasurementStatusEnum {
   RETIDO = 'RETIDO',
   EM_ANDAMENTO = 'EM_ANDAMENTO',
 }
+
+export type IdName = { id: string; name: string };
