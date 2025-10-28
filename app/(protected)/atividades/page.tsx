@@ -1,23 +1,23 @@
 'use client';
 
 import { usePageTitle } from '@/app/context/PageTitle.context';
-import { unidadesService } from '@/app/services/unidadesService';
-import { UnidadeMedida } from '@/app/types';
+import { atividadesService } from '@/app/services/atividadesService';
+import { Atividades } from '@/app/types';
 import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { SearchBar } from '../components/SearchBar';
 
-const UnidadeMedidaPage: React.FC = () => {
+const AtividadesPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingItem, setEditingItem] = useState<UnidadeMedida | null>(null);
-  const [formData, setFormData] = useState({ descricao: '', complemento: '' });
+  const [editingItem, setEditingItem] = useState<Atividades | null>(null);
+  const [formData, setFormData] = useState({ name: '', description: '' });
   const [errors, setErrors] = useState({ descricao: '', complemento: '' });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
-  const [units, setUnits] = useState<UnidadeMedida[]>([]);
+  const [activities, setActivities] = useState<Atividades[]>([]);
 
   const handleToggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -25,8 +25,8 @@ const UnidadeMedidaPage: React.FC = () => {
 
   // Filtrar dados
   const filteredData = useMemo(() => {
-    return units.filter((unit) => searchTerm === '' || unit.description?.toLowerCase().includes(searchTerm.toLowerCase()) || unit.name?.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [units, searchTerm]);
+    return activities.filter((act) => searchTerm === '' || act.description!.toLowerCase().includes(searchTerm.toLowerCase()) || act.name!.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [activities, searchTerm]);
 
   // Paginação
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -36,24 +36,24 @@ const UnidadeMedidaPage: React.FC = () => {
   const validateForm = () => {
     const newErrors = { descricao: '', complemento: '' };
 
-    if (!formData.descricao.trim()) {
+    if (!formData.name.trim()) {
       newErrors.descricao = 'Descrição é obrigatória';
     }
 
-    if (!formData.complemento.trim()) {
+    if (!formData.description.trim()) {
       newErrors.complemento = 'Complemento é obrigatório';
     }
 
     // Verificar se já existe uma unidade com a mesma descrição ou complemento
-    const existingUnit = units.find(
-      (unit) => unit.id !== editingItem?.id && (unit.description?.toLowerCase() === formData.descricao.toLowerCase() || unit.name?.toLowerCase() === formData.complemento.toLowerCase())
+    const existingActivity = activities.find(
+      (act) => act.id !== editingItem?.id && (act.description!.toLowerCase() === formData.name.toLowerCase() || act.name!.toLowerCase() === formData.description.toLowerCase())
     );
 
-    if (existingUnit) {
-      if (existingUnit.description?.toLowerCase() === formData.descricao.toLowerCase()) {
+    if (existingActivity) {
+      if (existingActivity.description!.toLowerCase() === formData.name.toLowerCase()) {
         newErrors.descricao = 'Já existe uma unidade com esta descrição';
       }
-      if (existingUnit.name?.toLowerCase() === formData.complemento.toLowerCase()) {
+      if (existingActivity.name!.toLowerCase() === formData.description.toLowerCase()) {
         newErrors.complemento = 'Já existe uma unidade com este complemento';
       }
     }
@@ -62,13 +62,13 @@ const UnidadeMedidaPage: React.FC = () => {
     return !newErrors.descricao && !newErrors.complemento;
   };
 
-  const handleOpenModal = (unit?: UnidadeMedida) => {
-    if (unit) {
-      setEditingItem(unit);
-      setFormData({ descricao: unit.description || '', complemento: unit.name || '' });
+  const handleOpenModal = (act?: Atividades) => {
+    if (act) {
+      setEditingItem(act);
+      setFormData({ name: act.name!, description: act.description! });
     } else {
       setEditingItem(null);
-      setFormData({ descricao: '', complemento: '' });
+      setFormData({ name: '', description: '' });
     }
     setErrors({ descricao: '', complemento: '' });
     setShowModal(true);
@@ -77,7 +77,7 @@ const UnidadeMedidaPage: React.FC = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingItem(null);
-    setFormData({ descricao: '', complemento: '' });
+    setFormData({ name: '', description: '' });
     setErrors({ descricao: '', complemento: '' });
   };
 
@@ -86,19 +86,19 @@ const UnidadeMedidaPage: React.FC = () => {
 
     try {
       if (editingItem) {
-        await unidadesService.atualizar(editingItem.id!, {
-          description: formData.descricao,
-          name: formData.complemento,
+        await atividadesService.atualizar(Number(editingItem.id), {
+          description: formData.name,
+          name: formData.description,
         });
       } else {
-        await unidadesService.criar({
-          description: formData.descricao,
-          name: formData.complemento,
+        await atividadesService.criar({
+          description: formData.name,
+          name: formData.description,
         });
       }
 
-      const data = await unidadesService.listar();
-      setUnits(data);
+      const data = await atividadesService.listar();
+      setActivities(data);
       handleCloseModal();
     } catch (error) {
       console.error(error);
@@ -109,9 +109,9 @@ const UnidadeMedidaPage: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
       try {
-        await unidadesService.excluir(id);
-        const data = await unidadesService.listar();
-        setUnits(data);
+        await atividadesService.excluir(id);
+        const data = await atividadesService.listar();
+        setActivities(data);
       } catch (error) {
         console.error(error);
         alert('Erro ao excluir unidade.');
@@ -119,19 +119,15 @@ const UnidadeMedidaPage: React.FC = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  };
-
   React.useEffect(() => {
-    setTitle('Cadastro de Unidade');
-    setSubtitle('Unidades de Medida');
-    setDescription('Cadastro e Controle das Unidades de Medida');
+    setTitle('Cadastro de Atividades');
+    setSubtitle('Atividades');
+    setDescription('Cadastro e Controle das Atividades');
 
     const carregar = async () => {
       try {
-        const data = await unidadesService.listar();
-        setUnits(data);
+        const data = await atividadesService.listar();
+        setActivities(data);
       } catch (error) {
         console.error(error);
         alert('Erro ao carregar unidades.');
@@ -147,7 +143,7 @@ const UnidadeMedidaPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <button onClick={() => handleOpenModal()} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <Plus className="h-4 w-4 mr-2" />
-            Nova Unidade
+            Nova Atividade
           </button>
         </div>
 
@@ -175,18 +171,18 @@ const UnidadeMedidaPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedData.map((unit) => (
-                  <tr key={unit.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{unit.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.createdAt}</td>
+                {paginatedData.map((act) => (
+                  <tr key={act.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{act.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.description}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{act.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.createdAt}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex space-x-2">
-                        <button onClick={() => handleOpenModal(unit)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
+                        <button onClick={() => handleOpenModal(act)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button onClick={() => handleDelete(unit.id!)} className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded" title="Excluir">
+                        <button onClick={() => handleDelete(Number(act.id))} className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded" title="Excluir">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
@@ -275,7 +271,7 @@ const UnidadeMedidaPage: React.FC = () => {
           <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-900">{editingItem ? 'Editar Unidade de Medida' : 'Nova Unidade de Medida'}</h2>
+                <h2 className="text-xl font-semibold text-gray-900">{editingItem ? 'Editar Atividade' : 'Nova Atividade'}</h2>
                 <button onClick={handleCloseModal} className="text-gray-400 hover:text-gray-600 transition-colors">
                   <X className="h-6 w-6" />
                 </button>
@@ -289,12 +285,12 @@ const UnidadeMedidaPage: React.FC = () => {
                   <input
                     id="descricao"
                     type="text"
-                    value={formData.descricao}
+                    value={formData.name}
                     onChange={(e) => setFormData((prev) => ({ ...prev, descricao: e.target.value }))}
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.descricao ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Ex: Metro Quadrado"
+                    placeholder="Ex: Contrapiso"
                   />
                   {errors.descricao && <p className="mt-1 text-sm text-red-600">{errors.descricao}</p>}
                 </div>
@@ -306,12 +302,12 @@ const UnidadeMedidaPage: React.FC = () => {
                   <input
                     id="complemento"
                     type="text"
-                    value={formData.complemento}
+                    value={formData.description}
                     onChange={(e) => setFormData((prev) => ({ ...prev, complemento: e.target.value }))}
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.descricao ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Ex: m²"
+                    placeholder="Ex: Atividade reponsavel por nivelar o contrapiso"
                   />
                   {errors.descricao && <p className="mt-1 text-sm text-red-600">{errors.descricao}</p>}
                 </div>
@@ -334,4 +330,4 @@ const UnidadeMedidaPage: React.FC = () => {
   );
 };
 
-export default UnidadeMedidaPage;
+export default AtividadesPage;

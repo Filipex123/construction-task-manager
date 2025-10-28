@@ -14,7 +14,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, onSearchChange
       </div>
       <input
         type="text"
-        placeholder="Buscar obra por nome..."
+        placeholder="Busque por qualquer termo"
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
         className="w-full bg-white pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"

@@ -1,102 +1,63 @@
 'use client';
 import React, { useMemo, useState } from 'react';
 import { usePageTitle } from '../context/PageTitle.context';
-import { mockObras as initialMockObras } from '../mockData';
-import { Obra, Tarefa } from '../types';
-import { ObraCard } from './components/ConstructionCard';
+import { obraService } from '../services/obraService';
+import { tarefaService } from '../services/tarefaService';
+import { Obra, PaymentStatusEnum } from '../types';
+import { Loader } from './components/Loader';
 import { SearchBar } from './components/SearchBar';
+import { TarefaCard } from './components/TarefaCard';
 
 function Home() {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [obras, setObras] = useState<Obra[]>(initialMockObras);
+  const [obras, setObras] = useState<Obra[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const filteredObras = useMemo(() => {
-    return obras.filter((obra) => obra.nome.toLowerCase().includes(searchTerm.toLowerCase()) || obra.descricao.toLowerCase().includes(searchTerm.toLowerCase()));
+    return obras.filter((obra) => obra.name?.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description?.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
-  const handleEdit = (obraId: string, tarefaId: string, updated: Omit<Tarefa, 'id'>) => {
-    setObras((prevObras) =>
-      prevObras.map((obra) => {
-        if (obra.id !== obraId) return obra;
-        return {
-          ...obra,
-          tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, ...updated } : t)),
-        };
-      })
-    );
-  };
-
-  const handleDelete = (tarefaId: string) => {
-    setObras((prevObras) =>
-      prevObras.map((obra) => ({
-        ...obra,
-        tarefas: obra.tarefas.filter((tarefa) => tarefa.id !== tarefaId),
-      }))
-    );
-  };
-
-  const handlePay = (tarefaId: string) => {
-    setObras((prev) =>
-      prev.map((obra) => ({
-        ...obra,
-        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, statusPagamento: 'pago' } : t)),
-      }))
-    );
-  };
-
-  const handleAddTask = (obraId: string, newTask: Omit<Tarefa, 'id'>) => {
-    setObras((prevObras) =>
-      prevObras.map((obra) => {
-        if (obra.id === obraId) {
-          const taskId = `${obraId}-${Date.now()}`;
-          const taskWithId: Tarefa = { ...newTask, id: taskId };
-          return {
-            ...obra,
-            tarefas: [...obra.tarefas, taskWithId],
-          };
-        }
-        return obra;
-      })
-    );
-  };
-
-  const handleLoadTasks = async (obraId: string) => {
-    // Simula chamada para o backend
-    console.log('Carregando tarefas para obra:', obraId);
-
-    // Simula delay de rede
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Aqui você faria a chamada real para o backend:
-    // const response = await fetch(`/api/obras/${obraId}/tarefas`);
-    // const tarefas = await response.json();
-    //
-    // setObras(prevObras =>
-    //   prevObras.map(obra =>
-    //     obra.id === obraId ? { ...obra, tarefas } : obra
-    //   )
-    // );
-
-    console.log('Tarefas carregadas com sucesso');
+  const handlePay = async (tarefaId: number) => {
+    console.log('Iniciando pagamento para a tarefa com ID:', tarefaId);
+    try {
+      await tarefaService.atualizar(tarefaId, { paymentStatus: PaymentStatusEnum.PAGO, paymentDate: new Date().toISOString().slice(0, 10), updatedBy: 'system' });
+      console.log(`Processando pagamento para a tarefa com ID: ${tarefaId}`);
+    } catch (error) {
+      console.error('Erro ao processar o pagamento:', error);
+    }
   };
 
   React.useEffect(() => {
     setTitle('Pagamento');
     setSubtitle('Controle de Obras');
     setDescription('Gerencie e monitore todas as atividades das suas obras em um só lugar.');
+
+    const carregarObras = async () => {
+      setIsLoading(true);
+      try {
+        const data = await obraService.listar();
+        setObras(data.items || []);
+      } catch (error) {
+        console.error('Erro ao carregar obras:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    carregarObras();
   }, []);
 
   return (
     <>
-      {/* <DashboardSummary obras={obras} /> */}
-
       <div className="mb-6">
         <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
       </div>
 
-      {filteredObras.length === 0 ? (
+      {isLoading && <Loader message={'Carregando Obras'} />}
+
+      {!isLoading && filteredObras.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-gray-400 text-lg mb-2">Nenhuma obra encontrada</div>
           <p className="text-gray-500">{searchTerm ? 'Tente ajustar sua pesquisa' : 'Não há obras cadastradas'}</p>
@@ -104,7 +65,7 @@ function Home() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <ObraCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onDelete={handleDelete} onPay={handlePay} onAddTask={handleAddTask} />
+            <TarefaCard key={obra.id} obra={obra} onPay={handlePay} />
           ))}
         </div>
       )}

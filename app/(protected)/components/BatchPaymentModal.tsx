@@ -1,6 +1,6 @@
+import { Building2, CheckCircle, DollarSign, MapPin, Package, X } from 'lucide-react';
 import React from 'react';
-import { X, DollarSign, CheckCircle, MapPin, Building2, Package } from 'lucide-react';
-import { Tarefa } from '../../types';
+import { IdName, Tarefa } from '../../types';
 
 interface BatchPaymentModalProps {
   isOpen: boolean;
@@ -19,9 +19,35 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
     }).format(value);
   };
 
-  const totalValue = tarefas.reduce((sum, tarefa) => sum + tarefa.valor, 0);
-  const uniqueEmpreiteiras = Array.from(new Set(tarefas.map((t) => t.empreiteira)));
-  const uniqueLocais = Array.from(new Set(tarefas.map((t) => t.local)));
+  // helper: normaliza um campo (string | object) para {id, name}
+  const toIdName = (val: any): IdName | null => {
+    if (val == null) return null;
+    if (typeof val === 'string') return { id: val, name: val };
+    if (typeof val === 'object') {
+      const id = String(val.id ?? val._id ?? val.value ?? val.uuid ?? val.key ?? val.name ?? val.label ?? '');
+      const name = String(val.name ?? val.label ?? val.title ?? val.value ?? id);
+      return { id: id || name, name };
+    }
+    return { id: String(val), name: String(val) };
+  };
+
+  const totalValue = tarefas.reduce((sum, tarefa) => sum + (tarefa.totalAmount ?? 0), 0);
+  const uniqueLocais = (() => {
+    const map = new Map<string, IdName>();
+    tarefas.forEach((t) => {
+      const pair = toIdName((t as any).location);
+      if (pair && !map.has(pair.id)) map.set(pair.id, pair);
+    });
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  })();
+  const uniqueEmpreiteiras = (() => {
+    const map = new Map<string, IdName>();
+    tarefas.forEach((t) => {
+      const pair = toIdName((t as any).contractor);
+      if (pair && !map.has(pair.id)) map.set(pair.id, pair);
+    });
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  })();
 
   const handleConfirm = () => {
     onConfirm();
@@ -109,22 +135,22 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
                   <div key={tarefa.id} className={`p-4 ${index !== tarefas.length - 1 ? 'border-b border-gray-200' : ''}`}>
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 text-sm truncate">{tarefa.atividade}</h4>
+                        <h4 className="font-medium text-gray-900 text-sm truncate">{tarefa.activity?.name}</h4>
                         <div className="flex items-center space-x-2 mt-1">
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <MapPin className="w-3 h-3" />
-                            <span className="truncate">{tarefa.local.name}</span>
+                            <span className="truncate">{tarefa.location!.name}</span>
                           </div>
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <Building2 className="w-3 h-3" />
-                            <span className="truncate">{tarefa.empreiteira}</span>
+                            <span className="truncate">{tarefa.contractor?.name}</span>
                           </div>
                         </div>
                       </div>
                       <div className="ml-4 text-right">
-                        <p className="font-semibold text-green-600 text-sm">{formatCurrency(tarefa.valor)}</p>
+                        <p className="font-semibold text-green-600 text-sm">{formatCurrency(tarefa.totalAmount!)}</p>
                         <p className="text-xs text-gray-500">
-                          {tarefa.quantidade} {tarefa.unidade}
+                          {tarefa.quantity} {tarefa.unitOfMeasure?.name}
                         </p>
                       </div>
                     </div>
@@ -141,8 +167,8 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
               </h3>
               <div className="flex flex-wrap gap-2">
                 {uniqueEmpreiteiras.map((empreiteira) => (
-                  <span key={empreiteira} className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
-                    {empreiteira}
+                  <span key={empreiteira?.id} className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                    {empreiteira?.name}
                   </span>
                 ))}
               </div>
@@ -156,8 +182,8 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
               </h3>
               <div className="flex flex-wrap gap-2">
                 {uniqueLocais.map((local) => (
-                  <span key={local.id} className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
-                    {local.name}
+                  <span key={local!.id} className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+                    {local!.name}
                   </span>
                 ))}
               </div>

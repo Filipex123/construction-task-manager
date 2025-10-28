@@ -1,43 +1,47 @@
+import { MeasurementStatusEnum, MeasureTarefa } from '@/app/types';
+import { formatDateForInput } from '@/app/utils/dateUtils';
+import { CheckCircle2, Hash, Ruler, X } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { X, CheckCircle2, Ruler, Hash } from 'lucide-react';
 
 interface MeasureEntryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (data: { medidaPrevista: number; medidaRealizada: number; status: string }) => void;
-  initialValues?: { medidaPrevista?: number; medidaRealizada?: number; status?: string } | null;
-  title?: string;
+  onConfirm: (data: MeasureTarefa) => void;
+  initialValues?: MeasureTarefa | null;
 }
 
-export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, onClose, onConfirm, initialValues = null, title = 'Registrar Medição' }) => {
-  const [form, setForm] = useState({ medidaPrevista: '', medidaRealizada: '', status: 'pendente' });
-  const [errors, setErrors] = useState<{ medidaPrevista?: string; medidaRealizada?: string; status?: string }>({});
+export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, onClose, onConfirm, initialValues = null }) => {
+  const [form, setForm] = useState<MeasureTarefa>({ quantity: 0, quantityExecuted: 0, measurementStatus: MeasurementStatusEnum.PENDENTE });
+  const [errors, setErrors] = useState<{ quantity?: string; quantityExecuted?: string; status?: string }>({});
+  const title = initialValues ? 'Editar Medição' : 'Nova Medição';
 
   const statusOptions = [
-    { value: 'pendente', label: 'Pendente' },
-    { value: 'em_andamento', label: 'Em Andamento' },
-    { value: 'medido', label: 'Medido' },
-    { value: 'retencao', label: 'Retenção' },
+    { value: 'PENDENTE', label: 'Pendente' },
+    { value: 'EM_ANDAMENTO', label: 'Em Andamento' },
+    { value: 'MEDIDO', label: 'Medido' },
+    { value: 'RETIDO', label: 'Retido' },
   ];
 
   useEffect(() => {
     if (isOpen) {
       setForm({
-        medidaPrevista: initialValues?.medidaPrevista != null ? String(initialValues.medidaPrevista) : '',
-        medidaRealizada: initialValues?.medidaRealizada != null ? String(initialValues.medidaRealizada) : '',
-        status: initialValues?.status ?? 'pendente',
+        quantity: initialValues?.quantity != null ? Number(initialValues.quantity) : 0,
+        quantityExecuted: initialValues?.quantityExecuted != null ? Number(initialValues.quantityExecuted) : 0,
+        measurementStatus: initialValues?.measurementStatus ?? MeasurementStatusEnum.PENDENTE,
+        measurementDate: initialValues?.measurementDate ?? formatDateForInput(new Date().toISOString()),
+        updatedBy: initialValues?.updatedBy ?? undefined,
       });
       setErrors({});
     }
   }, [isOpen, initialValues]);
 
   const isValid = useMemo(() => {
-    const newErrors: { medidaPrevista?: string; medidaRealizada?: string; status?: string } = {};
-    const prevista = parseFloat(form.medidaPrevista || '0');
-    const realizada = parseFloat(form.medidaRealizada || '0');
-    if (!form.medidaPrevista || isNaN(prevista) || prevista < 0) newErrors.medidaPrevista = 'Informe um valor válido';
-    if (!form.medidaRealizada || isNaN(realizada) || realizada < 0) newErrors.medidaRealizada = 'Informe um valor válido';
-    if (!form.status) newErrors.status = 'Selecione um status';
+    const newErrors: { quantity?: string; quantityExecuted?: string; status?: string } = {};
+    const prevista = form.quantity || 0;
+    const realizada = form.quantityExecuted || 0;
+    if (!form.quantity || isNaN(prevista) || prevista < 0) newErrors.quantity = 'Informe um valor válido';
+    if (form.quantity === null || form.quantity === undefined || isNaN(realizada) || realizada < 0) newErrors.quantityExecuted = 'Informe um valor válido';
+    if (!form.measurementStatus) newErrors.status = 'Selecione um status';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [form]);
@@ -45,7 +49,14 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
   const handleConfirm = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
-    onConfirm({ medidaPrevista: parseFloat(form.medidaPrevista), medidaRealizada: parseFloat(form.medidaRealizada), status: form.status });
+
+    onConfirm({
+      quantity: form.quantity,
+      quantityExecuted: form.quantityExecuted,
+      measurementStatus: form.measurementStatus,
+      measurementDate: new Date().toISOString().slice(0, 10),
+      updatedBy: form.updatedBy,
+    });
     onClose();
   };
 
@@ -79,14 +90,14 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
               type="number"
               step="0.01"
               min="0"
-              value={form.medidaPrevista}
-              onChange={(e) => setForm((p) => ({ ...p, medidaPrevista: e.target.value }))}
+              value={form.quantity}
+              onChange={(e) => setForm((p) => ({ ...p, quantity: Number(e.target.value) }))}
               placeholder="0,00"
               className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
-                errors.medidaPrevista ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                errors.quantity ? 'border-red-300 bg-red-50' : 'border-gray-300'
               }`}
             />
-            {errors.medidaPrevista && <p className="text-red-600 text-sm mt-1">{errors.medidaPrevista}</p>}
+            {errors.quantity && <p className="text-red-600 text-sm mt-1">{errors.quantity}</p>}
           </div>
 
           {/* Medida Realizada */}
@@ -99,14 +110,15 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
               type="number"
               step="0.01"
               min="0"
-              value={form.medidaRealizada}
-              onChange={(e) => setForm((p) => ({ ...p, medidaRealizada: e.target.value }))}
+              defaultValue={undefined}
+              value={form.quantityExecuted}
+              onChange={(e) => setForm((p) => ({ ...p, quantityExecuted: Number(e.target.value) }))}
               placeholder="0,00"
               className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
-                errors.medidaRealizada ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                errors.quantityExecuted ? 'border-red-300 bg-red-50' : 'border-gray-300'
               }`}
             />
-            {errors.medidaRealizada && <p className="text-red-600 text-sm mt-1">{errors.medidaRealizada}</p>}
+            {errors.quantityExecuted && <p className="text-red-600 text-sm mt-1">{errors.quantityExecuted}</p>}
           </div>
 
           {/* Status */}
@@ -117,9 +129,9 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => setForm((p) => ({ ...p, status: option.value }))}
+                  onClick={() => setForm((p) => ({ ...p, measurementStatus: option.value as MeasurementStatusEnum }))}
                   className={`text-gray-600 p-3 rounded-lg border-2 transition-all text-sm font-medium ${
-                    form.status === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                    form.measurementStatus === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   {option.label}
@@ -134,7 +146,11 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
             <button type="button" onClick={onClose} className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
               Cancelar
             </button>
-            <button type="submit" className="flex-1 px-4 py-3 rounded-lg transition-colors font-medium text-white bg-blue-600 hover:bg-blue-700 inline-flex items-center justify-center space-x-2">
+            <button
+              type="submit"
+              onClick={handleConfirm}
+              className="flex-1 px-4 py-3 rounded-lg transition-colors font-medium text-white bg-blue-600 hover:bg-blue-700 inline-flex items-center justify-center space-x-2"
+            >
               <CheckCircle2 className="w-5 h-5 text-white" />
               <span>Confirmar</span>
             </button>
