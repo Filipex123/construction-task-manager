@@ -49,7 +49,11 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   })();
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    console.log(
+      'Confirmando pagamento em lote para tarefas:',
+      tarefas.map((t) => t.id)
+    );
     onConfirm();
     onClose();
   };

@@ -20,10 +20,8 @@ function Home() {
   }, [searchTerm, obras]);
 
   const handlePay = async (tarefaId: number) => {
-    console.log('Iniciando pagamento para a tarefa com ID:', tarefaId);
     try {
       await tarefaService.atualizar(tarefaId, { paymentStatus: PaymentStatusEnum.PAGO, paymentDate: new Date().toISOString().slice(0, 10), updatedBy: 'system' });
-      console.log(`Processando pagamento para a tarefa com ID: ${tarefaId}`);
     } catch (error) {
       console.error('Erro ao processar o pagamento:', error);
     }
@@ -38,6 +36,7 @@ function Home() {
       setIsLoading(true);
       try {
         const data = await obraService.listar();
+        console.log('Obras carregadas:', data.items);
         setObras(data.items || []);
       } catch (error) {
         console.error('Erro ao carregar obras:', error);

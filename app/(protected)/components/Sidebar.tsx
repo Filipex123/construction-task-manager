@@ -1,6 +1,7 @@
 import { useSidebar } from '@/app/context/Sidebar.context';
 import { ChevronDown, ChevronRight, ClipboardList, DollarSign, LogOut, Menu, Plus, Ruler, User, X } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 
 interface SidebarProps {
@@ -42,18 +43,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
           <nav className="flex flex-col mt-8 gap-2">
             {/* Pagamento */}
             <div className="px-4">
-              <a href="/" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
+              <Link href="/" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
                 <DollarSign className="w-5 h-5 flex-shrink-0" />
                 {isOpen && <span className="font-medium">Pagamento</span>}
-              </a>
+              </Link>
             </div>
 
             {/* Medição */}
             <div className="px-4">
-              <a href="/medicao" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
+              <Link href="/medicao" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
                 <Ruler className="w-5 h-5 flex-shrink-0" />
                 {isOpen && <span className="font-medium">Medição</span>}
-              </a>
+              </Link>
             </div>
 
             {/* Cadastro (collapsible) */}
@@ -73,21 +74,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
               {/* Subitems */}
               {isOpen && isCadastroOpen && (
                 <div className="mt-2 ml-6 flex flex-col gap-1">
-                  <a href="/nova-obra" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                  <Link href="/nova-obra" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro de Obra e Local</span>
-                  </a>
-                  <a href="/tarefa" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                  </Link>
+                  <Link href="/tarefa" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro de Tarefa</span>
-                  </a>
-                  <a href="/atividades" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                  </Link>
+                  <Link href="/atividades" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro de Atividades</span>
-                  </a>
-                  <a href="/empreiteira" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
-                    <span className="text-sm">Cadastro de  Empreiteiras</span>
-                  </a>
-                  <a href="/unidade-medidas" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                  </Link>
+                  <Link href="/empreiteira" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                    <span className="text-sm">Cadastro de Empreiteiras</span>
+                  </Link>
+                  <Link href="/unidade-medidas" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro de Unidade</span>
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

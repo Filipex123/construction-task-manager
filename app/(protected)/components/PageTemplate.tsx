@@ -1,4 +1,3 @@
-'use client';
 import { usePageTitle } from '@/app/context/PageTitle.context';
 import React from 'react';
 import { Header } from './Header';
