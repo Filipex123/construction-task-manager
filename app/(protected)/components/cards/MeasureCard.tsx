@@ -1,9 +1,9 @@
 import { tarefaService } from '@/app/services/tarefaService';
+import { MeasureTarefa, Obra, Tarefa } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
-import { MeasureTarefa, Obra, Tarefa } from '../../types';
-import { MeasureTable } from './MeasureTable';
-import { ObraFilters, TarefaFilterParams } from './ObraFilters';
+import { ObraFilters, TarefaFilterParams } from '../ObraFilters';
+import { MeasureTable } from '../tables/MeasureTable';
 
 interface MeasureCardProps {
   obra: Obra;

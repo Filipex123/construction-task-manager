@@ -1,13 +1,12 @@
-import { formatDateStringtoView, formatDatetimeStringtoView } from '@/app/utils/dateUtils';
-import { ChevronLeft, ChevronRight, Grid, List, Ruler } from 'lucide-react';
+import { ChevronLeft, ChevronRight, DollarSign, Grid, List } from 'lucide-react';
 import React from 'react';
-import { MeasureTarefa, StatusColorMedicao, Tarefa } from '../../types';
-import { MeasureEntryModal } from './MeasureEntryModal';
-import { TaskDetailModal } from './TaskDetailModal';
+import { StatusColor, Tarefa } from '../../../types';
+import { SinglePaymentModal } from '../modals/SinglePaymentModal';
+import { TaskDetailModal } from '../modals/TaskDetailModal';
 
-interface MeasureTableProps {
+interface PaymentTableProps {
   tarefas: Tarefa[];
-  onMeasure?: (tarefaId: number, measureFields: MeasureTarefa) => void;
+  onPay?: (tarefaId: number) => void;
   // server-side pagination props:
   serverSide?: boolean;
   totalItems?: number;
@@ -18,25 +17,26 @@ interface MeasureTableProps {
 
 type MobileView = 'table' | 'cards' | 'list';
 
-const statusConfig: StatusColorMedicao = {
+const statusConfig: StatusColor = {
   PENDENTE: 'bg-yellow-100 text-yellow-800',
   EM_ANDAMENTO: 'bg-blue-100 text-blue-800',
-  MEDIDO: 'bg-green-100 text-green-800',
-  RETIDO: 'bg-red-100 text-red-800',
+  PAGO: 'bg-green-100 text-green-800',
+  ATRASADO: 'bg-red-100 text-red-800',
 };
 
 const statusLabels = {
   PENDENTE: 'Pendente',
   EM_ANDAMENTO: 'Em Andamento',
-  MEDIDO: 'Medido',
-  RETIDO: 'Retido',
+  PAGO: 'Pago',
+  ATRASADO: 'Atrasado',
 };
 
-export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeasure, serverSide = false, totalItems = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
+export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay, serverSide = false, totalItems = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
   const [mobileView, setMobileView] = React.useState<MobileView>('cards');
   const [selectedTask, setSelectedTask] = React.useState<Tarefa | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = React.useState(false);
+  const [taskToPay, setTaskToPay] = React.useState<Tarefa | null>(null);
   const [currentPageState, setCurrentPage] = React.useState(1);
   const [isMobile, setIsMobile] = React.useState(false);
   const [localTarefas, setLocalTarefas] = React.useState<Tarefa[]>(tarefas);
@@ -63,6 +63,8 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
     setCurrentPage(1);
   }, [localTarefas.length, mobileView]);
 
+  // se serverSide, assumimos 'tarefas' já contém apenas a página atual
+  // se não serverSide, mantenha paginação local (existing logic)
   const itemsPerPage = isMobile ? 5 : 10;
   let currentTarefas = localTarefas;
   if (!serverSide) {
@@ -85,6 +87,17 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
     }).format(value);
   };
 
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const handleTaskClick = (tarefa: Tarefa) => {
     setSelectedTask(tarefa);
     setIsDetailModalOpen(true);
@@ -95,22 +108,36 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
     setSelectedTask(null);
   };
 
-  const handleMeasure = (tarefa: Tarefa) => {
-    setIsOpen(true);
-    setSelectedTask(tarefa);
+  const handlePayClick = (tarefa: Tarefa) => {
+    if (tarefa.paymentStatus != 'PAGO') {
+      setTaskToPay(tarefa);
+      setIsPaymentModalOpen(true);
+    }
   };
 
-  const handleConfirmMeasure = (data: MeasureTarefa) => {
-    if (selectedTask && onMeasure) {
-      onMeasure(selectedTask.id, data);
+  const handlePaymentConfirm = async () => {
+    if (taskToPay && onPay) {
+      onPay(taskToPay.id);
     }
+  };
+
+  const handleClosePaymentModal = () => {
+    setIsPaymentModalOpen(false);
+    setTaskToPay(null);
   };
 
   const ActionButtons = ({ tarefa }: { tarefa: Tarefa }) => (
     <div className="flex space-x-2">
-      <button onClick={() => handleMeasure(tarefa)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors" title="Medir">
-        <Ruler className="w-4 h-4" />
-      </button>
+      {onPay && (
+        <button
+          onClick={() => handlePayClick(tarefa)}
+          disabled={tarefa.paymentStatus === 'PAGO' || tarefa.paymentStatus === 'EM_ANDAMENTO'}
+          className="p-2 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Pagar"
+        >
+          <DollarSign className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 
@@ -123,7 +150,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
               <h5 className="font-medium text-gray-900 text-sm mb-1">{tarefa.location.name}</h5>
               <p className="text-gray-600 text-sm">{tarefa.activity.name}</p>
             </div>
-            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.measurementStatus]}`}>{statusLabels[tarefa.measurementStatus]}</span>
+            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.paymentStatus]}`}>{statusLabels[tarefa.paymentStatus]}</span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-sm mb-3">
@@ -160,7 +187,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-1">
                 <h5 className="font-medium text-gray-900 text-sm">{tarefa.location.name}</h5>
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.measurementStatus]}`}>{statusLabels[tarefa.measurementStatus]}</span>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.paymentStatus]}`}>{statusLabels[tarefa.paymentStatus]}</span>
               </div>
               <p className="text-gray-600 text-sm mb-2">{tarefa.activity.name}</p>
             </div>
@@ -197,7 +224,6 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empreiteira</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Criação</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Limite</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Medição</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
           </tr>
@@ -211,17 +237,25 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.quantity}</td>
               <td className="px-4 py-4 text-sm font-medium text-gray-900">{formatCurrency(tarefa.totalAmount)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.contractor.name}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{formatDatetimeStringtoView(tarefa.createdAt)}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{formatDateStringtoView(tarefa.dueDate)}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{formatDateStringtoView(tarefa.measurementDate)}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{formatDate(tarefa.createdAt)}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{formatDate(tarefa.dueDate)}</td>
               <td className="px-4 py-4 text-sm">
-                <span className={`inline-flex  w-[100px] h-[40px] items-center justify-center px-2 py-1 text-xs font-semibold rounded-full text-center ${statusConfig[tarefa.measurementStatus]}`}>
-                  {statusLabels[tarefa.measurementStatus]}
+                <span className={`inline-flex  w-[100px] h-[40px] items-center justify-center px-2 py-1 text-xs font-semibold rounded-full text-center ${statusConfig[tarefa.paymentStatus]}`}>
+                  {statusLabels[tarefa.paymentStatus]}
                 </span>
               </td>
               <td className="px-4 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                 <div className="flex space-x-2">
-                  <ActionButtons tarefa={tarefa} />
+                  {onPay && (
+                    <button
+                      onClick={() => handlePayClick(tarefa)}
+                      disabled={tarefa.paymentStatus === 'PAGO' || tarefa.paymentStatus === 'EM_ANDAMENTO'}
+                      className="p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Pagar"
+                    >
+                      <DollarSign className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>
@@ -348,17 +382,12 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
 
       <TaskDetailModal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal} tarefa={selectedTask} />
 
-      <MeasureEntryModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onConfirm={handleConfirmMeasure}
-        initialValues={selectedTask ? { quantity: selectedTask.quantity, quantityExecuted: selectedTask.quantityExecuted, measurementStatus: selectedTask.measurementStatus } : null}
-      />
+      <SinglePaymentModal isOpen={isPaymentModalOpen} onClose={handleClosePaymentModal} onConfirm={handlePaymentConfirm} tarefa={taskToPay} />
     </div>
   );
 };
 
-const areEqual = (prev: MeasureTableProps, next: MeasureTableProps) => {
+const areEqual = (prev: PaymentTableProps, next: PaymentTableProps) => {
   // If same reference, skip
   if (
     prev.tarefas === next.tarefas &&
@@ -366,26 +395,22 @@ const areEqual = (prev: MeasureTableProps, next: MeasureTableProps) => {
     prev.currentPage === next.currentPage &&
     prev.pageSize === next.pageSize &&
     prev.serverSide === next.serverSide &&
-    prev.onPageChange === next.onPageChange &&
-    prev.onMeasure === next.onMeasure
+    prev.onPay === next.onPay &&
+    prev.onPageChange === next.onPageChange
   ) {
-    console.log('MeasureTable: props are equal, skipping re-render');
     return true;
   }
 
   // Quick length check
-  if (prev.tarefas.length !== next.tarefas.length) {
-    console.log('MeasureTable: tarefas length changed, re-rendering');
-    return false;
-  }
+  if (prev.tarefas.length !== next.tarefas.length) return false;
 
   // Compare ids and a few key fields to detect status/amount/quantity changes
   for (let i = 0; i < prev.tarefas.length; i++) {
     const p = prev.tarefas[i];
     const n = next.tarefas[i];
     if (p.id !== n.id) return false;
-    if (p.measurementStatus !== n.measurementStatus) return false;
-    if (p.quantityExecuted !== n.quantityExecuted) return false;
+    if (p.paymentStatus !== n.paymentStatus) return false;
+    if (p.totalAmount !== n.totalAmount) return false;
     if (p.quantity !== n.quantity) return false;
   }
 
@@ -394,4 +419,4 @@ const areEqual = (prev: MeasureTableProps, next: MeasureTableProps) => {
 };
 
 // export memoized component
-export const MeasureTable = React.memo(MeasureTableInner, areEqual);
+export const PaymentTable = React.memo(PaymentTableInner, areEqual);

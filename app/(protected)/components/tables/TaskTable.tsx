@@ -1,14 +1,12 @@
-import { ChevronLeft, ChevronRight, DollarSign, Edit3, Grid, List, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit3, Grid, List, Trash2 } from 'lucide-react';
 import React from 'react';
-import { StatusColor, Tarefa } from '../../types';
-import { SinglePaymentModal } from './SinglePaymentModal';
-import { TaskDetailModal } from './TaskDetailModal';
+import { StatusColor, Tarefa } from '../../../types';
+import { TaskDetailModal } from '../modals/TaskDetailModal';
 
 interface TaskTableProps {
   tarefas: Tarefa[];
   onEdit: (tarefaId: number) => void;
   onDelete?: (tarefaId: number) => void;
-  onPay?: (tarefaId: number) => void;
   // server-side pagination props:
   serverSide?: boolean;
   totalItems?: number;
@@ -33,7 +31,7 @@ const statusLabels = {
   ATRASADO: 'Atrasado',
 };
 
-export const TaskTableInner: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete, onPay, serverSide = false, totalItems = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
+export const TaskTableInner: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDelete, serverSide = false, totalItems = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
   const [mobileView, setMobileView] = React.useState<MobileView>('cards');
   const [selectedTask, setSelectedTask] = React.useState<Tarefa | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
@@ -110,24 +108,6 @@ export const TaskTableInner: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDe
     setSelectedTask(null);
   };
 
-  const handlePayClick = (tarefa: Tarefa) => {
-    if (tarefa.paymentStatus != 'PAGO') {
-      setTaskToPay(tarefa);
-      setIsPaymentModalOpen(true);
-    }
-  };
-
-  const handlePaymentConfirm = async () => {
-    if (taskToPay && onPay) {
-      onPay(taskToPay.id);
-    }
-  };
-
-  const handleClosePaymentModal = () => {
-    setIsPaymentModalOpen(false);
-    setTaskToPay(null);
-  };
-
   const ActionButtons = ({ tarefa }: { tarefa: Tarefa }) => (
     <div className="flex space-x-2">
       <button onClick={() => onEdit(tarefa.id)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors" title="Editar">
@@ -136,16 +116,6 @@ export const TaskTableInner: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDe
       {onDelete && (
         <button onClick={() => onDelete(tarefa.id)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors" title="Deletar">
           <Trash2 className="w-4 h-4" />
-        </button>
-      )}
-      {onPay && (
-        <button
-          onClick={() => handlePayClick(tarefa)}
-          disabled={tarefa.paymentStatus === 'PAGO' || tarefa.paymentStatus === 'EM_ANDAMENTO'}
-          className="p-2 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Pagar"
-        >
-          <DollarSign className="w-4 h-4" />
         </button>
       )}
     </div>
@@ -262,16 +232,6 @@ export const TaskTableInner: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDe
                   {onDelete && (
                     <button onClick={() => onDelete(tarefa.id)} className="p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors" title="Deletar">
                       <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                  {onPay && (
-                    <button
-                      onClick={() => handlePayClick(tarefa)}
-                      disabled={tarefa.paymentStatus === 'PAGO' || tarefa.paymentStatus === 'EM_ANDAMENTO'}
-                      className="p-1 text-green-600 hover:text-green-800 hover:bg-green-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Pagar"
-                    >
-                      <DollarSign className="w-4 h-4" />
                     </button>
                   )}
                 </div>
@@ -399,8 +359,6 @@ export const TaskTableInner: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDe
       <PaginationControls />
 
       <TaskDetailModal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal} tarefa={selectedTask} />
-
-      <SinglePaymentModal isOpen={isPaymentModalOpen} onClose={handleClosePaymentModal} onConfirm={handlePaymentConfirm} tarefa={taskToPay} />
     </div>
   );
 };
@@ -415,7 +373,6 @@ const areEqual = (prev: TaskTableProps, next: TaskTableProps) => {
     prev.serverSide === next.serverSide &&
     prev.onEdit === next.onEdit &&
     prev.onDelete === next.onDelete &&
-    prev.onPay === next.onPay &&
     prev.onPageChange === next.onPageChange
   ) {
     return true;

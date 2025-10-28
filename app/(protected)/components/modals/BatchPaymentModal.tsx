@@ -1,6 +1,6 @@
 import { Building2, CheckCircle, DollarSign, MapPin, Package, X } from 'lucide-react';
 import React from 'react';
-import { IdName, Tarefa } from '../../types';
+import { IdName, Tarefa } from '../../../types';
 
 interface BatchPaymentModalProps {
   isOpen: boolean;

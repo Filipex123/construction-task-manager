@@ -1,11 +1,11 @@
 import { tarefaService } from '@/app/services/tarefaService';
-import { Building, ChevronDown, ChevronUp, DollarSign, Loader2, Plus } from 'lucide-react';
+import { AddTarefaRequest, Obra, PaymentStatusEnum, Tarefa } from '@/app/types';
+import { Building, ChevronDown, ChevronUp, Loader2, Plus } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
-import { AddTarefaRequest, Obra, PaymentStatusEnum, Tarefa } from '../../types';
-import { AddTarefaFormData, AddTaskModal } from './AddTaskModal';
-import { BatchPaymentModal } from './BatchPaymentModal';
-import { ObraFilters, TarefaFilterParams } from './ObraFilters';
-import { TaskTable } from './TaskTable';
+import { ObraFilters, TarefaFilterParams } from '../ObraFilters';
+import { AddTarefaFormData, AddTaskModal } from '../modals/AddTaskModal';
+import { BatchPaymentModal } from '../modals/BatchPaymentModal';
+import { TaskTable } from '../tables/TaskTable';
 
 interface TarefaCardProps {
   obra: Obra;
@@ -181,25 +181,6 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
     }
   };
 
-  const handlePayment = useCallback(
-    async (taskId: number) => {
-      if (!onPay) return;
-      try {
-        setIsLoading(true);
-        await onPay(taskId);
-        await fetchTasks(1, filters);
-        setCurrentPage(1);
-      } catch (err) {
-        console.error('Erro ao adicionar tarefa:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [fetchTasks, filters, onPay]
-  );
-
-  // --- END NEW handlers ---
-
   const getTotalValue = () => {
     if (filteredTarefas.length === 0) return 0;
     return filteredTarefas.reduce((total, tarefa) => total + (tarefa.totalAmount ?? 0), 0);
@@ -258,20 +239,6 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
                   <span className="font-medium">{tarefasCount} tarefas</span>
                 </div>
               )}
-
-              {isExpanded && !isLoading && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenBatch();
-                  }}
-                  className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors font-medium text-sm"
-                  title="Pagamento em Lote"
-                >
-                  <DollarSign className="w-4 h-4" />
-                  <span>Em Lote</span>
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -291,11 +258,8 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
         onToggle={handleToggleExpand}
         onOpenBatch={handleOpenBatch}
       />
-      {/* Expandable Content: manter aberto mesmo durante fetch, mostrar overlay de loading */}
       {isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
-          {/* Summary */}
-
           <div className="px-8 py-5 bg-gray-50 border-b">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div className="mb-2 sm:mb-0">
@@ -359,7 +323,6 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
                     tarefas={filteredTarefas}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
-                    onPay={handlePayment}
                     serverSide
                     totalItems={totalItems}
                     currentPage={currentPage}
