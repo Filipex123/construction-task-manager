@@ -1,8 +1,8 @@
-import { Empreiteira, Obra, PaymentData, UnidadeMedida } from './types';
+import { PaymentData } from './types';
 
-export const mockObras: Obra[] = [
+export const mockObras: any[] = [
   {
-    id: '4',
+    id: 4,
     name: 'Residencial Jardim das Flores',
     description: 'Condomínio de casas geminadas',
     dataInicio: '2024-04-20',
@@ -485,7 +485,7 @@ export const mockLocais = [
   { id: '18', name: 'Segurança' },
 ];
 
-export const mockContractors: Empreiteira[] = [
+export const mockContractors: any[] = [
   {
     id: 1,
     descricao: 'Especializada em fundações e terraplanagem',
@@ -536,7 +536,7 @@ export const mockContractors: Empreiteira[] = [
   },
 ];
 
-export const mockUnits: UnidadeMedida[] = [
+export const mockUnits: any[] = [
   {
     id: 1,
     descricao: 'Metro Quadrado',

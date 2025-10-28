@@ -51,6 +51,7 @@ export const tarefaService = {
       body: JSON.stringify(dados),
     });
     if (!res.ok) throw new Error('Erro ao atualizar tarefa');
+    return;
   },
 
   async excluir(id: string): Promise<void> {

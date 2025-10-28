@@ -326,48 +326,48 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
 
           <div className="p-8 relative">
             {/* overlay de loading: aparece por cima do conteúdo sem desmontar o painel */}
-            {isLoading && (
+            {isLoading ? (
               <div className="absolute inset-0 bg-white/60 z-50 flex items-center justify-center">
                 <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
               </div>
-            )}
-
-            <>
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-semibold text-gray-800">Tarefas</h4>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditTaskId(null);
-                    setIsAddModalOpen(true);
-                  }}
-                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">Nova Tarefa</span>
-                  <span className="sm:hidden">Nova</span>
-                </button>
-              </div>
-
-              {filteredTarefas.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-gray-400 text-lg mb-2">Nenhuma tarefa encontrada</div>
-                  <p className="text-gray-500">Adicione a primeira tarefa desta obra</p>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg font-semibold text-gray-800">Tarefas</h4>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditTaskId(null);
+                      setIsAddModalOpen(true);
+                    }}
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Nova Tarefa</span>
+                    <span className="sm:hidden">Nova</span>
+                  </button>
                 </div>
-              ) : (
-                <TaskTable
-                  tarefas={filteredTarefas}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onPay={handlePayment}
-                  serverSide
-                  totalItems={totalItems}
-                  currentPage={currentPage}
-                  pageSize={pageSize}
-                  onPageChange={handlePageChange}
-                />
-              )}
-            </>
+
+                {filteredTarefas.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-gray-400 text-lg mb-2">Nenhuma tarefa encontrada</div>
+                    <p className="text-gray-500">Adicione a primeira tarefa desta obra</p>
+                  </div>
+                ) : (
+                  <TaskTable
+                    tarefas={filteredTarefas}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onPay={handlePayment}
+                    serverSide
+                    totalItems={totalItems}
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </>
+            )}
           </div>
         </div>
       )}

@@ -25,7 +25,7 @@ const UnidadeMedidaPage: React.FC = () => {
 
   // Filtrar dados
   const filteredData = useMemo(() => {
-    return units.filter((unit) => searchTerm === '' || unit.description.toLowerCase().includes(searchTerm.toLowerCase()) || unit.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    return units.filter((unit) => searchTerm === '' || unit.description?.toLowerCase().includes(searchTerm.toLowerCase()) || unit.name?.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [units, searchTerm]);
 
   // Paginação
@@ -46,14 +46,14 @@ const UnidadeMedidaPage: React.FC = () => {
 
     // Verificar se já existe uma unidade com a mesma descrição ou complemento
     const existingUnit = units.find(
-      (unit) => unit.id !== editingItem?.id && (unit.description.toLowerCase() === formData.descricao.toLowerCase() || unit.name.toLowerCase() === formData.complemento.toLowerCase())
+      (unit) => unit.id !== editingItem?.id && (unit.description?.toLowerCase() === formData.descricao.toLowerCase() || unit.name?.toLowerCase() === formData.complemento.toLowerCase())
     );
 
     if (existingUnit) {
-      if (existingUnit.description.toLowerCase() === formData.descricao.toLowerCase()) {
+      if (existingUnit.description?.toLowerCase() === formData.descricao.toLowerCase()) {
         newErrors.descricao = 'Já existe uma unidade com esta descrição';
       }
-      if (existingUnit.name.toLowerCase() === formData.complemento.toLowerCase()) {
+      if (existingUnit.name?.toLowerCase() === formData.complemento.toLowerCase()) {
         newErrors.complemento = 'Já existe uma unidade com este complemento';
       }
     }
@@ -65,7 +65,7 @@ const UnidadeMedidaPage: React.FC = () => {
   const handleOpenModal = (unit?: UnidadeMedida) => {
     if (unit) {
       setEditingItem(unit);
-      setFormData({ descricao: unit.description, complemento: unit.name });
+      setFormData({ descricao: unit.description || '', complemento: unit.name || '' });
     } else {
       setEditingItem(null);
       setFormData({ descricao: '', complemento: '' });
@@ -86,7 +86,7 @@ const UnidadeMedidaPage: React.FC = () => {
 
     try {
       if (editingItem) {
-        await unidadesService.atualizar(editingItem.id, {
+        await unidadesService.atualizar(editingItem.id!, {
           description: formData.descricao,
           name: formData.complemento,
         });
@@ -106,7 +106,7 @@ const UnidadeMedidaPage: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
       try {
         await unidadesService.excluir(id);
@@ -186,7 +186,7 @@ const UnidadeMedidaPage: React.FC = () => {
                         <button onClick={() => handleOpenModal(unit)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button onClick={() => handleDelete(unit.id)} className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded" title="Excluir">
+                        <button onClick={() => handleDelete(unit.id!)} className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded" title="Excluir">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>

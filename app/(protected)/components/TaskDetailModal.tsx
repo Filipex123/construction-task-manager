@@ -1,4 +1,5 @@
-import { AlertCircle, Building2, Calendar, CheckCircle, Clock, DollarSign, Package, User, X } from 'lucide-react';
+import { formatDateStringtoView, formatDatetimeStringtoView } from '@/app/utils/dateUtils';
+import { AlertCircle, Building2, Calendar, CheckCircle, Clock, DollarSign, Loader, Package, Ruler, User, X } from 'lucide-react';
 import React from 'react';
 import { Tarefa } from '../../types';
 
@@ -18,19 +19,17 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
     }).format(value);
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Não informado';
-    return new Intl.DateTimeFormat('pt-BR').format(new Date(dateString));
-  };
-
   const statusConfig = {
     PENDENTE: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: Clock },
-    EM_ANDAMENTO: { label: 'Em Andamento', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: AlertCircle },
+    EM_ANDAMENTO: { label: 'Em Andamento', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: Loader },
     PAGO: { label: 'Pago', color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle },
+    MEDIDO: { label: 'Pago', color: 'bg-green-100 text-green-800 border-green-200', icon: Ruler },
     ATRASADO: { label: 'Atrasado', color: 'bg-red-100 text-red-800 border-red-200', icon: AlertCircle },
+    RETIDO: { label: 'Retido', color: 'bg-red-100 text-red-800 border-red-200', icon: AlertCircle },
   };
 
-  const StatusIcon = statusConfig[tarefa.paymentStatus].icon;
+  const StatusPaymentIcon = statusConfig[tarefa.paymentStatus].icon;
+  const StatusMeasureIcon = statusConfig[tarefa.measurementStatus].icon;
 
   const InfoItem = ({ icon: Icon, label, value, highlight = false }: { icon: React.ElementType; label: string; value: string | number | null; highlight?: boolean }) => (
     <div className={`p-4 rounded-lg border ${highlight ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}`}>
@@ -66,11 +65,18 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
               <X className="w-6 h-6" />
             </button>
           </div>
+          <div className="flex flex-row gap-4">
+            {/* Status Badge */}
+            <div className="mt-3 flex items-center space-x-2">
+              <StatusPaymentIcon className="w-5 h-5" />
+              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${statusConfig[tarefa.paymentStatus].color}`}>{statusConfig[tarefa.paymentStatus].label}</span>
+            </div>
 
-          {/* Status Badge */}
-          <div className="mt-3 flex items-center space-x-2">
-            <StatusIcon className="w-5 h-5" />
-            <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${statusConfig[tarefa.paymentStatus].color}`}>{statusConfig[tarefa.paymentStatus].label}</span>
+            {/* Status Badge */}
+            <div className="mt-3 flex items-center space-x-2">
+              <StatusMeasureIcon className="w-5 h-5" />
+              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${statusConfig[tarefa.measurementStatus].color}`}>{statusConfig[tarefa.measurementStatus].label}</span>
+            </div>
           </div>
         </div>
 
@@ -100,7 +106,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <InfoItem icon={DollarSign} label="Status Pagamento" value={tarefa.paymentStatus} />
                 <InfoItem icon={Package} label="Status Medidor" value={tarefa.measurementStatus} />
-                <InfoItem icon={Calendar} label="Data Medição" value={formatDate(tarefa.measurementDate ?? '')} />
+                <InfoItem icon={Calendar} label="Data Medição" value={formatDateStringtoView(tarefa.measurementDate ?? '')} />
                 <InfoItem icon={Building2} label="Empreiteiro" value={tarefa.contractor.name!} />
               </div>
             </section>
@@ -112,8 +118,8 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <span>Cronograma de Pagamento</span>
               </h3>
               <div className="grid grid-cols-1 gap-4">
-                <InfoItem icon={Calendar} label="Data Prevista para Pagamento" value={formatDate(tarefa.dueDate)} highlight />
-                <InfoItem icon={CheckCircle} label="Data do Pagamento Realizado" value={tarefa.paymentDate ? formatDate(tarefa.paymentDate) : 'Não realizado'} />
+                <InfoItem icon={Calendar} label="Data Prevista para Pagamento" value={formatDatetimeStringtoView(tarefa.dueDate)} highlight />
+                <InfoItem icon={CheckCircle} label="Data do Pagamento Realizado" value={tarefa.paymentDate ? formatDateStringtoView(tarefa.paymentDate) : 'Não realizado'} />
               </div>
             </section>
 
@@ -124,8 +130,8 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <span>Informações do Sistema</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <InfoItem icon={Calendar} label="Data de Criação" value={formatDate(tarefa.createdAt!)} />
-                <InfoItem icon={Calendar} label="Data de Atualização" value={formatDate(tarefa.updatedAt!)} />
+                <InfoItem icon={Calendar} label="Data de Criação" value={formatDatetimeStringtoView(tarefa.createdAt!)} />
+                <InfoItem icon={Calendar} label="Data de Atualização" value={formatDatetimeStringtoView(tarefa.updatedAt!)} />
                 <div className="sm:col-span-2">
                   <InfoItem icon={User} label="Usuário Última Atualização" value={tarefa.updatedBy ?? 'system'} />
                 </div>

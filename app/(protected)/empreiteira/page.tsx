@@ -21,10 +21,9 @@ const EmpreiteiraPage: React.FC = () => {
   // Filtrar dados
   const filteredData = useMemo(() => {
     return contractors.filter(
-      (contractor) => searchTerm === '' || contractor.description.toLowerCase().includes(searchTerm.toLowerCase()) || contractor.name.toLowerCase().includes(searchTerm.toLowerCase())
+      (contractor) => searchTerm === '' || contractor.description?.toLowerCase().includes(searchTerm.toLowerCase()) || contractor.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [contractors, searchTerm]);
-
 
   // Paginação
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -44,14 +43,14 @@ const EmpreiteiraPage: React.FC = () => {
 
     // Verificar se já existe uma unidade com a mesma descrição ou complemento
     const existingUnit = contractors.find(
-      (unit) => unit.id !== editingItem?.id && (unit.description.toLowerCase() === formData.descricao.toLowerCase() || unit.name.toLowerCase() === formData.nome.toLowerCase())
+      (unit) => unit.id !== editingItem?.id && (unit.description?.toLowerCase() === formData.descricao.toLowerCase() || unit.name?.toLowerCase() === formData.nome.toLowerCase())
     );
 
     if (existingUnit) {
-      if (existingUnit.description.toLowerCase() === formData.descricao.toLowerCase()) {
+      if (existingUnit.description?.toLowerCase() === formData.descricao.toLowerCase()) {
         newErrors.descricao = 'Já existe uma unidade com esta descrição';
       }
-      if (existingUnit.name.toLowerCase() === formData.nome.toLowerCase()) {
+      if (existingUnit.name?.toLowerCase() === formData.nome.toLowerCase()) {
         newErrors.nome = 'Já existe uma unidade com este nome';
       }
     }
@@ -63,7 +62,7 @@ const EmpreiteiraPage: React.FC = () => {
   const handleOpenModal = (unit?: Empreiteira) => {
     if (unit) {
       setEditingItem(unit);
-      setFormData({ descricao: unit.description, nome: unit.name });
+      setFormData({ descricao: unit.description || '', nome: unit.name || '' });
     } else {
       setEditingItem(null);
       setFormData({ descricao: '', nome: '' });
@@ -81,10 +80,10 @@ const EmpreiteiraPage: React.FC = () => {
 
   const handleSave = async () => {
     if (!validateForm()) return;
-  
+
     try {
       if (editingItem) {
-        await empreiteraService.atualizar(editingItem.id, {
+        await empreiteraService.atualizar(editingItem.id!, {
           description: formData.descricao,
           name: formData.nome,
         });
@@ -92,11 +91,10 @@ const EmpreiteiraPage: React.FC = () => {
         await empreiteraService.criar({
           description: formData.descricao,
           name: formData.nome,
-          entity: '',
-          cnpj: ''
+          cnpj: '',
         });
       }
-  
+
       const data = await empreiteraService.listar();
       setContractors(data);
       handleCloseModal();
@@ -106,11 +104,10 @@ const EmpreiteiraPage: React.FC = () => {
     }
   };
 
-
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id?: number) => {
     if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
       try {
-        await empreiteraService.excluir(id);
+        await empreiteraService.excluir(id!);
         const data = await empreiteraService.listar();
         setContractors(data);
       } catch (error) {
@@ -128,19 +125,19 @@ const EmpreiteiraPage: React.FC = () => {
     setTitle('Cadastro de Empreiteiras');
     setSubtitle('Empreiteiras');
     setDescription('Cadastro e Controle das Empreiteiras parceiras');
-  
-      const carregar = async () => {
-        try {        
-          const data = await empreiteraService.listar();               
-          setContractors(data);
-        } catch (error) {
-          console.error(error);
-          alert('Erro ao carregar unidades.');
-        }
-      };
-  
-      carregar();
-    }, []);
+
+    const carregar = async () => {
+      try {
+        const data = await empreiteraService.listar();
+        setContractors(data);
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao carregar unidades.');
+      }
+    };
+
+    carregar();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -282,7 +279,7 @@ const EmpreiteiraPage: React.FC = () => {
             </div>
 
             <div className="p-6 space-y-4">
-               <div>
+              <div>
                 <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-2">
                   Nome *
                 </label>
@@ -313,7 +310,7 @@ const EmpreiteiraPage: React.FC = () => {
                   placeholder="Ex: Construtora responsavel por realizar fundação e baldrame"
                 />
                 {errors.descricao && <p className="mt-1 text-sm text-red-600">{errors.descricao}</p>}
-              </div>             
+              </div>
             </div>
 
             <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200">

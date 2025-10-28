@@ -1,67 +1,50 @@
 'use client';
 import { usePageTitle } from '@/app/context/PageTitle.context';
+import { obraService } from '@/app/services/obraService';
+import { tarefaService } from '@/app/services/tarefaService';
 import React, { useMemo, useState } from 'react';
-import { mockObras as initialMockObras } from '../../mockData';
-import { Obra, Tarefa } from '../../types';
+import { MeasureTarefa, Obra } from '../../types';
 import { SearchBar } from '.././components/SearchBar';
-import { MedidaCard } from '../components/MeasureCard';
+import { Loader } from '../components/Loader';
+import { MeasureCard } from '../components/MeasureCard';
 
 function Medicao() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [obras, setObras] = useState<Obra[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [obras, setObras] = useState<Obra[]>(initialMockObras);
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
 
   const filteredObras = useMemo(() => {
-    return obras.filter((obra) => obra.name.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    return obras.filter((obra) => obra.name?.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description?.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
-  const handleToggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const handleEdit = (obraId: string, tarefaId: string, updated: Omit<Tarefa, 'id'>) => {
-    setObras((prevObras) =>
-      prevObras.map((obra) => {
-        if (obra.id !== obraId) return obra;
-        return {
-          ...obra,
-          tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, ...updated } : t)),
-        };
-      })
-    );
-  };
-
-  const handleAddTask = (obraId: string, newTask: Omit<Tarefa, 'id'>) => {
-    setObras((prevObras) =>
-      prevObras.map((obra) => {
-        if (obra.id === obraId) {
-          const taskId = `${obraId}-${Date.now()}`;
-          const taskWithId: Tarefa = { ...newTask, id: taskId };
-          return {
-            ...obra,
-            tarefas: [...obra.tarefas, taskWithId],
-          };
-        }
-        return obra;
-      })
-    );
-  };
-
-  ///Revisar logica deve realizar a medição dos campos filtrados
-  const handlePay = (tarefaId: string) => {
-    setObras((prev) =>
-      prev.map((obra) => ({
-        ...obra,
-        tarefas: obra.tarefas.map((t) => (t.id === tarefaId ? { ...t, paymentStatus: 'pago' } : t)),
-      }))
-    );
+  const handleMeasure = async (taskId: number, measureFields: MeasureTarefa) => {
+    try {
+      await tarefaService.atualizar(taskId, measureFields);
+      console.log(`Processando medicao para a tarefa com ID: ${taskId}`);
+    } catch (error) {
+      console.error('Erro ao processar o medicao:', error);
+    }
   };
 
   React.useEffect(() => {
     setTitle('Medição');
     setSubtitle('Gerenciar Medição');
     setDescription('Controle e monitore todas as atividades das suas obras');
+
+    const carregarObras = async () => {
+      setIsLoading(true);
+      try {
+        const data = await obraService.listar();
+        setObras(data.items || []);
+      } catch (error) {
+        console.error('Erro ao carregar obras:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    carregarObras();
   }, []);
 
   return (
@@ -70,7 +53,9 @@ function Medicao() {
         <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
       </div>
 
-      {filteredObras.length === 0 ? (
+      {isLoading && <Loader message={'Carregando Obras'} />}
+
+      {!isLoading && filteredObras.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-gray-400 text-lg mb-2">Nenhuma obra encontrada</div>
           <p className="text-gray-500">{searchTerm ? 'Tente ajustar sua pesquisa' : 'Não há obras cadastradas'}</p>
@@ -78,7 +63,7 @@ function Medicao() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <MedidaCard key={obra.id} obra={obra} onUpdateTask={handleEdit} onPay={handlePay} />
+            <MeasureCard key={obra.id} obra={obra} onMeasure={handleMeasure} />
           ))}
         </div>
       )}

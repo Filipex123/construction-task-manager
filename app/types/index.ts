@@ -17,6 +17,14 @@ export interface Tarefa {
   updatedBy?: string;
 }
 
+export interface MeasureTarefa {
+  quantityExecuted: number;
+  quantity: number;
+  measurementStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'MEDIDO' | 'RETIDO';
+  measurementDate?: string;
+  updatedBy?: string;
+}
+
 export interface AddTarefaRequest {
   quantity: number;
   totalAmount: number;

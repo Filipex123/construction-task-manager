@@ -119,10 +119,6 @@ const AtividadesPage: React.FC = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  };
-
   React.useEffect(() => {
     setTitle('Cadastro de Atividades');
     setSubtitle('Atividades');
