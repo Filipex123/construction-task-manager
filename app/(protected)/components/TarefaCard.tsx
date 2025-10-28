@@ -9,7 +9,7 @@ import { TaskTable } from './TaskTable';
 
 interface TarefaCardProps {
   obra: Obra;
-  onPay?: (tarefaId: number) => Promise<void>;
+  onPay: (tarefaId: number) => Promise<void>;
 }
 
 export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
@@ -27,22 +27,20 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
   const [pageSize] = React.useState(10);
   const [totalItems, setTotalItems] = React.useState(0);
 
-  const filterPayableTasks = () => {
+  const filterPayableTasks = useCallback(() => {
     return filteredTarefas.filter((t) => t.paymentStatus !== PaymentStatusEnum.PAGO && t.paymentStatus !== PaymentStatusEnum.EM_ANDAMENTO);
-  };
+  }, [filteredTarefas]);
 
   const fetchTasks = React.useCallback(
     async (page = 1, incomingFilters: Partial<TarefaFilterParams> = {}) => {
       setIsLoading(true);
       try {
-        // ajustar chamada de acordo com sua tarefaService API
         const params = {
           page,
           pageSize,
           ...incomingFilters,
         };
         const data = await tarefaService.listar(obra.id!, params);
-        console.log('Tarefas carregadas:', data.items);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
         setTotalItems(typeof data.total === 'number' ? data.total : Array.isArray(data.items) ? data.items.length : 0);
         setHasLoadedTasks(true);
@@ -62,7 +60,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
     if (!isExpanded && !hasLoadedTasks) {
       setIsExpanded(true);
       // disparar fetch em background sem await para não bloquear UI
-      fetchTasks(1, filters).catch((err) => {
+      await fetchTasks(1, filters).catch((err) => {
         console.error('Erro ao carregar tarefas no background:', err);
       });
       return;
@@ -165,11 +163,15 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
     [fetchTasks, currentPage, filters]
   );
 
-  const handleBatchPayment = useCallback(async () => {
+  const handleBatchPayment = async () => {
     if (!onPay) return;
+
     try {
       setIsLoading(true);
-      await Promise.all(filterPayableTasks().map((tarefa) => onPay(tarefa.id)));
+      for (const tarefa of filteredTarefas) {
+        await onPay(tarefa.id);
+        await new Promise((res) => setTimeout(res, 100));
+      }
       await fetchTasks(1, filters);
       setCurrentPage(1);
     } catch (err) {
@@ -177,7 +179,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [fetchTasks, filters, onPay]);
+  };
 
   const handlePayment = useCallback(
     async (taskId: number) => {
@@ -293,34 +295,33 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
       {isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
           {/* Summary */}
-          {onPay && (
-            <div className="px-8 py-5 bg-gray-50 border-b">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div className="mb-2 sm:mb-0">
-                  <span className="text-sm text-gray-600">Valor Total:</span>
-                  <span className="ml-2 text-xl font-bold text-green-600">{formatCurrency(totalValue)}</span>
-                </div>
-                <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
-                  <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'PAGO').length} pago</span>
-                    <div className="w-full h-1 bg-green-500 rounded-full" />
-                  </span>
-                  <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'EM_ANDAMENTO').length} em andamento</span>
-                    <div className="w-full h-1 bg-blue-500 rounded-full" />
-                  </span>
-                  <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'PENDENTE').length} pendente</span>
-                    <div className="w-full h-1 bg-yellow-500 rounded-full" />
-                  </span>
-                  <span className="flex flex-col items-center space-y-1">
-                    <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'ATRASADO').length} atrasado</span>
-                    <div className="w-full h-1 bg-red-500 rounded-full" />
-                  </span>
-                </div>
+
+          <div className="px-8 py-5 bg-gray-50 border-b">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-2 sm:mb-0">
+                <span className="text-sm text-gray-600">Valor Total:</span>
+                <span className="ml-2 text-xl font-bold text-green-600">{formatCurrency(totalValue)}</span>
+              </div>
+              <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
+                <span className="flex flex-col items-center space-y-1">
+                  <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'PAGO').length} pago</span>
+                  <div className="w-full h-1 bg-green-500 rounded-full" />
+                </span>
+                <span className="flex flex-col items-center space-y-1">
+                  <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'EM_ANDAMENTO').length} em andamento</span>
+                  <div className="w-full h-1 bg-blue-500 rounded-full" />
+                </span>
+                <span className="flex flex-col items-center space-y-1">
+                  <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'PENDENTE').length} pendente</span>
+                  <div className="w-full h-1 bg-yellow-500 rounded-full" />
+                </span>
+                <span className="flex flex-col items-center space-y-1">
+                  <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'ATRASADO').length} atrasado</span>
+                  <div className="w-full h-1 bg-red-500 rounded-full" />
+                </span>
               </div>
             </div>
-          )}
+          </div>
 
           <ObraFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} />
 

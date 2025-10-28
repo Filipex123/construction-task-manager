@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { IdName, Tarefa } from '../../types';
 
 export type TarefaFilterParams = {
-  status?: string[];
+  paymentStatus?: string[];
   location?: string[]; // agora contêm ids
   contractor?: string[];
   activity?: string[];
@@ -126,7 +126,7 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ tarefas, onFilter
   // Função que monta e retorna o objeto de filtros (sem emitir)
   const buildFiltersObject = (status: string[], locais: IdName[], empreiteiras: IdName[], atividades: IdName[], dataCriacao: string, dataLimite: string): TarefaFilterParams => {
     return {
-      status: status.length ? status : undefined,
+      paymentStatus: status.length ? status : undefined,
       location: locais.length ? locais.map((l) => l.id) : undefined,
       contractor: empreiteiras.length ? empreiteiras.map((e) => e.id) : undefined,
       activity: atividades.length ? atividades.map((a) => a.id) : undefined,
