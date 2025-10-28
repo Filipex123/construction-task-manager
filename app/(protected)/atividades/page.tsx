@@ -5,9 +5,13 @@ import { atividadesService } from '@/app/services/atividadesService';
 import { Atividades } from '@/app/types';
 import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
+import { Loader } from '../components/Loader';
 import { SearchBar } from '../components/SearchBar';
+import { ConfirmModal } from '../components/modals/ConfirmModal';
 
 const AtividadesPage: React.FC = () => {
+  const { setTitle, setSubtitle, setDescription } = usePageTitle();
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,13 +19,10 @@ const AtividadesPage: React.FC = () => {
   const [editingItem, setEditingItem] = useState<Atividades | null>(null);
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [errors, setErrors] = useState({ descricao: '', complemento: '' });
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { setTitle, setSubtitle, setDescription } = usePageTitle();
   const [activities, setActivities] = useState<Atividades[]>([]);
-
-  const handleToggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const [isLoading, setIsLoading] = useState<Boolean>(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [selectedItemDelete, setSelectedItemDelete] = useState<number | null>(null);
 
   // Filtrar dados
   const filteredData = useMemo(() => {
@@ -84,6 +85,7 @@ const AtividadesPage: React.FC = () => {
   const handleSave = async () => {
     if (!validateForm()) return;
 
+    setIsLoading(true);
     try {
       if (editingItem) {
         await atividadesService.atualizar(Number(editingItem.id), {
@@ -103,18 +105,23 @@ const AtividadesPage: React.FC = () => {
     } catch (error) {
       console.error(error);
       alert('Erro ao salvar unidade.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
+  const handleDelete = async (id: number | null) => {
+    if (id) {
       try {
+        setIsLoading(true);
         await atividadesService.excluir(id);
         const data = await atividadesService.listar();
         setActivities(data);
       } catch (error) {
         console.error(error);
         alert('Erro ao excluir unidade.');
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -125,12 +132,15 @@ const AtividadesPage: React.FC = () => {
     setDescription('Cadastro e Controle das Atividades');
 
     const carregar = async () => {
+      setIsLoading(true);
       try {
         const data = await atividadesService.listar();
         setActivities(data);
       } catch (error) {
         console.error(error);
         alert('Erro ao carregar unidades.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -160,37 +170,48 @@ const AtividadesPage: React.FC = () => {
         {/* Tabela */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Complemento</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Criação</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedData.map((act) => (
-                  <tr key={act.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{act.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{act.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.createdAt}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex space-x-2">
-                        <button onClick={() => handleOpenModal(act)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
-                          <Edit className="h-4 w-4" />
-                        </button>
-                        <button onClick={() => handleDelete(Number(act.id))} className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded" title="Excluir">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
+            {isLoading ? (
+              <Loader message={'Carregando Atividades...'} />
+            ) : (
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Complemento</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Criação</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {paginatedData.map((act) => (
+                    <tr key={act.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{act.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.description}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{act.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.createdAt}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div className="flex space-x-2">
+                          <button onClick={() => handleOpenModal(act)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedItemDelete(Number(act.id));
+                              setIsConfirmModalOpen(true);
+                            }}
+                            className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded"
+                            title="Excluir"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
 
           {/* Paginação */}
@@ -286,7 +307,7 @@ const AtividadesPage: React.FC = () => {
                     id="descricao"
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, descricao: e.target.value }))}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.descricao ? 'border-red-300' : 'border-gray-300'
                     }`}
@@ -303,7 +324,7 @@ const AtividadesPage: React.FC = () => {
                     id="complemento"
                     type="text"
                     value={formData.description}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, complemento: e.target.value }))}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.descricao ? 'border-red-300' : 'border-gray-300'
                     }`}
@@ -326,6 +347,16 @@ const AtividadesPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onConfirm={() => {
+          handleDelete(selectedItemDelete);
+          setIsConfirmModalOpen(false);
+        }}
+        onCancel={() => setIsConfirmModalOpen(false)}
+        title={'Excluir Atividade'}
+      />
     </>
   );
 };
