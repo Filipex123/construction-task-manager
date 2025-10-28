@@ -5,7 +5,9 @@ import { empreiteraService } from '@/app/services/empreiteiraService';
 import { Empreiteira } from '@/app/types';
 import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
+import { Loader } from '../components/Loader';
 import { SearchBar } from '../components/SearchBar';
+import { ConfirmModal } from '../components/modals/ConfirmModal';
 
 const EmpreiteiraPage: React.FC = () => {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
@@ -17,6 +19,9 @@ const EmpreiteiraPage: React.FC = () => {
   const [formData, setFormData] = useState({ descricao: '', nome: '' });
   const [errors, setErrors] = useState({ descricao: '', nome: '' });
   const [contractors, setContractors] = useState<Empreiteira[]>([]);
+  const [isLoading, setIsLoading] = useState<Boolean>(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [selectedItemDelete, setSelectedItemDelete] = useState<number | null>(null);
 
   // Filtrar dados
   const filteredData = useMemo(() => {
@@ -80,7 +85,7 @@ const EmpreiteiraPage: React.FC = () => {
 
   const handleSave = async () => {
     if (!validateForm()) return;
-
+    setIsLoading(true);
     try {
       if (editingItem) {
         await empreiteraService.atualizar(editingItem.id!, {
@@ -101,24 +106,25 @@ const EmpreiteiraPage: React.FC = () => {
     } catch (error) {
       console.error(error);
       alert('Erro ao salvar unidade.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleDelete = async (id?: number) => {
-    if (window.confirm('Tem certeza que deseja excluir esta unidade de medida?')) {
+  const handleDelete = async (id: number | null) => {
+    if (id) {
       try {
+        setIsLoading(true);
         await empreiteraService.excluir(id!);
         const data = await empreiteraService.listar();
         setContractors(data);
       } catch (error) {
         console.error(error);
         alert('Erro ao excluir unidade.');
+      } finally {
+        setIsLoading(false);
       }
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
   React.useEffect(() => {
@@ -127,12 +133,15 @@ const EmpreiteiraPage: React.FC = () => {
     setDescription('Cadastro e Controle das Empreiteiras parceiras');
 
     const carregar = async () => {
+      setIsLoading(true);
       try {
         const data = await empreiteraService.listar();
         setContractors(data);
       } catch (error) {
         console.error(error);
         alert('Erro ao carregar unidades.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -161,37 +170,49 @@ const EmpreiteiraPage: React.FC = () => {
       {/* Tabela */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Criação</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedData.map((unit) => (
-                <tr key={unit.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-600">{unit.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.createdAt}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex space-x-2">
-                      <button onClick={() => handleOpenModal(unit)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button onClick={() => handleDelete(unit.id)} className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded" title="Excluir">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
+          {isLoading ? (
+            <Loader message={'Carregando Empreiteiras...'} />
+          ) : (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Criação</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {paginatedData.map((contr) => (
+                  <tr key={contr.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{contr.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-600">{contr.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contr.description}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contr.createdAt}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div className="flex space-x-2">
+                        <button onClick={() => handleOpenModal(contr)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedItemDelete(Number(contr.id));
+                            setIsConfirmModalOpen(true);
+                          }}
+                          className="text-red-600 hover:text-red-900 transition-colors p-1 hover:bg-red-50 rounded"
+                          title="Excluir"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          ;
         </div>
 
         {/* Paginação */}
@@ -325,6 +346,16 @@ const EmpreiteiraPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onConfirm={() => {
+          handleDelete(selectedItemDelete);
+          setIsConfirmModalOpen(false);
+        }}
+        onCancel={() => setIsConfirmModalOpen(false)}
+        title={'Excluir Empreiteira'}
+      />
     </div>
   );
 };
