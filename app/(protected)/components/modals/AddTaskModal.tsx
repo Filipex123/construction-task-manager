@@ -1,6 +1,6 @@
 import { Building2, DollarSign, Edit3, Hash, MapPin, Package, Plus, Wrench, X } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Atividades, Empreiteira, Local, MeasurementStatusEnum, PaymentStatusEnum, Tarefa, UnidadeMedida } from '../../types';
+import { Atividades, Empreiteira, Local, MeasurementStatusEnum, PaymentStatusEnum, Tarefa, UnidadeMedida } from '../../../types';
 
 import { atividadesService } from '@/app/services/atividadesService';
 import { empreiteraService } from '@/app/services/empreiteiraService';
@@ -14,7 +14,7 @@ interface AddTaskModalProps {
   obraId: number;
   mode?: 'add' | 'edit';
   initialTask?: Tarefa | null;
-  onUpdateTask?: (tarefaId: number, task: Omit<Tarefa, 'id'>) => void;
+  onUpdateTask?: (tarefaId: number, task: AddTarefaFormData) => void;
 }
 
 export type AddTarefaFormData = {

@@ -1,7 +1,7 @@
 import { formatDateStringtoView, formatDatetimeStringtoView } from '@/app/utils/dateUtils';
 import { AlertCircle, Building2, Calendar, CheckCircle, Clock, DollarSign, Loader, Package, Ruler, User, X } from 'lucide-react';
 import React from 'react';
-import { Tarefa } from '../../types';
+import { Tarefa } from '../../../types';
 
 interface TaskDetailModalProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
     PENDENTE: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: Clock },
     EM_ANDAMENTO: { label: 'Em Andamento', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: Loader },
     PAGO: { label: 'Pago', color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle },
-    MEDIDO: { label: 'Pago', color: 'bg-green-100 text-green-800 border-green-200', icon: Ruler },
+    MEDIDO: { label: 'Medido', color: 'bg-green-100 text-green-800 border-green-200', icon: Ruler },
     ATRASADO: { label: 'Atrasado', color: 'bg-red-100 text-red-800 border-red-200', icon: AlertCircle },
     RETIDO: { label: 'Retido', color: 'bg-red-100 text-red-800 border-red-200', icon: AlertCircle },
   };

@@ -6,7 +6,7 @@ import { tarefaService } from '../services/tarefaService';
 import { Obra, PaymentStatusEnum } from '../types';
 import { Loader } from './components/Loader';
 import { SearchBar } from './components/SearchBar';
-import { TarefaCard } from './components/TarefaCard';
+import { PaymentCard } from './components/cards/PaymentCard';
 
 function Home() {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
@@ -64,7 +64,7 @@ function Home() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <TarefaCard key={obra.id} obra={obra} onPay={handlePay} />
+            <PaymentCard key={obra.id} obra={obra} onPay={handlePay} />
           ))}
         </div>
       )}

@@ -1,6 +1,6 @@
 import { Building2, CheckCircle, DollarSign, Hash, MapPin, Package, X } from 'lucide-react';
 import React from 'react';
-import { Tarefa } from '../../types';
+import { Tarefa } from '../../../types';
 
 interface SinglePaymentModalProps {
   isOpen: boolean;

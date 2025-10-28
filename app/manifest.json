@@ -7,7 +7,7 @@
   "background_color": "#ffffff",
   "icons": [
     {
-      "src": "../public/logo_construtora-vital.png",
+      "src": "logo_construtora-vital.png",
       "sizes": "240x240",
       "type": "image/png"
     }

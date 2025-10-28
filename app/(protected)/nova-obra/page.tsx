@@ -5,9 +5,9 @@ import { Obra } from '@/app/types';
 import { Plus } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Loader } from '../components/Loader';
-import { LocalCard } from '../components/LocalCard';
 import { SearchBar } from '../components/SearchBar';
-import { SimpleModal } from '../components/SimpleModal';
+import { LocalCard } from '../components/cards/LocalCard';
+import { SimpleModal } from '../components/modals/SimpleModal';
 
 function LocalPage() {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();

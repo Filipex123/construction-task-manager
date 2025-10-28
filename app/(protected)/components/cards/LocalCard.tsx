@@ -1,10 +1,10 @@
 import { localService } from '@/app/services/localService';
+import { Local, Obra } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, Edit3, Loader2, Plus, Trash2 } from 'lucide-react';
 import React from 'react';
-import { Local, Obra } from '../../types';
-import { ConfirmModal } from './ConfirmModal';
-import { LocalTable } from './LocalTable';
-import { SimpleModal } from './SimpleModal';
+import { ConfirmModal } from '../modals/ConfirmModal';
+import { SimpleModal } from '../modals/SimpleModal';
+import { LocalTable } from '../tables/LocalTable';
 
 interface LocalCardProps {
   obra: Obra;
