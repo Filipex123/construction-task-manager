@@ -1,4 +1,4 @@
-import { Local, Tarefa } from '@/app/types';
+import { Local } from '@/app/types';
 import { ChevronLeft, ChevronRight, Edit3, Grid, List, Trash2 } from 'lucide-react';
 import React from 'react';
 
@@ -12,10 +12,6 @@ type MobileView = 'table' | 'cards' | 'list';
 
 export const LocalTable: React.FC<LocalTableProps> = ({ locais, onEdit, onDelete }) => {
   const [mobileView, setMobileView] = React.useState<MobileView>('cards');
-  const [selectedTask, setSelectedTask] = React.useState<Tarefa | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = React.useState(false);
-  const [taskToPay, setTaskToPay] = React.useState<Tarefa | null>(null);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [isMobile, setIsMobile] = React.useState(false);
 
@@ -45,11 +41,6 @@ export const LocalTable: React.FC<LocalTableProps> = ({ locais, onEdit, onDelete
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-  };
-
-  const handleCloseDetailModal = () => {
-    setIsDetailModalOpen(false);
-    setSelectedTask(null);
   };
 
   const ActionButtons = ({ local: local }: { local: Local }) => (

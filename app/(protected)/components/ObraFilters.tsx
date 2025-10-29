@@ -1,7 +1,7 @@
 import { formatDateForInput } from '@/app/utils/dateUtils';
 import { ChevronDown, ChevronUp, Filter, Plus, Search, X } from 'lucide-react';
 import React, { useState } from 'react';
-import { IdName, Tarefa } from '../../types';
+import { IdName, LastKeyPagination, Tarefa } from '../../types';
 
 export type TarefaFilterParams = {
   paymentStatus?: string[];
@@ -12,6 +12,7 @@ export type TarefaFilterParams = {
   dueDate?: string; // YYYY-MM-DD
   page?: number;
   pageSize?: number;
+  lastEvaluatedKey?: LastKeyPagination;
 };
 
 interface ObraFiltersProps {

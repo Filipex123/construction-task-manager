@@ -12,5 +12,5 @@ export function buildQueryString(params: TarefaFilterParams): string {
       return `${encodeURIComponent(key)}=${encodeURIComponent(value.toString())}`;
     });
 
-  return queryEntries.length > 0 ? `?${queryEntries.join('&')}` : '';
+  return queryEntries.length > 0 ? `${queryEntries.join('&')}` : '';
 }

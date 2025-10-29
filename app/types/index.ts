@@ -41,6 +41,11 @@ export interface AddTarefaRequest {
   fkEmpreiteiro: number;
 }
 
+export interface LastKeyPagination {
+  id: number;
+  entity: string;
+}
+
 export interface Local {
   id?: number;
   name?: string;
@@ -88,9 +93,9 @@ export interface Atividades {
 
 export interface PageableResponse<T> {
   items: T[];
-  total: number;
-  page: number;
-  size: number;
+  count: number;
+  totalCount: number;
+  lastEvaluatedKey?: LastKeyPagination;
 }
 
 export type StatusColor = {

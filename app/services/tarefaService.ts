@@ -19,9 +19,8 @@ export const tarefaService = {
       console.error('Erro ao listar tarefas:', error);
       return {
         items: [],
-        total: 0,
-        page: 0,
-        size: 0,
+        count: 0,
+        totalCount: 0,
       };
     }
   },
@@ -32,8 +31,8 @@ export const tarefaService = {
     return res.json();
   },
 
-  async criar(dados: AddTarefaRequest): Promise<Tarefa> {
-    const res = await fetch(API_URL, {
+  async criar(obraId: number, dados: AddTarefaRequest): Promise<Tarefa> {
+    const res = await fetch(`${API_URL}?idObra=${obraId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dados),
