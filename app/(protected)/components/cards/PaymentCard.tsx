@@ -39,7 +39,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
         };
         const data = await tarefaService.listar(obra.id!, params);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
-        setTotalItems(typeof data.total === 'number' ? data.total : Array.isArray(data.items) ? data.items.length : 0);
+        setTotalItems(typeof data.totalCount === 'number' ? data.totalCount : Array.isArray(data.items) ? data.items.length : 0);
         setHasLoadedTasks(true);
       } catch (error) {
         console.error('Erro ao carregar tarefas:', error);

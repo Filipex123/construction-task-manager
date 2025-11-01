@@ -13,9 +13,8 @@ export const localService = {
       console.error('Erro ao listar locais:', error);
       return {
         items: [],
-        total: 0,
-        page: 0,
-        size: 0,
+        count: 0,
+        totalCount: 0,
       };
     }
   },
