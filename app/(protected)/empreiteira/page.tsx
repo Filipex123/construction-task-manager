@@ -211,8 +211,7 @@ const EmpreiteiraPage: React.FC = () => {
                 ))}
               </tbody>
             </table>
-          )}
-          ;
+          )}          
         </div>
 
         {/* Paginação */}

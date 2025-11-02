@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { IdName, LastKeyPagination, Tarefa } from '../../types';
 
 export type TarefaFilterParams = {
-  paymentStatus?: string[];
+  measurementStatus?: string[];
   location?: string[]; // agora contêm ids
   contractor?: string[];
   activity?: string[];
@@ -15,7 +15,7 @@ export type TarefaFilterParams = {
   lastEvaluatedKey?: LastKeyPagination;
 };
 
-interface ObraFiltersProps {
+interface ObraMeasureFiltersProps {
   tarefas: Tarefa[]; // usado só para listar sugestões (pode ser page ou full list)
   // agora onFilterClick retorna Promise — aguarde no componente de filtros
   onFilterClick: (result: any) => Promise<any>;
@@ -23,19 +23,18 @@ interface ObraFiltersProps {
 
 const statusLabels = {
   PENDENTE: 'Pendente',
-  EM_ANDAMENTO: 'Em Andamento',
-  PAGO: 'Pago',
-  ATRASADO: 'Atrasado',
+  EM_ANDAMENTO: 'Em Andamento',  
+  MEDIDO: 'Medido',
+  RETIDO: 'Retido',
 };
 
 const statusColors = {
   PENDENTE: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   EM_ANDAMENTO: 'bg-blue-100 text-blue-800 border-blue-200 text-center',
-  PAGO: 'bg-green-100 text-green-800 border-green-200',
-  ATRASADO: 'bg-red-100 text-red-800 border-red-200',
+  MEDIDO: 'bg-green-100 text-green-800 border-green-200',  
 };
 
-export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ tarefas, onFilterClick }) => {
+export const ObraMeasureFiltersInner: React.FC<ObraMeasureFiltersProps> = ({ tarefas, onFilterClick }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   // agora armazenamos arrays de objetos {id, name} para exibição, mas enviaremos só ids
@@ -89,7 +88,7 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ tarefas, onFilter
   };
 
   // Extrair valores únicos (como {id,name})
-  const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.paymentStatus)));
+  const uniqueStatus = Array.from(new Set(tarefas.map((t) => t.measurementStatus)));
   const uniqueLocais = (() => {
     const map = new Map<string, IdName>();
     tarefas.forEach((t) => {
@@ -127,7 +126,7 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ tarefas, onFilter
   // Função que monta e retorna o objeto de filtros (sem emitir)
   const buildFiltersObject = (status: string[], locais: IdName[], empreiteiras: IdName[], atividades: IdName[], dataCriacao: string, dataLimite: string): TarefaFilterParams => {
     return {
-      paymentStatus: status.length ? status : undefined,
+      measurementStatus: status.length ? status : undefined,
       location: locais.length ? locais.map((l) => l.id) : undefined,
       contractor: empreiteiras.length ? empreiteiras.map((e) => e.id) : undefined,
       activity: atividades.length ? atividades.map((a) => a.id) : undefined,
@@ -589,7 +588,7 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ tarefas, onFilter
   );
 };
 
-export const ObraFilters = React.memo(ObraFiltersInner, (prev, next) => {
+export const ObraMeasureFilters = React.memo(ObraMeasureFiltersInner, (prev, next) => {
   // avoid re-render if tarefas reference didn't change and callback stable
   if (prev.tarefas === next.tarefas && prev.onFilterClick === next.onFilterClick) return true;
   // fallback to shallow id comparison

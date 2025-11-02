@@ -2,7 +2,7 @@ import { tarefaService } from '@/app/services/tarefaService';
 import { MeasureTarefa, Obra, Tarefa } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
-import { ObraFilters, TarefaFilterParams } from '../ObraFilters';
+import { ObraMeasureFilters, TarefaFilterParams } from '../ObraMeasureFilters';
 import { MeasureTable } from '../tables/MeasureTable';
 
 interface MeasureCardProps {
@@ -183,7 +183,8 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
           </div>
 
           {/* Criar um novo para medicao */}
-          <ObraFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} />
+          <ObraMeasureFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} />
+          
 
           <div className="p-8 relative">
             {/* overlay de loading: aparece por cima do conteúdo sem desmontar o painel */}

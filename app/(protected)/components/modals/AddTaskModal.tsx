@@ -67,9 +67,36 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     if (!formData?.quantity || formData.quantity <= 0) newErrors.quantity = 'Quantidade deve ser maior que zero';
     if (!formData?.totalAmount || formData.totalAmount <= 0) newErrors.totalAmount = 'Valor deve ser maior que zero';
     if (!formData?.contractor?.name?.trim()) newErrors.contractor = 'Empreiteira é obrigatória';
+    if (!formData?.contractor?.name?.trim()) newErrors.unitOfMeasure = 'Unidade de Medida é obrigatória';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+    const getProximaData = (): string => {
+    const hoje = new Date();
+    const dia = hoje.getDate();
+    let ano = hoje.getFullYear();
+    let mes = hoje.getMonth(); // 0 = janeiro
+
+    let diaRetorno: number;
+
+    if (dia >= 1 && dia <= 10) {
+      diaRetorno = 15;
+    } else if (dia >= 11 && dia <= 25) {
+      diaRetorno = 30;
+    } else {
+      diaRetorno = 15;
+      mes++;
+      if (mes > 11) {
+        mes = 0; // janeiro
+        ano++;
+      }
+    }
+
+    const dataFinal = new Date(ano, mes, diaRetorno);
+    return dataFinal.toISOString().split("T")[0]; // formato YYYY-MM-DD
+  };
+
 
   const buildSubmitTask = (): Omit<Tarefa, 'id'> => {
     return {
@@ -82,7 +109,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       paymentStatus: formData.paymentStatus,
       measurementStatus: MeasurementStatusEnum.PENDENTE,
       quantityExecuted: 0,
-      dueDate: formData.dueDate ?? new Date().toISOString().slice(0, 10), // default today if not provided
+      dueDate: formData.dueDate ?? "--/--/----", // default today if not provided
     };
   };
 
@@ -122,7 +149,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       setLoadingOptions(true);
       try {
         const [fLocais, fAtividades, fUnits, fContractors] = await Promise.all([
-          // ajustes: use os métodos reais do seu service; esses nomes são exemplos
+          // chamada do services
           localService?.listar(obraId),
           atividadesService?.listar(),
           unidadesService?.listar(),
@@ -306,7 +333,9 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                       const selected = units.find((u) => String(u.id) === e.target.value) ?? units[0];
                       handleInputChange('unitOfMeasure', selected);
                     }}
-                    className="w-full text-gray-900 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className={`w-full px-3 py-3 text-gray-900 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
+                    errors.unitOfMeasure ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
                   >
                     <option value="" className="text-gray-200">
                       Selecione uma unidade
@@ -317,6 +346,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                       </option>
                     ))}
                   </select>
+                    {errors.unitOfMeasure && <p className="text-red-600 text-sm mt-1">{errors.unitOfMeasure}</p>}
                 </div>
 
                 <div>
@@ -408,7 +438,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
               {/* Due Date (opcional) */}
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Data Limite</label>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Data Vencimento</label>
                 <input
                   type="date"
                   value={formData.dueDate ?? ''}

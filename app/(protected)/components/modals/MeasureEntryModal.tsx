@@ -16,9 +16,9 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
   const title = initialValues ? 'Editar Medição' : 'Nova Medição';
 
   const statusOptions = [
-    { value: 'PENDENTE', label: 'Pendente' },
-    { value: 'EM_ANDAMENTO', label: 'Em Andamento' },
+    { value: 'PENDENTE', label: 'Pendente' },   
     { value: 'MEDIDO', label: 'Medido' },
+    { value: 'EM_ANDAMENTO', label: 'Em Andamento' },
     { value: 'RETIDO', label: 'Retido' },
   ];
 

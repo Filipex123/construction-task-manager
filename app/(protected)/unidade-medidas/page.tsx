@@ -209,8 +209,7 @@ const UnidadeMedidaPage: React.FC = () => {
                   ))}
                 </tbody>
               </table>
-            )}
-            ;
+            )}            
           </div>
 
           {/* Paginação */}

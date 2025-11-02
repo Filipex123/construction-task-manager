@@ -1,4 +1,4 @@
-import { formatDateStringtoView, formatDatetimeStringtoView } from '@/app/utils/dateUtils';
+import { formatDateStringtoView, formatDatetimeStringtoView, formatDateStringtoViewDueDate } from '@/app/utils/dateUtils';
 import { ChevronLeft, ChevronRight, Grid, List, Ruler } from 'lucide-react';
 import React from 'react';
 import { MeasureTarefa, StatusColorMedicao, Tarefa } from '../../../types';
@@ -196,7 +196,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empreiteira</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Criação</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Limite</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Vencimento</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Medição</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
@@ -212,7 +212,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
               <td className="px-4 py-4 text-sm font-medium text-gray-900">{formatCurrency(tarefa.totalAmount)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.contractor.name}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{formatDatetimeStringtoView(tarefa.createdAt)}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{formatDateStringtoView(tarefa.dueDate)}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{formatDateStringtoViewDueDate(tarefa.dueDate)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{formatDateStringtoView(tarefa.measurementDate)}</td>
               <td className="px-4 py-4 text-sm">
                 <span className={`inline-flex  w-[100px] h-[40px] items-center justify-center px-2 py-1 text-xs font-semibold rounded-full text-center ${statusConfig[tarefa.measurementStatus]}`}>

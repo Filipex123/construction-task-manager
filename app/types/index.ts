@@ -10,7 +10,7 @@ export interface Tarefa {
   measurementStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'MEDIDO' | 'RETIDO';
   quantityExecuted: number;
   measurementDate?: string;
-  dueDate: string;
+  dueDate?: string;
   paymentDate?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -20,7 +20,7 @@ export interface Tarefa {
 export interface MeasureTarefa {
   quantityExecuted: number;
   quantity: number;
-  measurementStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'MEDIDO' | 'RETIDO';
+  measurementStatus: 'MEDIDO' | 'PENDENTE' | 'EM_ANDAMENTO' | 'RETIDO' ;
   measurementDate?: string;
   updatedBy?: string;
 }
@@ -129,10 +129,11 @@ export enum PaymentStatusEnum {
 }
 
 export enum MeasurementStatusEnum {
-  MEDIDO = 'MEDIDO',
-  PENDENTE = 'PENDENTE',
-  RETIDO = 'RETIDO',
+ 
+  PENDENTE = 'PENDENTE',  
   EM_ANDAMENTO = 'EM_ANDAMENTO',
+  MEDIDO = 'MEDIDO',
+  RETIDO = 'RETIDO',
 }
 
 export type IdName = { id: string; name: string };
