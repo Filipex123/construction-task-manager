@@ -1,4 +1,4 @@
-import { formatDateStringtoView, formatDatetimeStringtoView, formatDateStringtoViewDueDate } from '@/app/utils/dateUtils';
+import { formatDateStringtoView, formatDateStringtoViewDueDate, formatDatetimeStringtoView } from '@/app/utils/dateUtils';
 import { ChevronLeft, ChevronRight, Grid, List, Ruler } from 'lucide-react';
 import React from 'react';
 import { MeasureTarefa, StatusColorMedicao, Tarefa } from '../../../types';
@@ -369,13 +369,11 @@ const areEqual = (prev: MeasureTableProps, next: MeasureTableProps) => {
     prev.onPageChange === next.onPageChange &&
     prev.onMeasure === next.onMeasure
   ) {
-    console.log('MeasureTable: props are equal, skipping re-render');
     return true;
   }
 
   // Quick length check
   if (prev.tarefas.length !== next.tarefas.length) {
-    console.log('MeasureTable: tarefas length changed, re-rendering');
     return false;
   }
 

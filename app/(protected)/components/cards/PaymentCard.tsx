@@ -1,5 +1,5 @@
 import { tarefaService } from '@/app/services/tarefaService';
-import { Obra, PaymentStatusEnum, Tarefa } from '@/app/types';
+import { LastKeyPagination, Obra, PaymentStatusEnum, Tarefa } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, DollarSign, Loader2 } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import { ObraFilters, TarefaFilterParams } from '../ObraFilters';
@@ -11,17 +11,20 @@ interface PaymentCardProps {
   onPay: (tarefaId: number) => Promise<void>;
 }
 
+const PAGE_SIZE = 10;
+
 export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   const [isBatchPaymentModalOpen, setIsBatchPaymentModalOpen] = React.useState(false);
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState<Tarefa[]>([]);
   const [hasLoadedTasks, setHasLoadedTasks] = React.useState(false);
+  const [lastKey, setLastKey] = React.useState<LastKeyPagination | undefined>();
 
   // server-side pagination / filters
   const [filters, setFilters] = React.useState<Partial<TarefaFilterParams>>({});
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [pageSize] = React.useState(10);
+  const [pageSize] = React.useState(5);
   const [totalItems, setTotalItems] = React.useState(0);
 
   const filterPayableTasks = useCallback(() => {
@@ -29,17 +32,19 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   }, [filteredTarefas]);
 
   const fetchTasks = React.useCallback(
-    async (page = 1, incomingFilters: Partial<TarefaFilterParams> = {}) => {
+    async (page = 1, incomingFilters: Partial<TarefaFilterParams> = {}, lastEvaluatedKey?: LastKeyPagination) => {
       setIsLoading(true);
       try {
         const params = {
           page,
-          pageSize,
+          pageSize: PAGE_SIZE,
+          lastEvaluatedKey: lastEvaluatedKey ? lastEvaluatedKey?.id : undefined,
           ...incomingFilters,
         };
         const data = await tarefaService.listar(obra.id!, params);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
-        setTotalItems(typeof data.totalCount === 'number' ? data.totalCount : Array.isArray(data.items) ? data.items.length : 0);
+        setTotalItems(data.count);
+        setLastKey({ id: data.lastEvaluatedKey?.id!, entity: data.lastEvaluatedKey?.entity! });
         setHasLoadedTasks(true);
       } catch (error) {
         console.error('Erro ao carregar tarefas:', error);
@@ -49,7 +54,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
         setIsLoading(false);
       }
     },
-    [obra.id, pageSize]
+    [obra.id, lastKey, setTotalItems]
   );
 
   const handleToggleExpand = async () => {
@@ -68,9 +73,10 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   // quando filtros mudam (vem do ObraFilters), reset página e buscar
   const handleFilterChange = useCallback(
     (f: Partial<TarefaFilterParams>) => {
+      setLastKey(undefined);
       setFilters(f);
       setCurrentPage(1);
-      return fetchTasks(1, f);
+      return fetchTasks(1, f, undefined);
     },
     [fetchTasks]
   );
@@ -79,7 +85,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   const handlePageChange = useCallback(
     (page: number) => {
       setCurrentPage(page);
-      return fetchTasks(page, filters);
+      return fetchTasks(page, filters, lastKey);
     },
     [fetchTasks, filters]
   );

@@ -236,11 +236,6 @@ export const TaskTableInner: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDe
     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    console.log('total pages: ', totalPages);
-    console.log('totalItems: ', totalItems);
-    console.log('pageSize: ', pageSize);
-
-    // if (totalPages <= 1) return null;
 
     const getVisiblePages = () => {
       const maxVisible = isMobile ? 3 : 5;

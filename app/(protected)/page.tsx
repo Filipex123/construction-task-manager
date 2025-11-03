@@ -36,7 +36,6 @@ function Home() {
       setIsLoading(true);
       try {
         const data = await obraService.listar();
-        console.log('Obras carregadas:', data.items);
         setObras(data.items || []);
       } catch (error) {
         console.error('Erro ao carregar obras:', error);

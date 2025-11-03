@@ -1,5 +1,5 @@
 import { tarefaService } from '@/app/services/tarefaService';
-import { MeasureTarefa, Obra, Tarefa } from '@/app/types';
+import { LastKeyPagination, MeasureTarefa, Obra, Tarefa } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import { ObraMeasureFilters, TarefaFilterParams } from '../ObraMeasureFilters';
@@ -10,11 +10,14 @@ interface MeasureCardProps {
   onMeasure?: (taskId: number, measureFields: MeasureTarefa) => Promise<void>;
 }
 
+const PAGE_SIZE = 10;
+
 export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState<Tarefa[]>([]);
   const [hasLoadedTasks, setHasLoadedTasks] = React.useState(false);
+  const [lastKey, setLastKey] = React.useState<LastKeyPagination | undefined>();
 
   // server-side pagination / filters
   const [filters, setFilters] = React.useState<Partial<TarefaFilterParams>>({});
@@ -28,18 +31,20 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
   };
 
   const fetchTasks = React.useCallback(
-    async (page = 1, incomingFilters: Partial<TarefaFilterParams> = {}) => {
+    async (page = 1, incomingFilters: Partial<TarefaFilterParams> = {}, lastEvaluatedKey?: LastKeyPagination) => {
       setIsLoading(true);
       try {
         // ajustar chamada de acordo com sua tarefaService API
         const params = {
           page,
-          pageSize,
+          limit: PAGE_SIZE,
+          lastEvaluatedKey: lastEvaluatedKey ? lastEvaluatedKey?.id : undefined,
           ...incomingFilters,
         };
         const data = await tarefaService.listar(obra.id!, params);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
-        setTotalItems(typeof data.totalCount === 'number' ? data.totalCount : Array.isArray(data.items) ? data.items.length : 0);
+        setTotalItems(data.count);
+        setLastKey({ id: data.lastEvaluatedKey?.id!, entity: data.lastEvaluatedKey?.entity! });
         setHasLoadedTasks(true);
       } catch (error) {
         console.error('Erro ao carregar tarefas:', error);
@@ -79,7 +84,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
   const handlePageChange = useCallback(
     (page: number) => {
       setCurrentPage(page);
-      return fetchTasks(page, filters);
+      return fetchTasks(page, filters, lastKey);
     },
     [fetchTasks, filters]
   );
@@ -90,7 +95,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
         setIsLoading(true);
         await onMeasure(taskId, measureFields);
         // após medir, refetch da página atual com filtros atuais
-        await fetchTasks(currentPage, filters);
+        await fetchTasks(currentPage, filters, lastKey);
       } catch (error) {
         console.error('Erro ao medir tarefa:', error);
       } finally {
@@ -184,7 +189,6 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
 
           {/* Criar um novo para medicao */}
           <ObraMeasureFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} />
-          
 
           <div className="p-8 relative">
             {/* overlay de loading: aparece por cima do conteúdo sem desmontar o painel */}

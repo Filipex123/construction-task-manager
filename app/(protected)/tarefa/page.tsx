@@ -1,12 +1,11 @@
 'use client';
 import { usePageTitle } from '@/app/context/PageTitle.context';
 import { obraService } from '@/app/services/obraService';
-import { tarefaService } from '@/app/services/tarefaService';
-import { Obra, PaymentStatusEnum } from '@/app/types';
+import { Obra } from '@/app/types';
 import React, { useMemo, useState } from 'react';
+import { TarefaCard } from '../components/cards/TarefaCard';
 import { Loader } from '../components/Loader';
 import { SearchBar } from '../components/SearchBar';
-import { TarefaCard } from '../components/cards/TarefaCard';
 
 function TarefaPage() {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
@@ -19,14 +18,6 @@ function TarefaPage() {
     return obras.filter((obra) => obra.name?.toLowerCase().includes(searchTerm.toLowerCase()) || obra.description?.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, obras]);
 
-  const handlePay = async (tarefaId: number) => {
-    try {
-      await tarefaService.atualizar(tarefaId, { paymentStatus: PaymentStatusEnum.PAGO, paymentDate: new Date().toISOString().slice(0, 10), updatedBy: 'system' });
-    } catch (error) {
-      console.error('Erro ao processar o pagamento:', error);
-    }
-  };
-
   React.useEffect(() => {
     setTitle('Tarefas');
     setSubtitle('Cadastro de tarefas de obras');
@@ -36,7 +27,6 @@ function TarefaPage() {
       setIsLoading(true);
       try {
         const data = await obraService.listar();
-        console.log('Obras carregadas:', data.items);
         setObras(data.items || []);
       } catch (error) {
         console.error('Erro ao carregar obras:', error);
@@ -64,7 +54,7 @@ function TarefaPage() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <TarefaCard key={obra.id} obra={obra} onPay={handlePay} />
+            <TarefaCard key={obra.id} obra={obra} />
           ))}
         </div>
       )}

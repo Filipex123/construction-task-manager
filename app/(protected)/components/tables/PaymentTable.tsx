@@ -270,7 +270,7 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
-    if (totalPages <= 1) return null;
+    // if (totalPages <= 1) return null;
 
     const getVisiblePages = () => {
       const maxVisible = isMobile ? 3 : 5;

@@ -8,12 +8,11 @@ import { TaskTable } from '../tables/TaskTable';
 
 interface TarefaCardProps {
   obra: Obra;
-  onPay: (tarefaId: number) => Promise<void>;
 }
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 10;
 
-export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
+export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [editTaskId, setEditTaskId] = React.useState<number | null>(null);
   const [isExpanded, setIsExpanded] = React.useState(false);
@@ -28,19 +27,17 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
   const [lastKey, setLastKey] = React.useState<LastKeyPagination | undefined>();
 
   const fetchTasks = React.useCallback(
-    async (incomingFilters: Partial<TarefaFilterParams> = {}) => {
-      console.log('lastKey: ', lastKey);
+    async (incomingFilters: Partial<TarefaFilterParams> = {}, lastEvaluatedKey?: LastKeyPagination) => {
       setIsLoading(true);
       try {
         const params = {
           limit: PAGE_SIZE,
-          lastEvaluatedKey: lastKey,
+          lastEvaluatedKey: lastEvaluatedKey ? lastEvaluatedKey?.id : undefined,
           ...incomingFilters,
         };
         const data = await tarefaService.listar(obra.id!, params);
-        console.log('Data: ', data.lastEvaluatedKey);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
-        setTotalItems(data.totalCount);
+        setTotalItems(data.count);
         setLastKey({ id: data.lastEvaluatedKey?.id!, entity: data.lastEvaluatedKey?.entity! });
         setHasLoadedTasks(true);
       } catch (error) {
@@ -51,7 +48,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
         setIsLoading(false);
       }
     },
-    [obra.id]
+    [obra.id, lastKey, setTotalItems]
   );
 
   const handleToggleExpand = async () => {
@@ -70,9 +67,10 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
   // quando filtros mudam (vem do ObraFilters), reset página e buscar
   const handleFilterChange = useCallback(
     (f: Partial<TarefaFilterParams>) => {
+      setLastKey(undefined);
       setFilters(f);
       setCurrentPage(1);
-      return fetchTasks(f);
+      return fetchTasks(f, undefined);
     },
     [fetchTasks]
   );
@@ -81,12 +79,11 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra, onPay }) => {
   const handlePageChange = useCallback(
     (page: number) => {
       setCurrentPage(page);
-      return fetchTasks(filters);
+      return fetchTasks(filters, lastKey);
     },
     [fetchTasks, filters]
   );
 
-  // --- NEW: handlers para criar, atualizar e excluir tarefas ---
   const handleAdd = useCallback(
     async (task: AddTarefaFormData) => {
       try {

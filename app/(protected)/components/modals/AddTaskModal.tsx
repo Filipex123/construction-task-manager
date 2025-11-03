@@ -6,6 +6,7 @@ import { atividadesService } from '@/app/services/atividadesService';
 import { empreiteraService } from '@/app/services/empreiteiraService';
 import { localService } from '@/app/services/localService';
 import { unidadesService } from '@/app/services/unidadesService';
+import { TextWithSelect } from '../InputSelect';
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -72,7 +73,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     return Object.keys(newErrors).length === 0;
   };
 
-    const getProximaData = (): string => {
+  const getProximaData = (): string => {
     const hoje = new Date();
     const dia = hoje.getDate();
     let ano = hoje.getFullYear();
@@ -94,9 +95,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     }
 
     const dataFinal = new Date(ano, mes, diaRetorno);
-    return dataFinal.toISOString().split("T")[0]; // formato YYYY-MM-DD
+    return dataFinal.toISOString().split('T')[0]; // formato YYYY-MM-DD
   };
-
 
   const buildSubmitTask = (): Omit<Tarefa, 'id'> => {
     return {
@@ -109,7 +109,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       paymentStatus: formData.paymentStatus,
       measurementStatus: MeasurementStatusEnum.PENDENTE,
       quantityExecuted: 0,
-      dueDate: formData.dueDate ?? "--/--/----", // default today if not provided
+      dueDate: formData.dueDate ?? '--/--/----', // default today if not provided
     };
   };
 
@@ -256,7 +256,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-4 space-y-4 overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div onClick={handleSubmit} className="p-4 space-y-4 overflow-y-auto max-h-[calc(90vh-80px)]">
           {loadingOptions ? (
             <div className="text-center py-12">
               <div className="loader mx-auto w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
@@ -270,6 +270,19 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                   <MapPin className="w-4 h-4" />
                   <span>Local</span>
                 </label>
+
+                <TextWithSelect
+                  apiUrl={'https://zernov6ywj.execute-api.us-east-1.amazonaws.com/prod/locais?idObra=1&limit=1000'}
+                  value={{
+                    id: formData.location?.id || 0,
+                    name: formData.location?.name || '',
+                  }}
+                  onChange={(value) => {
+                    const selected = locais.find((l) => l.id === value.id) ?? locais[0];
+                    handleInputChange('location', selected);
+                  }}
+                />
+
                 <select
                   value={formData.location?.id ?? ''}
                   onChange={(e) => {
@@ -334,8 +347,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                       handleInputChange('unitOfMeasure', selected);
                     }}
                     className={`w-full px-3 py-3 text-gray-900 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
-                    errors.unitOfMeasure ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
+                      errors.unitOfMeasure ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    }`}
                   >
                     <option value="" className="text-gray-200">
                       Selecione uma unidade
@@ -346,7 +359,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                       </option>
                     ))}
                   </select>
-                    {errors.unitOfMeasure && <p className="text-red-600 text-sm mt-1">{errors.unitOfMeasure}</p>}
+                  {errors.unitOfMeasure && <p className="text-red-600 text-sm mt-1">{errors.unitOfMeasure}</p>}
                 </div>
 
                 <div>
@@ -464,7 +477,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
               {mode === 'edit' ? 'Salvar Alterações' : 'Adicionar Tarefa'}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

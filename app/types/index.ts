@@ -20,7 +20,7 @@ export interface Tarefa {
 export interface MeasureTarefa {
   quantityExecuted: number;
   quantity: number;
-  measurementStatus: 'MEDIDO' | 'PENDENTE' | 'EM_ANDAMENTO' | 'RETIDO' ;
+  measurementStatus: 'MEDIDO' | 'PENDENTE' | 'EM_ANDAMENTO' | 'RETIDO';
   measurementDate?: string;
   updatedBy?: string;
 }
@@ -129,11 +129,11 @@ export enum PaymentStatusEnum {
 }
 
 export enum MeasurementStatusEnum {
- 
-  PENDENTE = 'PENDENTE',  
+  PENDENTE = 'PENDENTE',
   EM_ANDAMENTO = 'EM_ANDAMENTO',
   MEDIDO = 'MEDIDO',
   RETIDO = 'RETIDO',
 }
 
 export type IdName = { id: string; name: string };
+export type TaskIdName = { id: number; name: string };

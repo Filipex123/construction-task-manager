@@ -1,7 +1,7 @@
 import { formatDateForInput } from '@/app/utils/dateUtils';
 import { ChevronDown, ChevronUp, Filter, Plus, Search, X } from 'lucide-react';
 import React, { useState } from 'react';
-import { IdName, LastKeyPagination, Tarefa } from '../../types';
+import { IdName, Tarefa } from '../../types';
 
 export type TarefaFilterParams = {
   measurementStatus?: string[];
@@ -12,7 +12,7 @@ export type TarefaFilterParams = {
   dueDate?: string; // YYYY-MM-DD
   page?: number;
   pageSize?: number;
-  lastEvaluatedKey?: LastKeyPagination;
+  lastEvaluatedKey?: number;
 };
 
 interface ObraMeasureFiltersProps {
@@ -23,7 +23,7 @@ interface ObraMeasureFiltersProps {
 
 const statusLabels = {
   PENDENTE: 'Pendente',
-  EM_ANDAMENTO: 'Em Andamento',  
+  EM_ANDAMENTO: 'Em Andamento',
   MEDIDO: 'Medido',
   RETIDO: 'Retido',
 };
@@ -31,7 +31,7 @@ const statusLabels = {
 const statusColors = {
   PENDENTE: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   EM_ANDAMENTO: 'bg-blue-100 text-blue-800 border-blue-200 text-center',
-  MEDIDO: 'bg-green-100 text-green-800 border-green-200',  
+  MEDIDO: 'bg-green-100 text-green-800 border-green-200',
 };
 
 export const ObraMeasureFiltersInner: React.FC<ObraMeasureFiltersProps> = ({ tarefas, onFilterClick }) => {
