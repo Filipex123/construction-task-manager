@@ -22,7 +22,6 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
   // server-side pagination / filters
   const [filters, setFilters] = React.useState<Partial<TarefaFilterParams>>({});
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [pageSize] = React.useState(10);
   const [totalItems, setTotalItems] = React.useState(0);
 
   const getTotalValue = () => {
@@ -43,7 +42,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
         };
         const data = await tarefaService.listar(obra.id!, params);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
-        setTotalItems(data.count);
+        setTotalItems(data.totalCount);
         setLastKey({ id: data.lastEvaluatedKey?.id!, entity: data.lastEvaluatedKey?.entity! });
         setHasLoadedTasks(true);
       } catch (error) {
@@ -54,7 +53,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
         setIsLoading(false);
       }
     },
-    [obra.id, pageSize]
+    [obra.id, lastKey, setTotalItems]
   );
 
   const handleToggleExpand = async () => {
@@ -208,7 +207,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
                     <p className="text-gray-500">Adicione a primeira tarefa desta obra</p>
                   </div>
                 ) : (
-                  <MeasureTable tarefas={filteredTarefas} serverSide totalItems={totalItems} currentPage={currentPage} pageSize={pageSize} onPageChange={handlePageChange} onMeasure={handleMeasure} />
+                  <MeasureTable tarefas={filteredTarefas} serverSide totalItems={totalItems} currentPage={currentPage} pageSize={PAGE_SIZE} onPageChange={handlePageChange} onMeasure={handleMeasure} />
                 )}
               </>
             )}

@@ -13,7 +13,7 @@ type Props = {
     id: number;
     name: string;
   };
-  onChange: (newValue: { id: number; name: string }) => void;
+  onChange: (newValue: { id: number; name: string } | null) => void;
 };
 
 export const TextWithSelect: React.FC<Props> = ({ label, apiUrl, value, onChange }) => {
@@ -79,6 +79,11 @@ export const TextWithSelect: React.FC<Props> = ({ label, apiUrl, value, onChange
         value={value?.name || ''}
         onChange={(e) => handleChange(e.target.value)}
         onFocus={() => !loading && setOpen(true)}
+        onBlur={() => {
+          // Se o valor atual não corresponder a nenhuma opção válida, limpa
+          const found = options.find((opt) => opt.name === value?.name);
+          if (!found) onChange(null);
+        }}
       />
 
       {open && filteredOptions.length > 0 && (

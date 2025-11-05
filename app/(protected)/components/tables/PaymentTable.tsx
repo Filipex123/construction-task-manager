@@ -67,11 +67,6 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
   // se não serverSide, mantenha paginação local (existing logic)
   const itemsPerPage = isMobile ? 5 : 10;
   let currentTarefas = localTarefas;
-  if (!serverSide) {
-    const startIndex = (currentPageState - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    currentTarefas = localTarefas.slice(startIndex, endIndex);
-  }
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -267,10 +262,8 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
 
   const PaginationControls = () => {
     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-
-    // if (totalPages <= 1) return null;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
 
     const getVisiblePages = () => {
       const maxVisible = isMobile ? 3 : 5;
@@ -297,7 +290,7 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
     return (
       <div className="flex items-center justify-between mt-6 px-2">
         <div className="text-sm text-gray-600">
-          Mostrando {startIndex + 1}-{Math.min(endIndex, tarefas.length)} de {tarefas.length} tarefas
+          Mostrando {startIndex + 1}-{Math.min(endIndex, totalItems)} de {totalItems} tarefas
         </div>
 
         <div className="flex items-center space-x-1">

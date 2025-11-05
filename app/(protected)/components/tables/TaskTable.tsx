@@ -262,7 +262,7 @@ export const TaskTableInner: React.FC<TaskTableProps> = ({ tarefas, onEdit, onDe
     return (
       <div className="flex items-center justify-between mt-6 px-2">
         <div className="text-sm text-gray-600">
-          Mostrando {startIndex + 1}-{Math.min(endIndex, tarefas.length)} de {totalItems} tarefas
+          Mostrando {startIndex + 1}-{Math.min(endIndex, totalItems)} de {totalItems} tarefas
         </div>
 
         <div className="flex items-center space-x-1">

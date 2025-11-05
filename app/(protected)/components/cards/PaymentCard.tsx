@@ -24,7 +24,6 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   // server-side pagination / filters
   const [filters, setFilters] = React.useState<Partial<TarefaFilterParams>>({});
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [pageSize] = React.useState(5);
   const [totalItems, setTotalItems] = React.useState(0);
 
   const filterPayableTasks = useCallback(() => {
@@ -43,7 +42,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
         };
         const data = await tarefaService.listar(obra.id!, params);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
-        setTotalItems(data.count);
+        setTotalItems(data.totalCount);
         setLastKey({ id: data.lastEvaluatedKey?.id!, entity: data.lastEvaluatedKey?.entity! });
         setHasLoadedTasks(true);
       } catch (error) {
@@ -258,7 +257,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
                     <p className="text-gray-500">Adicione a primeira tarefa desta obra</p>
                   </div>
                 ) : (
-                  <PaymentTable tarefas={filteredTarefas} onPay={handlePayment} serverSide totalItems={totalItems} currentPage={currentPage} pageSize={pageSize} onPageChange={handlePageChange} />
+                  <PaymentTable tarefas={filteredTarefas} onPay={handlePayment} serverSide totalItems={totalItems} currentPage={currentPage} pageSize={PAGE_SIZE} onPageChange={handlePageChange} />
                 )}
               </>
             )}

@@ -45,6 +45,12 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick }) 
   const [dataLimiteInput, setDataLimiteInput] = useState('');
   const [isApplying, setIsApplying] = useState(false);
 
+  // const parseVoidTextFields = (text: TaskIdName | null) => {
+  //   if (!text) return null;
+
+  //   return text.name.trim() !== '' ? text : null;
+  // };
+
   const uniqueStatus = ['PAGO', 'PENDENTE', 'EM_ANDAMENTO', 'ATRASADO'];
 
   const applyDateMask = (value: string): string => {

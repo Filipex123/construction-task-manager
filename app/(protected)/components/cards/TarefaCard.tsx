@@ -37,7 +37,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
         };
         const data = await tarefaService.listar(obra.id!, params);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
-        setTotalItems(data.count);
+        setTotalItems(data.totalCount);
         setLastKey({ id: data.lastEvaluatedKey?.id!, entity: data.lastEvaluatedKey?.entity! });
         setHasLoadedTasks(true);
       } catch (error) {

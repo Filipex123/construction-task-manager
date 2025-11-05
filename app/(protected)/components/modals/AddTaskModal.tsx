@@ -278,8 +278,10 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                     name: formData.location?.name || '',
                   }}
                   onChange={(value) => {
-                    const selected = locais.find((l) => l.id === value.id) ?? locais[0];
-                    handleInputChange('location', selected);
+                    if (value) {
+                      const selected = locais.find((l) => l.id === value.id) ?? locais[0];
+                      handleInputChange('location', selected);
+                    }
                   }}
                 />
 
