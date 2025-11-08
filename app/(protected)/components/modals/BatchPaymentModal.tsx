@@ -139,22 +139,22 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
                   <div key={tarefa.id} className={`p-4 ${index !== tarefas.length - 1 ? 'border-b border-gray-200' : ''}`}>
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 text-sm truncate">{tarefa.activity?.name}</h4>
+                        <h4 className="font-medium text-gray-900 text-sm truncate">{tarefa.atividade?.name}</h4>
                         <div className="flex items-center space-x-2 mt-1">
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <MapPin className="w-3 h-3" />
-                            <span className="truncate">{tarefa.location!.name}</span>
+                            <span className="truncate">{tarefa.local!.name}</span>
                           </div>
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <Building2 className="w-3 h-3" />
-                            <span className="truncate">{tarefa.contractor?.name}</span>
+                            <span className="truncate">{tarefa.empreiteira?.name}</span>
                           </div>
                         </div>
                       </div>
                       <div className="ml-4 text-right">
                         <p className="font-semibold text-green-600 text-sm">{formatCurrency(tarefa.totalAmount!)}</p>
                         <p className="text-xs text-gray-500">
-                          {tarefa.quantity} {tarefa.unitOfMeasure?.name}
+                          {tarefa.quantity} {tarefa.unidadeDeMedida?.name}
                         </p>
                       </div>
                     </div>

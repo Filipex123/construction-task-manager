@@ -100,10 +100,10 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
   const buildSubmitTask = (): Omit<Tarefa, 'id'> => {
     return {
-      location: { id: Number(formData.location!.id), name: formData.location!.name },
-      activity: { id: Number(formData.activity!.id), name: formData.activity!.name },
-      unitOfMeasure: { id: Number(formData.unitOfMeasure!.id), name: formData.unitOfMeasure!.name },
-      contractor: { id: Number(formData.contractor!.id), name: formData.contractor!.name },
+      local: { id: Number(formData.location!.id), name: formData.location!.name },
+      atividade: { id: Number(formData.activity!.id), name: formData.activity!.name },
+      unidadeDeMedida: { id: Number(formData.unitOfMeasure!.id), name: formData.unitOfMeasure!.name },
+      empreiteira: { id: Number(formData.contractor!.id), name: formData.contractor!.name },
       quantity: Number(formData.quantity),
       totalAmount: Number(formData.totalAmount),
       paymentStatus: formData.paymentStatus,
@@ -177,10 +177,10 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
         // set defaults / preencher se for edição
         if (mode === 'edit' && initialTask) {
           setFormData({
-            location: initialTask.location ?? locaisArr[0],
-            activity: initialTask.activity ?? atividadesArr[0],
-            unitOfMeasure: initialTask.unitOfMeasure ?? unitsArr[0],
-            contractor: initialTask.contractor ?? contractorsArr[0],
+            location: initialTask.local ?? locaisArr[0],
+            activity: initialTask.atividade ?? atividadesArr[0],
+            unitOfMeasure: initialTask.unidadeDeMedida ?? unitsArr[0],
+            contractor: initialTask.empreiteira ?? contractorsArr[0],
             quantity: initialTask.quantity ?? 0,
             totalAmount: initialTask.totalAmount ?? 0,
             paymentStatus: initialTask.paymentStatus ?? PaymentStatusEnum.EM_ANDAMENTO,
@@ -217,10 +217,10 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     // simple deep compare
     return (
       JSON.stringify({
-        location: initialTask.location,
-        activity: initialTask.activity,
-        unitOfMeasure: initialTask.unitOfMeasure,
-        contractor: initialTask.contractor,
+        location: initialTask.local,
+        activity: initialTask.atividade,
+        unitOfMeasure: initialTask.unidadeDeMedida,
+        contractor: initialTask.empreiteira,
         quantity: initialTask.quantity,
         totalAmount: initialTask.totalAmount,
         paymentStatus: initialTask.paymentStatus,

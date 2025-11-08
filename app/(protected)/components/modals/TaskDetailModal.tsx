@@ -57,8 +57,8 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <Package className="w-6 h-6" />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-lg sm:text-xl font-bold truncate">{tarefa.activity.name}</h2>
-                <p className="text-blue-100 text-sm truncate">{tarefa.location.name}</p>
+                <h2 className="text-lg sm:text-xl font-bold truncate">{tarefa.atividade.name}</h2>
+                <p className="text-blue-100 text-sm truncate">{tarefa.local.name}</p>
               </div>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors ml-2">
@@ -90,7 +90,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <span>Informações Principais</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <InfoItem icon={Package} label="Unidade de Medida" value={tarefa.unitOfMeasure.name!} />
+                <InfoItem icon={Package} label="Unidade de Medida" value={tarefa.unidadeDeMedida.name!} />
                 <InfoItem icon={Package} label="Quantidade" value={tarefa.quantity} highlight />
                 <InfoItem icon={CheckCircle} label="Quantidade Realizada" value={tarefa.quantityExecuted} />
                 <InfoItem icon={DollarSign} label="Valor" value={formatCurrency(tarefa.totalAmount)} highlight />
@@ -107,7 +107,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                 <InfoItem icon={DollarSign} label="Status Pagamento" value={tarefa.paymentStatus} />
                 <InfoItem icon={Package} label="Status Medidor" value={tarefa.measurementStatus} />
                 <InfoItem icon={Calendar} label="Data Medição" value={formatDateStringtoView(tarefa.measurementDate ?? '')} />
-                <InfoItem icon={Building2} label="Empreiteiro" value={tarefa.contractor.name!} />
+                <InfoItem icon={Building2} label="Empreiteiro" value={tarefa.empreiteira.name!} />
               </div>
             </section>
 

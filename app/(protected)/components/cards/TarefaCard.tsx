@@ -1,5 +1,5 @@
 import { tarefaService } from '@/app/services/tarefaService';
-import { AddTarefaRequest, LastKeyPagination, Obra, Tarefa } from '@/app/types';
+import { AddTarefaRequest, Obra, PAGE_SIZE, Tarefa } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, Loader2, Plus } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import { ObraFilters, TarefaFilterParams } from '../ObraFilters';
@@ -9,8 +9,6 @@ import { TaskTable } from '../tables/TaskTable';
 interface TarefaCardProps {
   obra: Obra;
 }
-
-const PAGE_SIZE = 10;
 
 export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
@@ -24,21 +22,20 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
   const [filters, setFilters] = React.useState<Partial<TarefaFilterParams>>({});
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalItems, setTotalItems] = React.useState(0);
-  const [lastKey, setLastKey] = React.useState<LastKeyPagination | undefined>();
 
   const fetchTasks = React.useCallback(
-    async (incomingFilters: Partial<TarefaFilterParams> = {}, lastEvaluatedKey?: LastKeyPagination) => {
+    async (incomingFilters: Partial<TarefaFilterParams> = {}, page: number) => {
       setIsLoading(true);
       try {
         const params = {
-          limit: PAGE_SIZE,
-          lastEvaluatedKey: lastEvaluatedKey ? lastEvaluatedKey?.id : undefined,
           ...incomingFilters,
+          pageSize: PAGE_SIZE,
+          page: page,
         };
         const data = await tarefaService.listar(obra.id!, params);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
         setTotalItems(data.totalCount);
-        setLastKey({ id: data.lastEvaluatedKey?.id!, entity: data.lastEvaluatedKey?.entity! });
+        setCurrentPage(page);
         setHasLoadedTasks(true);
       } catch (error) {
         console.error('Erro ao carregar tarefas:', error);
@@ -48,7 +45,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
         setIsLoading(false);
       }
     },
-    [obra.id, lastKey, setTotalItems]
+    [obra.id, setTotalItems]
   );
 
   const handleToggleExpand = async () => {
@@ -56,7 +53,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
     if (!isExpanded && !hasLoadedTasks) {
       setIsExpanded(true);
       // disparar fetch em background sem await para não bloquear UI
-      await fetchTasks(filters).catch((err) => {
+      await fetchTasks(filters, currentPage).catch((err) => {
         console.error('Erro ao carregar tarefas no background:', err);
       });
       return;
@@ -67,10 +64,8 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
   // quando filtros mudam (vem do ObraFilters), reset página e buscar
   const handleFilterChange = useCallback(
     (f: Partial<TarefaFilterParams>) => {
-      setLastKey(undefined);
       setFilters(f);
-      setCurrentPage(1);
-      return fetchTasks(f, undefined);
+      return fetchTasks(f, currentPage);
     },
     [fetchTasks]
   );
@@ -78,8 +73,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
   // quando usuário troca página via TaskTable (server-side), refetch
   const handlePageChange = useCallback(
     (page: number) => {
-      setCurrentPage(page);
-      return fetchTasks(filters, lastKey);
+      return fetchTasks(filters, page);
     },
     [fetchTasks, filters]
   );
@@ -103,7 +97,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
           fkEmpreiteiro: task.contractor!.id!,
         };
         await tarefaService.criar(obra.id!, payload);
-        await fetchTasks(filters);
+        await fetchTasks(filters, currentPage);
         setCurrentPage(1);
         setIsAddModalOpen(false);
       } catch (err) {
@@ -131,7 +125,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
         };
         await tarefaService.atualizar(tarefaId, payload);
         // recarregar página atual para refletir alterações
-        await fetchTasks(filters);
+        await fetchTasks(filters, currentPage);
         setEditTaskId(null);
         setIsAddModalOpen(false);
       } catch (err) {
@@ -149,7 +143,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
         setIsLoading(true);
         await tarefaService.excluir(String(tarefaId));
         // após exclusão, recarregar página atual (pode ajustar para buscar página 1 se necessário)
-        await fetchTasks(filters);
+        await fetchTasks(filters, currentPage);
       } catch (err) {
         console.error('Erro ao excluir tarefa:', err);
       } finally {

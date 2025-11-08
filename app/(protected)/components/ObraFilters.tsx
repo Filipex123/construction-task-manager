@@ -13,7 +13,6 @@ export type TarefaFilterParams = {
   dueDate?: string;
   page?: number;
   pageSize?: number;
-  lastEvaluatedKey?: number;
 };
 
 interface ObraFiltersProps {

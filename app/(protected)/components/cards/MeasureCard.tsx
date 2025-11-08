@@ -1,5 +1,5 @@
 import { tarefaService } from '@/app/services/tarefaService';
-import { LastKeyPagination, MeasureTarefa, Obra, Tarefa } from '@/app/types';
+import { MeasureTarefa, Obra, PAGE_SIZE, Tarefa } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import { ObraMeasureFilters, TarefaFilterParams } from '../ObraMeasureFilters';
@@ -10,14 +10,11 @@ interface MeasureCardProps {
   onMeasure?: (taskId: number, measureFields: MeasureTarefa) => Promise<void>;
 }
 
-const PAGE_SIZE = 10;
-
 export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState<Tarefa[]>([]);
   const [hasLoadedTasks, setHasLoadedTasks] = React.useState(false);
-  const [lastKey, setLastKey] = React.useState<LastKeyPagination | undefined>();
 
   // server-side pagination / filters
   const [filters, setFilters] = React.useState<Partial<TarefaFilterParams>>({});
@@ -30,20 +27,19 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
   };
 
   const fetchTasks = React.useCallback(
-    async (page = 1, incomingFilters: Partial<TarefaFilterParams> = {}, lastEvaluatedKey?: LastKeyPagination) => {
+    async (incomingFilters: Partial<TarefaFilterParams> = {}, page: number) => {
       setIsLoading(true);
       try {
         // ajustar chamada de acordo com sua tarefaService API
         const params = {
+          ...incomingFilters,
           page,
           limit: PAGE_SIZE,
-          lastEvaluatedKey: lastEvaluatedKey ? lastEvaluatedKey?.id : undefined,
-          ...incomingFilters,
         };
         const data = await tarefaService.listar(obra.id!, params);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
         setTotalItems(data.totalCount);
-        setLastKey({ id: data.lastEvaluatedKey?.id!, entity: data.lastEvaluatedKey?.entity! });
+        setCurrentPage(page);
         setHasLoadedTasks(true);
       } catch (error) {
         console.error('Erro ao carregar tarefas:', error);
@@ -53,7 +49,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
         setIsLoading(false);
       }
     },
-    [obra.id, lastKey, setTotalItems]
+    [obra.id, setTotalItems]
   );
 
   const handleToggleExpand = async () => {
@@ -61,7 +57,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
     if (!isExpanded && !hasLoadedTasks) {
       setIsExpanded(true);
       // disparar fetch em background sem await para não bloquear UI
-      fetchTasks(1, filters).catch((err) => {
+      await fetchTasks(filters, currentPage).catch((err) => {
         console.error('Erro ao carregar tarefas no background:', err);
       });
       return;
@@ -73,8 +69,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
   const handleFilterChange = useCallback(
     (f: Partial<TarefaFilterParams>) => {
       setFilters(f);
-      setCurrentPage(1);
-      return fetchTasks(1, f);
+      return fetchTasks(f, currentPage);
     },
     [fetchTasks]
   );
@@ -82,8 +77,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
   // quando usuário troca página via TaskTable (server-side), refetch
   const handlePageChange = useCallback(
     (page: number) => {
-      setCurrentPage(page);
-      return fetchTasks(page, filters, lastKey);
+      return fetchTasks(filters, page);
     },
     [fetchTasks, filters]
   );
@@ -94,7 +88,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
         setIsLoading(true);
         await onMeasure(taskId, measureFields);
         // após medir, refetch da página atual com filtros atuais
-        await fetchTasks(currentPage, filters, lastKey);
+        return fetchTasks(filters, currentPage);
       } catch (error) {
         console.error('Erro ao medir tarefa:', error);
       } finally {

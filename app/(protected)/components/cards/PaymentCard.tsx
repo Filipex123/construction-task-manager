@@ -1,5 +1,5 @@
 import { tarefaService } from '@/app/services/tarefaService';
-import { LastKeyPagination, Obra, PaymentStatusEnum, Tarefa } from '@/app/types';
+import { Obra, PAGE_SIZE, PaymentStatusEnum, Tarefa } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, DollarSign, Loader2 } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import { ObraFilters, TarefaFilterParams } from '../ObraFilters';
@@ -11,15 +11,12 @@ interface PaymentCardProps {
   onPay: (tarefaId: number) => Promise<void>;
 }
 
-const PAGE_SIZE = 10;
-
 export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   const [isBatchPaymentModalOpen, setIsBatchPaymentModalOpen] = React.useState(false);
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState<Tarefa[]>([]);
   const [hasLoadedTasks, setHasLoadedTasks] = React.useState(false);
-  const [lastKey, setLastKey] = React.useState<LastKeyPagination | undefined>();
 
   // server-side pagination / filters
   const [filters, setFilters] = React.useState<Partial<TarefaFilterParams>>({});
@@ -31,19 +28,18 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   }, [filteredTarefas]);
 
   const fetchTasks = React.useCallback(
-    async (page = 1, incomingFilters: Partial<TarefaFilterParams> = {}, lastEvaluatedKey?: LastKeyPagination) => {
+    async (incomingFilters: Partial<TarefaFilterParams> = {}, page: number) => {
       setIsLoading(true);
       try {
         const params = {
+          ...incomingFilters,
           page,
           pageSize: PAGE_SIZE,
-          lastEvaluatedKey: lastEvaluatedKey ? lastEvaluatedKey?.id : undefined,
-          ...incomingFilters,
         };
         const data = await tarefaService.listar(obra.id!, params);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
         setTotalItems(data.totalCount);
-        setLastKey({ id: data.lastEvaluatedKey?.id!, entity: data.lastEvaluatedKey?.entity! });
+        setCurrentPage(page);
         setHasLoadedTasks(true);
       } catch (error) {
         console.error('Erro ao carregar tarefas:', error);
@@ -53,7 +49,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
         setIsLoading(false);
       }
     },
-    [obra.id, lastKey, setTotalItems]
+    [obra.id, setTotalItems]
   );
 
   const handleToggleExpand = async () => {
@@ -61,7 +57,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
     if (!isExpanded && !hasLoadedTasks) {
       setIsExpanded(true);
       // disparar fetch em background sem await para não bloquear UI
-      await fetchTasks(1, filters).catch((err) => {
+      await fetchTasks(filters, currentPage).catch((err) => {
         console.error('Erro ao carregar tarefas no background:', err);
       });
       return;
@@ -72,10 +68,8 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   // quando filtros mudam (vem do ObraFilters), reset página e buscar
   const handleFilterChange = useCallback(
     (f: Partial<TarefaFilterParams>) => {
-      setLastKey(undefined);
       setFilters(f);
-      setCurrentPage(1);
-      return fetchTasks(1, f, undefined);
+      return fetchTasks(f, currentPage);
     },
     [fetchTasks]
   );
@@ -83,8 +77,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   // quando usuário troca página via TaskTable (server-side), refetch
   const handlePageChange = useCallback(
     (page: number) => {
-      setCurrentPage(page);
-      return fetchTasks(page, filters, lastKey);
+      return fetchTasks(filters, page);
     },
     [fetchTasks, filters]
   );
@@ -98,8 +91,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
         await onPay(tarefa.id);
         await new Promise((res) => setTimeout(res, 100));
       }
-      await fetchTasks(1, filters);
-      setCurrentPage(1);
+      await fetchTasks(filters, currentPage);
     } catch (err) {
       console.error('Erro ao adicionar tarefa:', err);
     } finally {
@@ -113,7 +105,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
       try {
         setIsLoading(true);
         await onPay(taskId);
-        await fetchTasks(1, filters);
+        await fetchTasks(filters, currentPage);
         setCurrentPage(1);
       } catch (err) {
         console.error('Erro ao adicionar tarefa:', err);

@@ -13,7 +13,7 @@ interface MeasureTableProps {
   totalItems?: number;
   currentPage?: number;
   pageSize?: number;
-  onPageChange?: (page: number) => void;
+  onPageChange: (page: number) => void;
 }
 
 type MobileView = 'table' | 'cards' | 'list';
@@ -37,7 +37,6 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
   const [selectedTask, setSelectedTask] = React.useState<Tarefa | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
-  const [currentPageState, setCurrentPage] = React.useState(1);
   const [isMobile, setIsMobile] = React.useState(false);
   const [localTarefas, setLocalTarefas] = React.useState<Tarefa[]>(tarefas);
 
@@ -58,19 +57,11 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
-  // Reset página somente quando mudar o número de tarefas locais ou view
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [localTarefas.length, mobileView]);
-
-  const itemsPerPage = isMobile ? 5 : 10;
+  // const itemsPerPage = isMobile ? 5 : 10;
   let currentTarefas = localTarefas;
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    if (onPageChange) {
-      onPageChange(page);
-    }
+    onPageChange(page);
   };
 
   const formatCurrency = (value: number) => {
@@ -115,8 +106,8 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
         <div key={tarefa.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => handleTaskClick(tarefa)}>
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
-              <h5 className="font-medium text-gray-900 text-sm mb-1">{tarefa.location.name}</h5>
-              <p className="text-gray-600 text-sm">{tarefa.activity.name}</p>
+              <h5 className="font-medium text-gray-900 text-sm mb-1">{tarefa.local.name}</h5>
+              <p className="text-gray-600 text-sm">{tarefa.atividade.name}</p>
             </div>
             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.measurementStatus]}`}>{statusLabels[tarefa.measurementStatus]}</span>
           </div>
@@ -125,7 +116,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
             <div>
               <span className="text-gray-500">Quantidade:</span>
               <p className="font-medium text-black">
-                {tarefa.quantity} {tarefa.unitOfMeasure.name}
+                {tarefa.quantity} {tarefa.unidadeDeMedida.name}
               </p>
             </div>
             <div>
@@ -136,7 +127,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
 
           <div className="mb-3">
             <span className="text-gray-500 text-sm">Empreiteira:</span>
-            <p className="font-medium text-sm text-black">{tarefa.contractor.name}</p>
+            <p className="font-medium text-sm text-black">{tarefa.empreiteira.name}</p>
           </div>
 
           <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
@@ -154,17 +145,17 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-1">
-                <h5 className="font-medium text-gray-900 text-sm">{tarefa.location.name}</h5>
+                <h5 className="font-medium text-gray-900 text-sm">{tarefa.local.name}</h5>
                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.measurementStatus]}`}>{statusLabels[tarefa.measurementStatus]}</span>
               </div>
-              <p className="text-gray-600 text-sm mb-2">{tarefa.activity.name}</p>
+              <p className="text-gray-600 text-sm mb-2">{tarefa.atividade.name}</p>
             </div>
           </div>
 
           <div className="flex justify-between items-center text-sm" onClick={(e) => e.stopPropagation()}>
             <div className="flex space-x-4">
               <span className="text-gray-500">
-                {tarefa.quantity} {tarefa.unitOfMeasure.name}
+                {tarefa.quantity} {tarefa.unidadeDeMedida.name}
               </span>
               <span className="font-medium text-green-600">{formatCurrency(tarefa.totalAmount)}</span>
             </div>
@@ -172,7 +163,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
           </div>
 
           <div className="mt-2 pt-2 border-t border-gray-100">
-            <span className="text-xs text-gray-500">{tarefa.contractor.name}</span>
+            <span className="text-xs text-gray-500">{tarefa.empreiteira.name}</span>
           </div>
         </div>
       ))}
@@ -200,12 +191,12 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
         <tbody className="bg-white divide-y divide-gray-200">
           {currentTarefas.map((tarefa) => (
             <tr key={tarefa.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleTaskClick(tarefa)}>
-              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.location.name}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.activity.name}</td>
-              <td className="px-4 py-4 text-sm text-gray-500">{tarefa.unitOfMeasure.name}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.local.name}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.atividade.name}</td>
+              <td className="px-4 py-4 text-sm text-gray-500">{tarefa.unidadeDeMedida.name}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.quantity}</td>
               <td className="px-4 py-4 text-sm font-medium text-gray-900">{formatCurrency(tarefa.totalAmount)}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.contractor.name}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.empreiteira.name}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{formatDatetimeStringtoView(tarefa.createdAt)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{formatDateStringtoViewDueDate(tarefa.dueDate)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{formatDateStringtoView(tarefa.measurementDate)}</td>

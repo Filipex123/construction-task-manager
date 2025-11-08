@@ -1,9 +1,9 @@
 export interface Tarefa {
   id: number;
-  location: Local;
-  activity: Atividades;
-  unitOfMeasure: UnidadeMedida;
-  contractor: Empreiteira;
+  local: Local;
+  atividade: Atividades;
+  unidadeDeMedida: UnidadeMedida;
+  empreiteira: Empreiteira;
   quantity: number;
   totalAmount: number;
   paymentStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'PAGO' | 'ATRASADO';
@@ -39,11 +39,6 @@ export interface AddTarefaRequest {
   fkLocal: number;
   fkUnidadeMedida: number;
   fkEmpreiteiro: number;
-}
-
-export interface LastKeyPagination {
-  id: number;
-  entity: string;
 }
 
 export interface Local {
@@ -95,7 +90,6 @@ export interface PageableResponse<T> {
   items: T[];
   count: number;
   totalCount: number;
-  lastEvaluatedKey?: LastKeyPagination;
 }
 
 export type StatusColor = {
@@ -137,3 +131,5 @@ export enum MeasurementStatusEnum {
 
 export type IdName = { id: string; name: string };
 export type TaskIdName = { id: number; name: string };
+
+export const PAGE_SIZE = 10;
