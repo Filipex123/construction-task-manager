@@ -4,6 +4,7 @@ import { Building, ChevronDown, ChevronUp, Edit3, Loader2, Plus, Trash2 } from '
 import React from 'react';
 import { ConfirmModal } from '../modals/ConfirmModal';
 import { SimpleModal } from '../modals/SimpleModal';
+import { SearchBar } from '../SearchBar';
 import { LocalTable } from '../tables/LocalTable';
 
 interface LocalCardProps {
@@ -20,6 +21,11 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }
   const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [hasLoadedTasks, setHasLoadedTasks] = React.useState(locais.length > 0);
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const filteredData = React.useMemo(() => {
+    return locais.filter((local) => searchTerm === '' || local.name?.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [locais, searchTerm]);
 
   const handleToggleExpand = async () => {
     if (!isExpanded && !hasLoadedTasks) {
@@ -125,6 +131,9 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }
             <>
               {/* Location Table */}
               <div className="p-6">
+                <div className="pb-4">
+                  <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+                </div>
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-800">Locais</h4>
                   <button
@@ -136,15 +145,14 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }
                     <span className="sm:hidden">Novo</span>
                   </button>
                 </div>
-
-                {locais.length === 0 ? (
+                {filteredData.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="text-gray-400 text-lg mb-2">Nenhum local encontrado</div>
                     <p className="text-gray-500">Adicione o primeiro local desta obra</p>
                   </div>
                 ) : (
                   <LocalTable
-                    locais={locais}
+                    locais={filteredData}
                     onEdit={(id) => {
                       const locationToEdit = locais.find((local) => local.id === id) || null;
                       setEditLocation(locationToEdit);
