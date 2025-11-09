@@ -95,8 +95,7 @@ const EmpreiteiraPage: React.FC = () => {
       } else {
         await empreiteraService.criar({
           description: formData.descricao,
-          name: formData.nome,
-          cnpj: '',
+          name: formData.nome,          
         });
       }
 
@@ -189,7 +188,7 @@ const EmpreiteiraPage: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{contr.id}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-600">{contr.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contr.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contr.createdAt}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contr.createat}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex space-x-2">
                         <button onClick={() => handleOpenModal(contr)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">

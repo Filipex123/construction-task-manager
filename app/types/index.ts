@@ -60,10 +60,9 @@ export interface Obra {
 
 export interface Empreiteira {
   id?: number;
-  name?: string;
-  cnpj?: string;
+  name?: string;  
   description?: string;
-  createdAt?: string;
+  createat?: string;
   updatedAt?: string;
   updatedBy?: string;
 }
@@ -72,7 +71,7 @@ export interface UnidadeMedida {
   id?: number;
   name?: string;
   description?: string;
-  createdAt?: string;
+  createat?: string;
   updatedAt?: string;
   updatedBy?: string;
 }

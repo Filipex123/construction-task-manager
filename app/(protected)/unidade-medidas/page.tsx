@@ -187,7 +187,7 @@ const UnidadeMedidaPage: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.id}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.description}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{unit.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.createdAt}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.createat}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div className="flex space-x-2">
                           <button onClick={() => handleOpenModal(unit)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
