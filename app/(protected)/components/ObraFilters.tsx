@@ -1,4 +1,4 @@
-import { formatDateForInput, formatDateStringtoView } from '@/app/utils/dateUtils';
+import { formatDateForInput } from '@/app/utils/dateUtils';
 import { ChevronDown, ChevronUp, Filter, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { Tarefa, TaskIdName } from '../../types';
@@ -9,10 +9,19 @@ export type TarefaFilterParams = {
   location?: string[];
   contractor?: string[];
   activity?: string[];
-  createdAt?: string;
-  dueDate?: string;
+  startCreatedAt?: string;
+  endCreatedAt?: string;
+  startDueDate?: string;
+  endDueDate?: string;
   page?: number;
   pageSize?: number;
+};
+
+type DateRanges = {
+  startCreatedAt: string;
+  endCreatedAt: string;
+  startDueDate: string;
+  endDueDate: string;
 };
 
 interface ObraFiltersProps {
@@ -40,47 +49,63 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick }) 
   const [selectedLocal, setSelectedLocal] = useState<TaskIdName | null>(null);
   const [selectedEmpreiteira, setSelectedEmpreiteira] = useState<TaskIdName | null>(null);
   const [selectedAtividade, setSelectedAtividade] = useState<TaskIdName | null>(null);
-  const [dataCriacaoInput, setDataCriacaoInput] = useState('');
-  const [dataLimiteInput, setDataLimiteInput] = useState('');
   const [isApplying, setIsApplying] = useState(false);
+  const [dataErrors, setDataErrors] = useState({
+    createdAt: '',
+    dueDate: '',
+  });
 
-  // const parseVoidTextFields = (text: TaskIdName | null) => {
-  //   if (!text) return null;
-
-  //   return text.name.trim() !== '' ? text : null;
-  // };
-
+  const [dates, setDates] = useState<DateRanges>({
+    startCreatedAt: '',
+    endCreatedAt: '',
+    startDueDate: '',
+    endDueDate: '',
+  });
   const uniqueStatus = ['PAGO', 'PENDENTE', 'EM_ANDAMENTO', 'ATRASADO'];
 
-  const applyDateMask = (value: string): string => {
-    const digits = value.replace(/\D/g, '');
-    if (digits.length <= 2) return digits;
-    if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
+  const handleDatesChange = (field: keyof typeof dates, value: string) => {
+    const updated = { ...dates, [field]: value };
+    setDates(updated);
+    validateDates(updated);
   };
 
-  const buildFiltersObject = (
-    status: string[],
-    local: TaskIdName | null,
-    empreiteira: TaskIdName | null,
-    atividade: TaskIdName | null,
-    dataCriacao: string,
-    dataLimite: string
-  ): TarefaFilterParams => {
+  const validateDates = (values: typeof dates) => {
+    let createdAtError = '';
+    let dueDateError = '';
+
+    // Validação do range de criação
+    if ((values.startCreatedAt && !values.endCreatedAt) || (!values.startCreatedAt && values.endCreatedAt)) {
+      createdAtError = 'Preencha as duas datas de criação (início e fim).';
+    }
+
+    // Validação do range de vencimento
+    if ((values.startDueDate && !values.endDueDate) || (!values.startDueDate && values.endDueDate)) {
+      dueDateError = 'Preencha as duas datas de vencimento (início e fim).';
+    }
+
+    setDataErrors({
+      createdAt: createdAtError,
+      dueDate: dueDateError,
+    });
+  };
+
+  const buildFiltersObject = (status: string[], local: TaskIdName | null, empreiteira: TaskIdName | null, atividade: TaskIdName | null, dates: DateRanges): TarefaFilterParams => {
     return {
       paymentStatus: status.length ? status : undefined,
       location: local ? [String(local.id)] : undefined,
       contractor: empreiteira ? [String(empreiteira.id)] : undefined,
       activity: atividade ? [String(atividade.id)] : undefined,
-      createdAt: dataCriacao.trim() ? formatDateForInput(dataCriacao) : undefined,
-      dueDate: dataLimite.trim() ? formatDateForInput(dataLimite) : undefined,
+      startCreatedAt: dates.startCreatedAt || undefined,
+      endCreatedAt: dates.endCreatedAt || undefined,
+      startDueDate: dates.startDueDate || undefined,
+      endDueDate: dates.endDueDate || undefined,
       page: 1,
       pageSize: 10,
     };
   };
 
   const handleApplyFilters = async () => {
-    const filters = buildFiltersObject(selectedStatus, selectedLocal, selectedEmpreiteira, selectedAtividade, dataCriacaoInput, dataLimiteInput);
+    const filters = buildFiltersObject(selectedStatus, selectedLocal, selectedEmpreiteira, selectedAtividade, dates);
     try {
       setIsApplying(true);
       await onFilterClick(filters);
@@ -92,8 +117,7 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick }) 
   };
 
   const handleStatusToggle = (status: string) => {
-    const newSelected = selectedStatus.includes(status) ? selectedStatus.filter((s) => s !== status) : [...selectedStatus, status];
-    setSelectedStatus(newSelected);
+    setSelectedStatus((prev) => (prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]));
   };
 
   const clearAllFilters = async () => {
@@ -101,10 +125,20 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick }) 
     setSelectedLocal(null);
     setSelectedEmpreiteira(null);
     setSelectedAtividade(null);
-    setDataCriacaoInput('');
-    setDataLimiteInput('');
+    setDates({
+      startCreatedAt: '',
+      endCreatedAt: '',
+      startDueDate: '',
+      endDueDate: '',
+    });
 
-    const resetFilters = buildFiltersObject([], null, null, null, '', '');
+    const resetFilters = buildFiltersObject([], null, null, null, {
+      startCreatedAt: '',
+      endCreatedAt: '',
+      startDueDate: '',
+      endDueDate: '',
+    });
+
     try {
       setIsApplying(true);
       await onFilterClick(resetFilters);
@@ -115,20 +149,9 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick }) 
     }
   };
 
-  const handleDataCriacaoChange = (value: string) => {
-    const displayValue = value.includes('-') ? formatDateStringtoView(value) : applyDateMask(value);
-    setDataCriacaoInput(displayValue);
-  };
+  const hasActiveFilters = selectedStatus.length > 0 || selectedLocal || selectedEmpreiteira || selectedAtividade || Object.values(dates).some((v) => v.trim());
 
-  const handleDataLimiteChange = (value: string) => {
-    const displayValue = value.includes('-') ? formatDateStringtoView(value) : applyDateMask(value);
-    setDataLimiteInput(displayValue);
-  };
-
-  const hasActiveFilters = selectedStatus.length > 0 || selectedLocal || selectedEmpreiteira || selectedAtividade || dataCriacaoInput.trim() || dataLimiteInput.trim();
-
-  const activeFiltersCount =
-    selectedStatus.length + (selectedLocal ? 1 : 0) + (selectedEmpreiteira ? 1 : 0) + (selectedAtividade ? 1 : 0) + (dataCriacaoInput.trim() ? 1 : 0) + (dataLimiteInput.trim() ? 1 : 0);
+  const activeFiltersCount = selectedStatus.length + (selectedLocal ? 1 : 0) + (selectedEmpreiteira ? 1 : 0) + (selectedAtividade ? 1 : 0) + Object.values(dates).filter((v) => v.trim()).length;
 
   return (
     <div className="border-b border-gray-200 bg-gray-50">
@@ -210,31 +233,59 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick }) 
             onChange={(val) => setSelectedAtividade(val)}
           />
 
-          {/* Datas */}
-          <div className="flex flex-row gap-6">
+          {/* Datas Criação */}
+          <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">
-              <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Data de Criação</h5>
-              <input
-                type="date"
-                value={formatDateForInput(dataCriacaoInput)}
-                onChange={(e) => handleDataCriacaoChange(e.target.value)}
-                className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
-              />
-              {dataCriacaoInput && <div className="mt-2 text-xs text-gray-500">Filtrado por: {dataCriacaoInput}</div>}
-            </div>
+              <label className="text-sm font-medium text-gray-700">Data de Criação</label>
+              <div className="flex flex-col md:flex-row w-full justify-between gap-4 md:gap-8">
+                <input
+                  type="date"
+                  value={formatDateForInput(dates.startCreatedAt)}
+                  onChange={(e) => handleDatesChange('startCreatedAt', e.target.value)}
+                  className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
 
-            <div className="flex-1">
-              <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Data Vencimento</h5>
-              <input
-                type="date"
-                value={formatDateForInput(dataLimiteInput)}
-                onChange={(e) => handleDataLimiteChange(e.target.value)}
-                className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 text-sm"
-              />
-              {dataLimiteInput && <div className="mt-2 text-xs text-gray-500">Filtrado por: {dataLimiteInput}</div>}
+                <div className="flex items-center justify-center text-m text-gray-500">até</div>
+
+                <input
+                  type="date"
+                  value={formatDateForInput(dates.endCreatedAt)}
+                  onChange={(e) => handleDatesChange('endCreatedAt', e.target.value)}
+                  className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+              </div>
+
+              {dataErrors.createdAt && <p className="text-red-500 text-sm mt-2">{dataErrors.createdAt}</p>}
             </div>
           </div>
 
+          {/* Datas Vencimento */}
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-700">Data de Vencimento</label>
+              <div className="flex flex-col md:flex-row w-full justify-between gap-4 md:gap-8">
+                <input
+                  type="date"
+                  value={formatDateForInput(dates.startDueDate)}
+                  onChange={(e) => handleDatesChange('startDueDate', e.target.value)}
+                  className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+
+                <div className="flex items-center justify-center text-m text-gray-500">até</div>
+
+                <input
+                  type="date"
+                  value={formatDateForInput(dates.endDueDate)}
+                  onChange={(e) => handleDatesChange('endDueDate', e.target.value)}
+                  className="w-full bg-white text-gray-900 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+              </div>
+
+              {dataErrors.dueDate && <p className="text-red-500 text-sm mt-2">{dataErrors.dueDate}</p>}
+            </div>
+          </div>
+
+          {/* Botão Filtrar */}
           <div className="flex justify-end space-x-2">
             <button
               type="button"

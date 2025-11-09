@@ -32,8 +32,7 @@ export const obraService = {
     });
     if (!res.ok) throw new Error('Erro ao criar obra');
 
-    const data = await res.json();
-    return data.item;
+    return await res.json();
   },
 
   async atualizar(id: number, dados: Partial<Obra>): Promise<Obra> {
@@ -44,7 +43,8 @@ export const obraService = {
     });
     if (!res.ok) throw new Error('Erro ao atualizar obra');
 
-    const { data } = await res.json();
+    const data = await res.json();
+
     return data;
   },
 

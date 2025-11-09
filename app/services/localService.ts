@@ -34,7 +34,7 @@ export const localService = {
     if (!res.ok) throw new Error('Erro ao criar local');
 
     const data = await res.json();
-    return data.item;
+    return data;
   },
 
   async atualizar(id: number, dados: Partial<Local>): Promise<Local> {
@@ -50,8 +50,7 @@ export const localService = {
     });
     if (!res.ok) throw new Error('Erro ao atualizar local: ' + res.statusText);
 
-    const { data } = await res.json();
-    return data;
+    return await res.json();
   },
 
   async excluir(id: number): Promise<void> {

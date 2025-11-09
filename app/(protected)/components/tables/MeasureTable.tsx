@@ -1,4 +1,4 @@
-import { formatDateStringtoView, formatDateStringtoViewDueDate, formatDatetimeStringtoView } from '@/app/utils/dateUtils';
+import { formatDateStringtoView, formatDateStringtoViewDueDate } from '@/app/utils/dateUtils';
 import { ChevronLeft, ChevronRight, Grid, List, Ruler } from 'lucide-react';
 import React from 'react';
 import { MeasureTarefa, StatusColorMedicao, Tarefa } from '../../../types';
@@ -170,6 +170,17 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
     </div>
   );
 
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const DesktopTable = () => (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white">
@@ -197,7 +208,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.quantity}</td>
               <td className="px-4 py-4 text-sm font-medium text-gray-900">{formatCurrency(tarefa.totalAmount)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.empreiteira.name}</td>
-              <td className="px-4 py-4 text-sm text-gray-900">{formatDatetimeStringtoView(tarefa.createdAt)}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{formatDate(tarefa.createdAt)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{formatDateStringtoViewDueDate(tarefa.dueDate)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{formatDateStringtoView(tarefa.measurementDate)}</td>
               <td className="px-4 py-4 text-sm">
