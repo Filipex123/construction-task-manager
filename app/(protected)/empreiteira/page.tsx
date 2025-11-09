@@ -95,7 +95,7 @@ const EmpreiteiraPage: React.FC = () => {
       } else {
         await empreiteraService.criar({
           description: formData.descricao,
-          name: formData.nome,          
+          name: formData.nome,
         });
       }
 
@@ -210,7 +210,7 @@ const EmpreiteiraPage: React.FC = () => {
                 ))}
               </tbody>
             </table>
-          )}          
+          )}
         </div>
 
         {/* Paginação */}

@@ -24,7 +24,7 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }
   const [searchTerm, setSearchTerm] = React.useState('');
 
   const filteredData = React.useMemo(() => {
-    return locais.filter((local) => searchTerm === '' || local.name?.toLowerCase().includes(searchTerm.toLowerCase()));
+    return locais.filter((local) => searchTerm === '' || local.name?.toLowerCase().includes(searchTerm.toLowerCase()) || local.id === Number(searchTerm.toLowerCase()));
   }, [locais, searchTerm]);
 
   const handleToggleExpand = async () => {

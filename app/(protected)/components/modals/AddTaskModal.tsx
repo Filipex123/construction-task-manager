@@ -255,7 +255,6 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
           </button>
         </div>
 
-        {/* Form */}
         <div onClick={handleSubmit} className="p-4 space-y-4 overflow-y-auto max-h-[calc(90vh-80px)]">
           {loadingOptions ? (
             <div className="text-center py-12">
@@ -284,7 +283,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                     }
                   }}
                 />
-
+                {/* 
                 <select
                   value={formData.location?.id ?? ''}
                   onChange={(e) => {
@@ -303,7 +302,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                       {l.name}
                     </option>
                   ))}
-                </select>
+                </select> */}
                 {errors.location && <p className="text-red-600 text-sm mt-1">{errors.location}</p>}
               </div>
 
