@@ -3,6 +3,7 @@
 import { usePageTitle } from '@/app/context/PageTitle.context';
 import { atividadesService } from '@/app/services/atividadesService';
 import { Atividades } from '@/app/types';
+import { formatDateForInput } from '@/app/utils/dateUtils';
 import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Loader } from '../components/Loader';
@@ -189,7 +190,7 @@ const AtividadesPage: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{act.id}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.description}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{act.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.createdAt}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{act.createat}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div className="flex space-x-2">
                           <button onClick={() => handleOpenModal(act)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">

@@ -81,7 +81,7 @@ export interface Atividades {
   id?: number;
   name?: string;
   description?: string;
-  createdAt?: string;
+  createat?: string;
   updatedAt?: string;
   updatedBy?: string;
 }
