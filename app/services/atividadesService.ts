@@ -6,7 +6,7 @@ export const atividadesService = {
   async listar(): Promise<Atividades[]> {
     const res = await fetch(API_URL, { cache: 'no-store' });
     if (!res.ok) throw new Error('Erro ao listar atividades');
-    return res.json();
+    return await res.json();
   },
 
   async buscarPorId(id: number): Promise<Atividades> {

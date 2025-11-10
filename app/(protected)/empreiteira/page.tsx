@@ -26,7 +26,11 @@ const EmpreiteiraPage: React.FC = () => {
   // Filtrar dados
   const filteredData = useMemo(() => {
     return contractors.filter(
-      (contractor) => searchTerm === '' || contractor.description?.toLowerCase().includes(searchTerm.toLowerCase()) || contractor.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      (contractor) =>
+        searchTerm === '' ||
+        contractor.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contractor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contractor.id === Number(searchTerm.toLowerCase())
     );
   }, [contractors, searchTerm]);
 

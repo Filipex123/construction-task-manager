@@ -87,7 +87,7 @@ export const TextWithSelect: React.FC<Props> = ({ label, apiUrl, value, onChange
       />
 
       {open && filteredOptions.length > 0 && (
-        <ul className="absolute top-15 z-10 bg-white border border-gray-200 rounded-lg mt-1 w-full max-h-48 overflow-auto shadow-md">
+        <ul className="absolute top-13 z-10 bg-white border border-gray-200 rounded-lg mt-1 w-full max-h-48 overflow-auto shadow-md">
           {filteredOptions.map((opt) => (
             <li key={opt.id} onClick={() => handleSelect(opt)} className="p-2 cursor-pointer hover:bg-blue-50 transition text-black">
               {opt.name}

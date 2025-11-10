@@ -3,7 +3,6 @@
 import { usePageTitle } from '@/app/context/PageTitle.context';
 import { atividadesService } from '@/app/services/atividadesService';
 import { Atividades } from '@/app/types';
-import { formatDateForInput } from '@/app/utils/dateUtils';
 import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Loader } from '../components/Loader';
@@ -27,7 +26,13 @@ const AtividadesPage: React.FC = () => {
 
   // Filtrar dados
   const filteredData = useMemo(() => {
-    return activities.filter((act) => searchTerm === '' || act.description!.toLowerCase().includes(searchTerm.toLowerCase()) || act.name!.toLowerCase().includes(searchTerm.toLowerCase()));
+    return activities.filter(
+      (act) =>
+        searchTerm === '' ||
+        act.description!.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        act.name!.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        act.id === Number(searchTerm.toLowerCase())
+    );
   }, [activities, searchTerm]);
 
   // Paginação

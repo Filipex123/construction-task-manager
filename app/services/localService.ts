@@ -8,7 +8,7 @@ export const localService = {
       const url = idObra ? `${API_URL}?idObra=${idObra}` : API_URL;
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error('Erro ao listar local');
-      return res.json();
+      return await res.json();
     } catch (error) {
       console.error('Erro ao listar locais:', error);
       return {

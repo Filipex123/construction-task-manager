@@ -6,7 +6,7 @@ export const unidadesService = {
   async listar(): Promise<UnidadeMedida[]> {
     const res = await fetch(API_URL, { cache: 'no-store' });
     if (!res.ok) throw new Error('Erro ao listar unidades');
-    return res.json();
+    return await res.json();
   },
 
   async buscarPorId(id: number): Promise<UnidadeMedida> {

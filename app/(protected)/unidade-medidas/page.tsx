@@ -25,7 +25,14 @@ const UnidadeMedidaPage: React.FC = () => {
 
   // Filtrar dados
   const filteredData = useMemo(() => {
-    return units.filter((unit) => searchTerm === '' || unit.description?.toLowerCase().includes(searchTerm.toLowerCase()) || unit.name?.toLowerCase().includes(searchTerm.toLowerCase()));
+    return units.filter((unit) => {
+      return (
+        searchTerm === '' ||
+        unit.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        unit.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        unit.id === Number(searchTerm.toLowerCase())
+      );
+    });
   }, [units, searchTerm]);
 
   // Paginação
@@ -209,7 +216,7 @@ const UnidadeMedidaPage: React.FC = () => {
                   ))}
                 </tbody>
               </table>
-            )}            
+            )}
           </div>
 
           {/* Paginação */}

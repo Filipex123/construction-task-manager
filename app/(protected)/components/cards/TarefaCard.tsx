@@ -91,10 +91,10 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
           quantityExecuted: 0,
           dueDate: task.dueDate ?? Date.now().toString(),
           updatedBy: 'system', //TODO: ajustar usuário
-          fkAtividade: task.activity!.id!,
-          fkLocal: task.location!.id!,
-          fkUnidadeMedida: task.unitOfMeasure!.id!,
-          fkEmpreiteiro: task.contractor!.id!,
+          fkAtividade: task.atividade!.id!,
+          fkLocal: task.local!.id!,
+          fkUnidadeMedida: task.unidadeDeMedida!.id!,
+          fkEmpreiteiro: task.empreiteira!.id!,
         };
         await tarefaService.criar(obra.id!, payload);
         await fetchTasks(filters, currentPage);
@@ -118,10 +118,10 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
           totalAmount: task.totalAmount,
           paymentStatus: task.paymentStatus,
           dueDate: task.dueDate ?? Date.now().toString(),
-          fkAtividade: task.activity!.id!,
-          fkLocal: task.location!.id!,
-          fkUnidadeMedida: task.unitOfMeasure!.id!,
-          fkEmpreiteiro: task.contractor!.id!,
+          fkAtividade: task.atividade!.id!,
+          fkLocal: task.local!.id!,
+          fkUnidadeMedida: task.unidadeDeMedida!.id!,
+          fkEmpreiteiro: task.empreiteira!.id!,
         };
         await tarefaService.atualizar(tarefaId, payload);
         // recarregar página atual para refletir alterações
