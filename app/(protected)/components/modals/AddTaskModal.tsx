@@ -26,7 +26,6 @@ export type AddTarefaFormData = {
   quantity: number;
   totalAmount: number;
   paymentStatus: Tarefa['paymentStatus'];
-  dueDate?: string;
 };
 
 export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAddTask, obraId, mode = 'add', initialTask = null, onUpdateTask }) => {
@@ -44,7 +43,6 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     quantity: 0,
     totalAmount: 0,
     paymentStatus: PaymentStatusEnum.EM_ANDAMENTO,
-    dueDate: undefined,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -84,13 +82,11 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       paymentStatus: formData.paymentStatus,
       measurementStatus: MeasurementStatusEnum.PENDENTE,
       quantityExecuted: 0,
-      dueDate: formData.dueDate ?? '--/--/----', // default today if not provided
     };
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form validado: ', !validateForm());
     if (!validateForm()) return;
     const newTask = buildSubmitTask();
     if (mode === 'edit' && initialTask && onUpdateTask) {
@@ -110,7 +106,6 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       quantity: 0,
       totalAmount: 0,
       paymentStatus: PaymentStatusEnum.EM_ANDAMENTO,
-      dueDate: undefined,
     });
     setErrors({});
     onClose();
@@ -148,7 +143,6 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
             quantity: initialTask.quantity ?? 0,
             totalAmount: initialTask.totalAmount ?? 0,
             paymentStatus: initialTask.paymentStatus ?? PaymentStatusEnum.EM_ANDAMENTO,
-            dueDate: initialTask.dueDate,
           });
         } else {
           // add mode: keep selects unselected (null) and only keep defaults for simple fields
@@ -188,7 +182,6 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
         quantity: initialTask.quantity,
         totalAmount: initialTask.totalAmount,
         paymentStatus: initialTask.paymentStatus,
-        dueDate: initialTask.dueDate,
       }) !==
       JSON.stringify({
         location: formData.local,
@@ -198,7 +191,6 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
         quantity: formData.quantity,
         totalAmount: formData.totalAmount,
         paymentStatus: formData.paymentStatus,
-        dueDate: formData.dueDate,
       })
     );
   }, [mode, initialTask, formData]);

@@ -13,9 +13,7 @@ export const tarefaService = {
 
       if (!res.ok) throw new Error('Erro ao listar tarefas');
 
-      const data = await res.json();
-      console.log('DATA: ', data);
-      return data;
+      return await res.json();
     } catch (error) {
       console.error('Erro ao listar tarefas:', error);
       return {

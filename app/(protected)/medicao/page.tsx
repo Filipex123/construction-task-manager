@@ -20,7 +20,7 @@ function Medicao() {
 
   const handleMeasure = async (taskId: number, measureFields: MeasureTarefa) => {
     try {
-      await tarefaService.atualizar(taskId, measureFields);
+      await tarefaService.atualizar(taskId, { ...measureFields, medido: true });
       console.log(`Processando medicao para a tarefa com ID: ${taskId}`);
     } catch (error) {
       console.error('Erro ao processar o medicao:', error);

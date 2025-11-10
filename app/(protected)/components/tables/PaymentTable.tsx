@@ -74,7 +74,7 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
   };
 
   const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return '';
+    if (!dateString) return '--/--/----';
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return dateString;
 

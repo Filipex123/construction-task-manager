@@ -171,7 +171,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
   );
 
   const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return '';
+    if (!dateString) return '--/--/----';
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return dateString;
 

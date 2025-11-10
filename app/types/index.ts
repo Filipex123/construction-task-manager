@@ -39,6 +39,7 @@ export interface AddTarefaRequest {
   fkLocal: number;
   fkUnidadeMedida: number;
   fkEmpreiteiro: number;
+  medido?: boolean;
 }
 
 export interface Local {
@@ -60,7 +61,7 @@ export interface Obra {
 
 export interface Empreiteira {
   id?: number;
-  name?: string;  
+  name?: string;
   description?: string;
   createat?: string;
   updatedAt?: string;

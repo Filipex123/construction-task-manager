@@ -18,7 +18,7 @@ export const formatDateStringtoView = (dateString: string | undefined) => {
 };
 
 export const formatDateStringtoViewDueDate = (dateString: string | undefined) => {
-  if (!dateString || dateString == "--/--/----") return '--/--/----';
+  if (!dateString || dateString == '--/--/----') return '--/--/----';
 
   const dateArray = dateString.split('-');
   return `${dateArray[2]}/${dateArray[1]}/${dateArray[0]}`;
@@ -26,9 +26,8 @@ export const formatDateStringtoViewDueDate = (dateString: string | undefined) =>
 
 export const formatDatetimeStringtoView = (dateString: string | undefined) => {
   if (!dateString) return '--/--/----';
-  const isoDateStringArray = dateString.split('T');
+  const isoDateStringArray = dateString.split(' ');
   const dateArray = isoDateStringArray[0].split('-');
-
   return `${dateArray[2]}/${dateArray[1]}/${dateArray[0]}`;
 };
 

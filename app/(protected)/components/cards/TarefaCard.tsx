@@ -117,7 +117,6 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
           quantity: task.quantity,
           totalAmount: task.totalAmount,
           paymentStatus: task.paymentStatus,
-          dueDate: task.dueDate ?? Date.now().toString(),
           fkAtividade: task.atividade!.id!,
           fkLocal: task.local!.id!,
           fkUnidadeMedida: task.unidadeDeMedida!.id!,
