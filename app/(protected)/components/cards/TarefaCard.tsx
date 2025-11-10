@@ -89,7 +89,6 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
           paymentStatus: task.paymentStatus,
           measurementStatus: 'PENDENTE',
           quantityExecuted: 0,
-          dueDate: task.dueDate ?? Date.now().toString(),
           updatedBy: 'system', //TODO: ajustar usuário
           fkAtividade: task.atividade!.id!,
           fkLocal: task.local!.id!,

@@ -32,7 +32,6 @@ export interface AddTarefaRequest {
   measurementStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'MEDIDO' | 'RETIDO';
   quantityExecuted: number;
   measurementDate?: string;
-  dueDate: string;
   paymentDate?: string;
   updatedBy?: string;
   fkAtividade: number;
