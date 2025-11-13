@@ -1,8 +1,10 @@
+import { summariesService } from '@/app/services/summaryService';
 import { tarefaService } from '@/app/services/tarefaService';
-import { Obra, PAGE_SIZE, PaymentStatusEnum, Tarefa } from '@/app/types';
+import { Obra, PAGE_SIZE, PaymentStatusEnum, Summary, Tarefa } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, DollarSign, Loader2 } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import { ObraFilters, TarefaFilterParams } from '../ObraFilters';
+import { SummaryBar } from '../SummaryBar';
 import { BatchPaymentModal } from '../modals/BatchPaymentModal';
 import { PaymentTable } from '../tables/PaymentTable';
 
@@ -17,6 +19,9 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState<Tarefa[]>([]);
   const [hasLoadedTasks, setHasLoadedTasks] = React.useState(false);
+  const [totalCost, setTotalCost] = React.useState(0);
+  const [summaries, setSummaries] = React.useState<Summary | null>(null);
+  const [openSummary, setOpenSummary] = React.useState(false);
 
   // server-side pagination / filters
   const [filters, setFilters] = React.useState<Partial<TarefaFilterParams>>({});
@@ -37,8 +42,11 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
           pageSize: PAGE_SIZE,
         };
         const data = await tarefaService.listar(obra.id!, params);
+        const summaryData = await summariesService.listar(obra.id!);
+        setSummaries(summaryData);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
         setTotalItems(data.totalCount);
+        setTotalCost(data.totalCost);
         setCurrentPage(page);
         setHasLoadedTasks(true);
       } catch (error) {
@@ -205,33 +213,15 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
       {isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
           {/* Summary */}
-
-          <div className="px-8 py-5 bg-gray-50 border-b">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="mb-2 sm:mb-0">
-                <span className="text-sm text-gray-600">Valor Total:</span>
-                <span className="ml-2 text-xl font-bold text-green-600">{formatCurrency(totalValue)}</span>
-              </div>
-              <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'PAGO').length} pago</span>
-                  <div className="w-full h-1 bg-green-500 rounded-full" />
-                </span>
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'EM_ANDAMENTO').length} em andamento</span>
-                  <div className="w-full h-1 bg-blue-500 rounded-full" />
-                </span>
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'PENDENTE').length} pendente</span>
-                  <div className="w-full h-1 bg-yellow-500 rounded-full" />
-                </span>
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.paymentStatus.toUpperCase() === 'ATRASADO').length} atrasado</span>
-                  <div className="w-full h-1 bg-red-500 rounded-full" />
-                </span>
-              </div>
-            </div>
-          </div>
+          <SummaryBar
+            summaries={summaries}
+            totalCost={totalCost}
+            filteredTarefas={filteredTarefas}
+            openSummary={openSummary}
+            setOpenSummary={setOpenSummary}
+            formatCurrency={formatCurrency}
+            isMeasure={true}
+          />
 
           <ObraFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} />
 

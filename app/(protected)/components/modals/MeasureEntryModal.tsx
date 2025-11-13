@@ -1,5 +1,4 @@
 import { MeasurementStatusEnum, MeasureTarefa } from '@/app/types';
-import { formatDateForInput } from '@/app/utils/dateUtils';
 import { CheckCircle2, Hash, Ruler, X } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -16,7 +15,6 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
   const title = initialValues ? 'Editar Medição' : 'Nova Medição';
 
   const statusOptions = [
-    { value: 'PENDENTE', label: 'Pendente' },   
     { value: 'MEDIDO', label: 'Medido' },
     { value: 'EM_ANDAMENTO', label: 'Em Andamento' },
     { value: 'RETIDO', label: 'Retido' },
@@ -28,7 +26,6 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
         quantity: initialValues?.quantity != null ? Number(initialValues.quantity) : 0,
         quantityExecuted: initialValues?.quantityExecuted != null ? Number(initialValues.quantityExecuted) : 0,
         measurementStatus: initialValues?.measurementStatus ?? MeasurementStatusEnum.PENDENTE,
-        measurementDate: initialValues?.measurementDate ?? formatDateForInput(new Date().toISOString()),
         updatedBy: initialValues?.updatedBy ?? undefined,
       });
       setErrors({});
@@ -54,10 +51,17 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
       quantity: form.quantity,
       quantityExecuted: form.quantityExecuted,
       measurementStatus: form.measurementStatus,
-      measurementDate: new Date().toISOString().slice(0, 10),
       updatedBy: form.updatedBy,
     });
     onClose();
+  };
+
+  const handleMedir = (option: { value: string; label: string }) => {
+    if (option.value === 'MEDIDO' && initialValues?.quantity) {
+      setForm((p) => ({ ...p, measurementStatus: option.value as MeasurementStatusEnum, quantityExecuted: initialValues?.quantity }));
+    } else {
+      setForm((p) => ({ ...p, measurementStatus: option.value as MeasurementStatusEnum }));
+    }
   };
 
   if (!isOpen) return null;
@@ -124,12 +128,12 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
           {/* Status */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Status</label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               {statusOptions.map((option) => (
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => setForm((p) => ({ ...p, measurementStatus: option.value as MeasurementStatusEnum }))}
+                  onClick={() => handleMedir(option)}
                   className={`text-gray-600 p-3 rounded-lg border-2 transition-all text-sm font-medium ${
                     form.measurementStatus === option.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
                   }`}

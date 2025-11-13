@@ -52,6 +52,26 @@ export const tarefaService = {
     return;
   },
 
+  async medir(id: number, dados: Partial<AddTarefaRequest>): Promise<void> {
+    const res = await fetch(`${API_URL}/${id}?mode=medicao`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados),
+    });
+    if (!res.ok) throw new Error('Erro ao atualizar tarefa');
+    return;
+  },
+
+  async pagar(id: number, user?: string): Promise<void> {
+    const res = await fetch(`${API_URL}/${id}?mode=pagamento`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ updatedBy: user || 'system' }), //todo put correct user
+    });
+    if (!res.ok) throw new Error('Erro ao atualizar tarefa');
+    return;
+  },
+
   async excluir(id: string): Promise<void> {
     const res = await fetch(`${API_URL}/${id}`, {
       method: 'DELETE',

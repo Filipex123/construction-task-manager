@@ -32,7 +32,7 @@ const statusLabels = {
   RETIDO: 'Retido',
 };
 
-export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeasure, serverSide = false, totalItems = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
+export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeasure, totalItems = 0, currentPage = 1, pageSize = 10, onPageChange }) => {
   const [mobileView, setMobileView] = React.useState<MobileView>('cards');
   const [selectedTask, setSelectedTask] = React.useState<Tarefa | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);

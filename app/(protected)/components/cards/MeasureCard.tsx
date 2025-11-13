@@ -1,8 +1,10 @@
+import { summariesService } from '@/app/services/summaryService';
 import { tarefaService } from '@/app/services/tarefaService';
-import { MeasureTarefa, Obra, PAGE_SIZE, Tarefa } from '@/app/types';
+import { MeasureTarefa, Obra, PAGE_SIZE, Summary, Tarefa } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
-import { ObraMeasureFilters, TarefaFilterParams } from '../ObraMeasureFilters';
+import { ObraFilters, TarefaFilterParams } from '../ObraFilters';
+import { SummaryBar } from '../SummaryBar';
 import { MeasureTable } from '../tables/MeasureTable';
 
 interface MeasureCardProps {
@@ -15,16 +17,14 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
   const [isLoading, setIsLoading] = React.useState(false);
   const [filteredTarefas, setFilteredTarefas] = React.useState<Tarefa[]>([]);
   const [hasLoadedTasks, setHasLoadedTasks] = React.useState(false);
+  const [totalCost, setTotalCost] = React.useState(0);
+  const [summaries, setSummaries] = React.useState<Summary | null>(null);
+  const [openSummary, setOpenSummary] = React.useState(false);
 
   // server-side pagination / filters
   const [filters, setFilters] = React.useState<Partial<TarefaFilterParams>>({});
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalItems, setTotalItems] = React.useState(0);
-
-  const getTotalValue = () => {
-    if (filteredTarefas.length === 0) return 0;
-    return filteredTarefas.reduce((total, tarefa) => total + (tarefa.totalAmount ?? 0), 0);
-  };
 
   const fetchTasks = React.useCallback(
     async (incomingFilters: Partial<TarefaFilterParams> = {}, page: number) => {
@@ -37,8 +37,11 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
           limit: PAGE_SIZE,
         };
         const data = await tarefaService.listar(obra.id!, params);
+        const summaryData = await summariesService.listar(obra.id!);
+        setSummaries(summaryData);
         setFilteredTarefas(Array.isArray(data.items) ? data.items : []);
         setTotalItems(data.totalCount);
+        setTotalCost(data.totalCost);
         setCurrentPage(page);
         setHasLoadedTasks(true);
       } catch (error) {
@@ -106,7 +109,6 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
 
   // memoize derived values
   const tarefasCount = useMemo(() => filteredTarefas.length, [filteredTarefas]);
-  const totalValue = useMemo(() => getTotalValue(), [filteredTarefas]);
 
   // Header extraído para fora do componente para não recriar o tipo em cada render
   type HeaderProps = {
@@ -153,35 +155,18 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
       {isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
           {/* Summary */}
-          <div className="px-8 py-5 bg-gray-50 border-b">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="mb-2 sm:mb-0">
-                <span className="text-sm text-gray-600">Valor Total:</span>
-                <span className="ml-2 text-xl font-bold text-green-600">{formatCurrency(totalValue)}</span>
-              </div>
-              <div className="flex gap-4 justify-center space-x-4 text-sm text-black">
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.measurementStatus.toUpperCase() === 'MEDIDO').length} medido</span>
-                  <div className="w-full h-1 bg-green-500 rounded-full" />
-                </span>
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.measurementStatus.toUpperCase() === 'EM_ANDAMENTO').length} em andamento</span>
-                  <div className="w-full h-1 bg-blue-500 rounded-full" />
-                </span>
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.measurementStatus.toUpperCase() === 'PENDENTE').length} pendente</span>
-                  <div className="w-full h-1 bg-yellow-500 rounded-full" />
-                </span>
-                <span className="flex flex-col items-center space-y-1">
-                  <span className="text-xs">{filteredTarefas.filter((t) => t.measurementStatus.toUpperCase() === 'RETIDO').length} retido</span>
-                  <div className="w-full h-1 bg-red-500 rounded-full" />
-                </span>
-              </div>
-            </div>
-          </div>
+          <SummaryBar
+            summaries={summaries}
+            totalCost={totalCost}
+            filteredTarefas={filteredTarefas}
+            openSummary={openSummary}
+            setOpenSummary={setOpenSummary}
+            formatCurrency={formatCurrency}
+            isMeasure={true}
+          />
 
           {/* Criar um novo para medicao */}
-          <ObraMeasureFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} />
+          <ObraFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} isMeasure />
 
           <div className="p-8 relative">
             {/* overlay de loading: aparece por cima do conteúdo sem desmontar o painel */}

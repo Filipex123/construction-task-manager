@@ -5,7 +5,8 @@ const API_URL = 'https://elalpwcip7.execute-api.us-east-1.amazonaws.com/prod/obr
 export const obraService = {
   async listar(): Promise<PageableResponse<Obra>> {
     try {
-      const res = await fetch(API_URL, { cache: 'no-store' });
+      const idUsuario = Number(localStorage.getItem('idUsuario'));
+      const res = await fetch(`${API_URL}?idUsuario=${idUsuario}`, { cache: 'no-store' });
       if (!res.ok) throw new Error('Erro ao listar obras');
       return res.json();
     } catch (error) {
@@ -18,14 +19,9 @@ export const obraService = {
     }
   },
 
-  async buscarPorId(id: number): Promise<Obra> {
-    const res = await fetch(`${API_URL}/${id}`);
-    if (!res.ok) throw new Error('Erro ao buscar obra');
-    return res.json();
-  },
-
   async criar(dados: Omit<Obra, 'ID'>): Promise<Obra> {
-    const res = await fetch(API_URL, {
+    const idUsuario = Number(localStorage.getItem('idUsuario'));
+    const res = await fetch(`${API_URL}?idUsuario=${idUsuario}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dados),

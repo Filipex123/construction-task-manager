@@ -21,7 +21,6 @@ export interface MeasureTarefa {
   quantityExecuted: number;
   quantity: number;
   measurementStatus: 'MEDIDO' | 'PENDENTE' | 'EM_ANDAMENTO' | 'RETIDO';
-  measurementDate?: string;
   updatedBy?: string;
 }
 
@@ -85,10 +84,17 @@ export interface Atividades {
   updatedBy?: string;
 }
 
+export interface Summary {
+  ValorTotal: number;
+  ValorPago: number;
+  ValorAPagar: number;
+}
+
 export interface PageableResponse<T> {
   items: T[];
   count: number;
   totalCount: number;
+  totalCost: number;
 }
 
 export type StatusColor = {

@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,6 +42,7 @@ export default function LoginPage() {
     // 🔐 Exemplo de validação simples
     if (email === 'admin@vital.com' && password === '123456') {
       localStorage.setItem('logged', 'true');
+      localStorage.setItem('idUsuario', '1');
       router.push('/'); // redireciona para a home (protegida)
     } else {
       alert('Credenciais inválidas');

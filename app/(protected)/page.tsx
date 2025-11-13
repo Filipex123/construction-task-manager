@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { usePageTitle } from '../context/PageTitle.context';
 import { obraService } from '../services/obraService';
 import { tarefaService } from '../services/tarefaService';
-import { Obra, PaymentStatusEnum } from '../types';
+import { Obra } from '../types';
 import { Loader } from './components/Loader';
 import { SearchBar } from './components/SearchBar';
 import { PaymentCard } from './components/cards/PaymentCard';
@@ -21,7 +21,7 @@ function Home() {
 
   const handlePay = async (tarefaId: number) => {
     try {
-      await tarefaService.atualizar(tarefaId, { paymentStatus: PaymentStatusEnum.PAGO, paymentDate: new Date().toISOString().slice(0, 10), updatedBy: 'system' });
+      await tarefaService.pagar(tarefaId);
     } catch (error) {
       console.error('Erro ao processar o pagamento:', error);
     }

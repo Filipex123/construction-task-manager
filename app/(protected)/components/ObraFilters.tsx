@@ -6,6 +6,7 @@ import { TextWithSelect } from './InputSelect';
 
 export type TarefaFilterParams = {
   paymentStatus?: string[];
+  measurementStatus?: string[];
   location?: string[];
   contractor?: string[];
   activity?: string[];
@@ -27,6 +28,7 @@ type DateRanges = {
 interface ObraFiltersProps {
   tarefas: Tarefa[];
   onFilterClick: (result: any) => Promise<any>;
+  isMeasure?: boolean;
 }
 
 const statusLabels = {
@@ -34,16 +36,19 @@ const statusLabels = {
   EM_ANDAMENTO: 'Em Andamento',
   PAGO: 'Pago',
   ATRASADO: 'Atrasado',
+  MEDIDO: 'Medido',
+  RETIDO: 'Retido',
 };
 
 const statusColors = {
   PENDENTE: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   EM_ANDAMENTO: 'bg-blue-100 text-blue-800 border-blue-200 text-center',
   PAGO: 'bg-green-100 text-green-800 border-green-200',
+  MEDIDO: 'bg-green-100 text-green-800 border-green-200',
   ATRASADO: 'bg-red-100 text-red-800 border-red-200',
 };
 
-export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick }) => {
+export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, isMeasure = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [selectedLocal, setSelectedLocal] = useState<TaskIdName | null>(null);
@@ -62,6 +67,9 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick }) 
     endDueDate: '',
   });
   const uniqueStatus = ['PAGO', 'PENDENTE', 'EM_ANDAMENTO', 'ATRASADO'];
+  const uniqueMeasurementStatus = ['MEDIDO', 'PENDENTE', 'EM_ANDAMENTO', 'RETIDO'];
+
+  const getStatusByProp = () => (isMeasure ? uniqueMeasurementStatus : uniqueStatus);
 
   const handleDatesChange = (field: keyof typeof dates, value: string) => {
     const updated = { ...dates, [field]: value };
@@ -91,7 +99,7 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick }) 
 
   const buildFiltersObject = (status: string[], local: TaskIdName | null, empreiteira: TaskIdName | null, atividade: TaskIdName | null, dates: DateRanges): TarefaFilterParams => {
     return {
-      paymentStatus: status.length ? status : undefined,
+      ...(isMeasure ? { measurementStatus: status.length ? status : undefined } : { paymentStatus: status.length ? status : undefined }),
       location: local ? [String(local.id)] : undefined,
       contractor: empreiteira ? [String(empreiteira.id)] : undefined,
       activity: atividade ? [String(atividade.id)] : undefined,
@@ -191,7 +199,7 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick }) 
           <div>
             <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Status</h5>
             <div className="flex flex-wrap gap-2">
-              {uniqueStatus.map((status) => (
+              {getStatusByProp().map((status) => (
                 <button
                   key={status}
                   type="button"
