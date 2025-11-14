@@ -75,6 +75,15 @@ export interface UnidadeMedida {
   updatedBy?: string;
 }
 
+
+export interface Login {
+  id?: number;
+  login?: string;
+  password?: string;
+  description?: string;
+  isAdmin?: boolean;
+}
+
 export interface Atividades {
   id?: number;
   name?: string;

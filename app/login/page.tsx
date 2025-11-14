@@ -34,22 +34,45 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  e.preventDefault();
+  if (!validateForm()) return;
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    // 🔐 Exemplo de validação simples
-    if (email === 'admin@vital.com' && password === '123456') {
-      localStorage.setItem('logged', 'true');
-      localStorage.setItem('idUsuario', '1');
-      router.push('/'); // redireciona para a home (protegida)
-    } else {
-      alert('Credenciais inválidas');
+  try {
+    // 🔹 Monta a URL com query params
+    const url = `https://s9vh7o77o7.execute-api.us-east-1.amazonaws.com/prod/login?login=${encodeURIComponent(
+      email
+    )}&password=${encodeURIComponent(password)}`;
+
+    const response = await fetch(url, {
+      method: "GET"
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Erro ao fazer login");
+      setIsLoading(false);
+      return;
     }
 
-    setIsLoading(false);
-  };
+    // 🔹 Salva dados no localStorage
+    localStorage.setItem("logged", "true");
+    localStorage.setItem("idUsuario", String(data.id));
+    localStorage.setItem("usuarioLogin", data.login);
+    localStorage.setItem("isAdmin", String(data.isAdmin));
+
+    router.push("/");
+  } catch (error) {
+    console.error(error);
+    alert("Erro ao conectar com o servidor");
+  }
+
+  setIsLoading(false);
+};
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
