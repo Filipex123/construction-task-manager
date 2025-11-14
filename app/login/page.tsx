@@ -61,6 +61,7 @@ export default function LoginPage() {
     localStorage.setItem("logged", "true");
     localStorage.setItem("idUsuario", String(data.id));
     localStorage.setItem("usuarioLogin", data.login);
+    localStorage.setItem("usuarioName", data.name);
     localStorage.setItem("isAdmin", String(data.isAdmin));
 
     router.push("/");

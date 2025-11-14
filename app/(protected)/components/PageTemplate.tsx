@@ -10,9 +10,20 @@ interface PageTemplateProps {
 export const PageTemplate: React.FC<PageTemplateProps> = ({ children }) => {
   const { title, subtitle, descrition } = usePageTitle();
 
+  const [userName, setUserName] = React.useState<string>("");
+  const [userEmail, setUserEmail] = React.useState<string>("");
+
+  React.useEffect(() => {
+    const login = localStorage.getItem("usuarioName") || "";
+    const email = localStorage.getItem("usuarioLogin") || ""; // se quiser tratar email diferente, mude aqui
+
+    setUserName(login);
+    setUserEmail(email);
+  }, []);
+
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar userName="Lucas Carvalho Barros" userEmail="lucas.carvalho.barros@hotmail.com" />
+      <Sidebar userName={userName} userEmail={userEmail} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header title={title} />

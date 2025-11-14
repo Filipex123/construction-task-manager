@@ -21,6 +21,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
     localStorage.removeItem("logged");
     localStorage.removeItem("idUsuario");
     localStorage.removeItem("usuarioLogin");
+    localStorage.removeItem("usuarioName");
     localStorage.removeItem("isAdmin");
 
     router.push("/login"); // redireciona para o login
