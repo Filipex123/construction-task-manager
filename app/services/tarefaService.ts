@@ -20,6 +20,7 @@ export const tarefaService = {
         items: [],
         count: 0,
         totalCount: 0,
+        totalCost: 0,
       };
     }
   },
