@@ -1,6 +1,6 @@
 import { summariesService } from '@/app/services/summaryService';
 import { tarefaService } from '@/app/services/tarefaService';
-import { Obra, PAGE_SIZE, PaymentStatusEnum, Summary, Tarefa } from '@/app/types';
+import { Obra, ObraSummary, PAGE_SIZE, PaymentStatusEnum, Tarefa } from '@/app/types';
 import { Building, ChevronDown, ChevronUp, DollarSign, Loader2 } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import { ObraFilters, TarefaFilterParams } from '../ObraFilters';
@@ -20,7 +20,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({ obra, onPay }) => {
   const [filteredTarefas, setFilteredTarefas] = React.useState<Tarefa[]>([]);
   const [hasLoadedTasks, setHasLoadedTasks] = React.useState(false);
   const [totalCost, setTotalCost] = React.useState(0);
-  const [summaries, setSummaries] = React.useState<Summary | null>(null);
+  const [summaries, setSummaries] = React.useState<ObraSummary | null>(null);
   const [openSummary, setOpenSummary] = React.useState(false);
 
   // server-side pagination / filters

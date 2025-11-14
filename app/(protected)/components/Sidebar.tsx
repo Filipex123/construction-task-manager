@@ -2,9 +2,8 @@ import { useSidebar } from '@/app/context/Sidebar.context';
 import { ChevronDown, ChevronRight, ClipboardList, DollarSign, LogOut, Menu, Plus, Ruler, User, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React from 'react';
-import { useRouter } from "next/navigation";
-
 
 interface SidebarProps {
   userName: string;
@@ -18,15 +17,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
   const router = useRouter();
 
   const logout = () => {
-    localStorage.removeItem("logged");
-    localStorage.removeItem("idUsuario");
-    localStorage.removeItem("usuarioLogin");
-    localStorage.removeItem("usuarioName");
-    localStorage.removeItem("isAdmin");
+    localStorage.removeItem('logged');
+    localStorage.removeItem('idUsuario');
+    localStorage.removeItem('usuarioLogin');
+    localStorage.removeItem('usuarioName');
+    localStorage.removeItem('isAdmin');
 
-    router.push("/login"); // redireciona para o login
+    router.push('/login'); // redireciona para o login
   };
-
 
   return (
     <>
@@ -130,20 +128,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                   <User className="h-4 w-4 text-white" />
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium">{userName}</p>
-                  <p className="text-xs text-gray-400">{userEmail}</p>
+                <div className="ml-3 max-w-[150px] overflow-hidden">
+                  <p className="text-sm font-medium truncate">{userName}</p>
+                  <p className="text-xs text-gray-400 truncate">{userEmail}</p>
                 </div>
               </>
             )}
           </div>
           <button
-        onClick={logout}
-        className={`w-full flex items-center px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors ${!isOpen ? 'justify-center' : 'justify-start'}`}
-      >
-        <LogOut className={`h-4 w-4 ${!isOpen ? '' : 'mr-2'}`} />
-        {isOpen && 'Sair'}
-      </button>
+            onClick={logout}
+            className={`w-full flex items-center px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors ${!isOpen ? 'justify-center' : 'justify-start'}`}
+          >
+            <LogOut className={`h-4 w-4 ${!isOpen ? '' : 'mr-2'}`} />
+            {isOpen && 'Sair'}
+          </button>
         </div>
 
         {/* Toggle Button for Desktop */}

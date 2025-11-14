@@ -75,7 +75,6 @@ export interface UnidadeMedida {
   updatedBy?: string;
 }
 
-
 export interface Login {
   id?: number;
   login?: string;
@@ -93,10 +92,22 @@ export interface Atividades {
   updatedBy?: string;
 }
 
-export interface Summary {
+export interface ObraSummary {
   ValorTotal: number;
   ValorPago: number;
   ValorAPagar: number;
+}
+
+export interface GeneralSummary {
+  totalAtividades: UnitSummary;
+  emAndamento: UnitSummary;
+  atrasadas: UnitSummary;
+  concluidas: UnitSummary;
+}
+
+export interface UnitSummary {
+  percentage: number;
+  total: number;
 }
 
 export interface PageableResponse<T> {

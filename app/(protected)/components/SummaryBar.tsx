@@ -1,9 +1,9 @@
-import { Summary, Tarefa } from '@/app/types';
+import { ObraSummary, Tarefa } from '@/app/types';
 import { ChartNoAxesCombined, ChevronDown, ChevronUp } from 'lucide-react';
 import React from 'react';
 
 interface SummaryBarProps {
-  summaries: Summary | null;
+  summaries: ObraSummary | null;
   totalCost: number;
   filteredTarefas: Tarefa[];
   openSummary: boolean;

@@ -34,46 +34,43 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!validateForm()) return;
+    e.preventDefault();
+    if (!validateForm()) return;
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    // 🔹 Monta a URL com query params
-    const url = `https://s9vh7o77o7.execute-api.us-east-1.amazonaws.com/prod/login?login=${encodeURIComponent(
-      email
-    )}&password=${encodeURIComponent(password)}`;
+    try {
+      // 🔹 Monta a URL com query params
+      const url = `https://s9vh7o77o7.execute-api.us-east-1.amazonaws.com/prod/login?login=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
 
-    const response = await fetch(url, {
-      method: "GET"
-    });
+      const response = await fetch(url, {
+        method: 'GET',
+        cache: 'no-store',
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      alert(data.message || "Erro ao fazer login");
-      setIsLoading(false);
-      return;
+      if (!response.ok) {
+        alert(data.message || 'Erro ao fazer login');
+        setIsLoading(false);
+        return;
+      }
+
+      // 🔹 Salva dados no localStorage
+      localStorage.setItem('logged', 'true');
+      localStorage.setItem('idUsuario', String(data.id));
+      localStorage.setItem('usuarioLogin', data.login);
+      localStorage.setItem('usuarioName', data.name);
+      localStorage.setItem('isAdmin', String(data.isAdmin));
+
+      router.push('/');
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao conectar com o servidor');
     }
 
-    // 🔹 Salva dados no localStorage
-    localStorage.setItem("logged", "true");
-    localStorage.setItem("idUsuario", String(data.id));
-    localStorage.setItem("usuarioLogin", data.login);
-    localStorage.setItem("usuarioName", data.name);
-    localStorage.setItem("isAdmin", String(data.isAdmin));
-
-    router.push("/");
-  } catch (error) {
-    console.error(error);
-    alert("Erro ao conectar com o servidor");
-  }
-
-  setIsLoading(false);
-};
-
-
+    setIsLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">

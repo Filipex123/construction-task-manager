@@ -4,9 +4,10 @@ import { usePageTitle } from '../context/PageTitle.context';
 import { obraService } from '../services/obraService';
 import { tarefaService } from '../services/tarefaService';
 import { Obra } from '../types';
+import { PaymentCard } from './components/cards/PaymentCard';
+import { DashboardSummary } from './components/DashboardSumary';
 import { Loader } from './components/Loader';
 import { SearchBar } from './components/SearchBar';
-import { PaymentCard } from './components/cards/PaymentCard';
 
 function Home() {
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
@@ -49,6 +50,7 @@ function Home() {
 
   return (
     <>
+      <DashboardSummary />
       <div className="mb-6">
         <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
       </div>
