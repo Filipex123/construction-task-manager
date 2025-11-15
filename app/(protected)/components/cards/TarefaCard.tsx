@@ -235,7 +235,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
             isMeasure={true}
           />
 
-          <ObraFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} />
+          <ObraFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} obraId={obra.id!} />
 
           <div className="p-8 relative">
             {/* overlay de loading: aparece por cima do conteúdo sem desmontar o painel */}

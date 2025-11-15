@@ -6,7 +6,7 @@ import { atividadesService } from '@/app/services/atividadesService';
 import { empreiteraService } from '@/app/services/empreiteiraService';
 import { localService } from '@/app/services/localService';
 import { unidadesService } from '@/app/services/unidadesService';
-import { TextWithSelect } from '../InputSelect';
+import { Option, TextWithSelect } from '../InputSelect';
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -229,7 +229,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                   </label>
 
                   <TextWithSelect
-                    apiUrl={'https://zernov6ywj.execute-api.us-east-1.amazonaws.com/prod/locais?idObra=1&limit=1000'}
+                    isLoading={loadingOptions}
+                    options={locais.map((l) => ({ id: l.id, name: l.name })) as Option[]}
                     value={{
                       id: formData.local?.id || 0,
                       name: formData.local?.name || '',
@@ -237,11 +238,12 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                     onChange={(value) => {
                       if (value) {
                         const selected = locais.find((l) => l.id === value.id) ?? value;
-                        handleInputChange('local', selected);
+                        handleInputChange('local', selected as Option & Local);
                       } else {
                         handleInputChange('local', null);
                       }
                     }}
+                    label={'Locais'}
                   />
                   {errors.location && <p className="text-red-600 text-sm mt-1">{errors.location}</p>}
                 </div>
@@ -254,7 +256,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
                   </label>
 
                   <TextWithSelect
-                    apiUrl={'https://8dg3v1avkb.execute-api.us-east-1.amazonaws.com/prod/atividades'}
+                    isLoading={loadingOptions}
+                    options={atividades.map((l) => ({ id: l.id, name: l.name })) as Option[]}
                     value={{
                       id: formData.atividade?.id || 0,
                       name: formData.atividade?.name || '',

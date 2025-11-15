@@ -1,8 +1,11 @@
+import { atividadesService } from '@/app/services/atividadesService';
+import { empreiteraService } from '@/app/services/empreiteiraService';
+import { localService } from '@/app/services/localService';
 import { formatDateForInput } from '@/app/utils/dateUtils';
 import { ChevronDown, ChevronUp, Filter, X } from 'lucide-react';
-import React, { useState } from 'react';
-import { Tarefa, TaskIdName } from '../../types';
-import { TextWithSelect } from './InputSelect';
+import React, { useEffect, useState } from 'react';
+import { Atividades, Empreiteira, Local, Tarefa, TaskIdName } from '../../types';
+import { Option, TextWithSelect } from './InputSelect';
 
 export type TarefaFilterParams = {
   paymentStatus?: string[];
@@ -26,6 +29,7 @@ type DateRanges = {
 };
 
 interface ObraFiltersProps {
+  obraId: number;
   tarefas: Tarefa[];
   onFilterClick: (result: any) => Promise<any>;
   isMeasure?: boolean;
@@ -48,8 +52,13 @@ const statusColors = {
   ATRASADO: 'bg-red-100 text-red-800 border-red-200',
 };
 
-export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, isMeasure = false }) => {
+export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, isMeasure = false, obraId }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [locais, setLocais] = useState<Local[]>([]);
+  const [atividades, setAtividades] = useState<Atividades[]>([]);
+  const [contractors, setContractors] = useState<Empreiteira[]>([]);
+
+  const [loadingOptions, setLoadingOptions] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [selectedLocal, setSelectedLocal] = useState<TaskIdName | null>(null);
   const [selectedEmpreiteira, setSelectedEmpreiteira] = useState<TaskIdName | null>(null);
@@ -161,6 +170,37 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, is
 
   const activeFiltersCount = selectedStatus.length + (selectedLocal ? 1 : 0) + (selectedEmpreiteira ? 1 : 0) + (selectedAtividade ? 1 : 0) + Object.values(dates).filter((v) => v.trim()).length;
 
+  useEffect(() => {
+    let mounted = true;
+    const loadOptions = async () => {
+      setLoadingOptions(true);
+      try {
+        const [fLocais, fAtividades, fContractors] = await Promise.all([localService?.listar(obraId), atividadesService?.listar(), empreiteraService?.listar()]);
+
+        if (!mounted) return;
+
+        const locaisArr: Local[] = fLocais.items;
+        const atividadesArr: Atividades[] = fAtividades;
+        const contractorsArr: Empreiteira[] = fContractors;
+
+        setLocais(locaisArr);
+        setAtividades(atividadesArr);
+        setContractors(contractorsArr);
+      } catch (err) {
+        console.error('Erro ao carregar opções do modal de tarefa:', err);
+        // fallback já definido via mocks
+      } finally {
+        if (mounted) setLoadingOptions(false);
+      }
+    };
+
+    loadOptions();
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [obraId]);
+
   return (
     <div className="border-b border-gray-200 bg-gray-50">
       {/* Toggle */}
@@ -218,17 +258,12 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, is
           </div>
 
           {/* Locais */}
-          <TextWithSelect
-            label="Local"
-            apiUrl="https://zernov6ywj.execute-api.us-east-1.amazonaws.com/prod/locais?idObra=1&limit=1000"
-            value={selectedLocal ?? undefined}
-            onChange={(val) => setSelectedLocal(val)}
-          />
+          <TextWithSelect label="Local" options={locais.map((l) => ({ id: l.id, name: l.name })) as Option[]} value={selectedLocal ?? undefined} onChange={(val) => setSelectedLocal(val)} />
 
           {/* Empreiteira */}
           <TextWithSelect
             label="Empreiteira"
-            apiUrl="https://kizi7kxvm0.execute-api.us-east-1.amazonaws.com/prod/empreiteiras"
+            options={contractors.map((l) => ({ id: l.id, name: l.name })) as Option[]}
             value={selectedEmpreiteira ?? undefined}
             onChange={(val) => setSelectedEmpreiteira(val)}
           />
@@ -236,7 +271,7 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, is
           {/* Atividade */}
           <TextWithSelect
             label="Atividade"
-            apiUrl="https://8dg3v1avkb.execute-api.us-east-1.amazonaws.com/prod/atividades"
+            options={atividades.map((l) => ({ id: l.id, name: l.name })) as Option[]}
             value={selectedAtividade ?? undefined}
             onChange={(val) => setSelectedAtividade(val)}
           />

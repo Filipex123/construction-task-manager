@@ -166,7 +166,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
           />
 
           {/* Criar um novo para medicao */}
-          <ObraFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} isMeasure />
+          <ObraFilters tarefas={filteredTarefas} onFilterClick={handleFilterChange} isMeasure obraId={obra.id!} />
 
           <div className="p-8 relative">
             {/* overlay de loading: aparece por cima do conteúdo sem desmontar o painel */}
