@@ -1,7 +1,7 @@
 'use client';
 
 import { usePageTitle } from '@/app/context/PageTitle.context';
-import { unidadesService } from '@/app/services/unidadesService';
+import { usuariosService } from '@/app/services/usuariosService';
 import { UnidadeMedida } from '@/app/types';
 import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
@@ -93,18 +93,16 @@ const UsuariosPage: React.FC = () => {
     setIsLoading(true);
     try {
       if (editingItem) {
-        await unidadesService.atualizar(editingItem.id!, {
-          description: formData.descricao,
+        await usuariosService.atualizar(editingItem.id!, {          
           name: formData.complemento,
         });
       } else {
-        await unidadesService.criar({
-          description: formData.descricao,
+        await usuariosService.criar({          
           name: formData.complemento,
         });
       }
 
-      const data = await unidadesService.listar();
+      const data = await usuariosService.listar();
       setUnits(data);
       handleCloseModal();
     } catch (error) {
@@ -119,8 +117,8 @@ const UsuariosPage: React.FC = () => {
     if (id) {
       try {
         setIsLoading(true);
-        await unidadesService.excluir(id);
-        const data = await unidadesService.listar();
+        await usuariosService.excluir(id);
+        const data = await usuariosService.listar();
         setUnits(data);
       } catch (error) {
         console.error(error);
@@ -139,7 +137,7 @@ const UsuariosPage: React.FC = () => {
     const carregar = async () => {
       setIsLoading(true);
       try {
-        const data = await unidadesService.listar();
+        const data = await usuariosService.listar();
         setUnits(data);
       } catch (error) {
         console.error(error);
