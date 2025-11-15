@@ -77,10 +77,10 @@ export interface UnidadeMedida {
 
 export interface Login {
   id?: number;
-  login?: string;
-  password?: string;
-  description?: string;
-  isAdmin?: boolean;
+  name?: string;  
+  createat?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export interface Atividades {
