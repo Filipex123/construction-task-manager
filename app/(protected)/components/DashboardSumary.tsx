@@ -86,7 +86,7 @@ export const DashboardSummary: React.FC = () => {
 
       <div className="space-y-1">
         <p className={`text-2xl font-bold ${color}`}>{valueType === 'currency' ? formatCurrency(value) : value.toLocaleString()}</p>
-        <p className={`text-xs opacity-75 ${color}`}>{valueType === 'currency' ? `de ${formatCurrency(total)} total` : `de ${total.toLocaleString()} total`}</p>
+        <p className={`text-xs opacity-75 ${color}`}>{`de ${total} total`}</p>
       </div>
     </div>
   );
@@ -128,7 +128,7 @@ export const DashboardSummary: React.FC = () => {
               title="Total de Atividades"
               value={summaries?.totalAtividades.total ?? 0}
               total={summaries?.totalAtividades.total ?? 0}
-              percentage={100}
+              percentage={summaries?.totalAtividades.percentage ?? 0}
               color="text-blue-700"
               bgColor="bg-blue-50"
               icon={Building}
@@ -235,7 +235,7 @@ export const DashboardSummary: React.FC = () => {
                   <TrendingUp className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl font-bold">{formatCurrency(summaries?.totalAtividades.total!)}</p>
+              <p className="text-2xl font-bold">{formatCurrency(summaries?.totalAtividades.valorTotal!)}</p>
             </div>
 
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
@@ -245,7 +245,7 @@ export const DashboardSummary: React.FC = () => {
                   <Clock className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl font-bold">{formatCurrency(summaries?.emAndamento.total!)}</p>
+              <p className="text-2xl font-bold">{formatCurrency(summaries?.emAndamento.valorTotal!)}</p>
             </div>
 
             <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-xl p-4 text-white">
@@ -255,7 +255,7 @@ export const DashboardSummary: React.FC = () => {
                   <AlertTriangle className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl font-bold">{formatCurrency(summaries?.atrasadas.total!)}</p>
+              <p className="text-2xl font-bold">{formatCurrency(summaries?.atrasadas.valorTotal!)}</p>
             </div>
 
             <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-xl p-4 text-white">
@@ -265,7 +265,7 @@ export const DashboardSummary: React.FC = () => {
                   <CheckCircle className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl font-bold">{formatCurrency(summaries?.concluidas.total!)}</p>
+              <p className="text-2xl font-bold">{formatCurrency(summaries?.concluidas.valorTotal!)}</p>
             </div>
           </div>
         </div>

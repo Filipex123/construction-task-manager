@@ -53,7 +53,7 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({ summaries, totalCost, fi
           <div className="grid grid-cols-2 md:flex md:flex-row items-center gap-2 md:gap-4 mb-2 md:mb-0">
             <div className="flex flex-col md:flex-row items-center md:gap-2">
               <span className="text-sm text-gray-600">Valor Total:</span>
-              <span className="text-md font-bold text-green-600">{formatCurrency(summaries?.ValorTotal ?? 0)}</span>
+              <span className="text-md font-bold text-green-600">{formatCurrency(summaries?.valorTotal ?? 0)}</span>
             </div>
             <div className="flex flex-col md:flex-row items-center md:gap-2">
               <span className="text-sm text-gray-600">Valor Filtrado:</span>
@@ -61,11 +61,11 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({ summaries, totalCost, fi
             </div>
             <div className="flex flex-col md:flex-row items-center md:gap-2">
               <span className="text-sm text-gray-600">Valor Pago:</span>
-              <span className="text-md font-bold text-green-600">{formatCurrency(summaries?.ValorPago || 0)}</span>
+              <span className="text-md font-bold text-green-600">{formatCurrency(summaries?.valorPago || 0)}</span>
             </div>
             <div className="flex flex-col md:flex-row items-center md:gap-2">
               <span className="text-sm text-gray-600">Valor a Pagar:</span>
-              <span className="text-md font-bold text-green-600">{formatCurrency(summaries?.ValorAPagar || 0)}</span>
+              <span className="text-md font-bold text-green-600">{formatCurrency(summaries?.valorAPagar || 0)}</span>
             </div>
           </div>
 
