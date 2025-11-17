@@ -78,6 +78,9 @@ export interface UnidadeMedida {
 export interface Login {
   id?: number;
   name?: string;  
+  isAdmin: boolean;
+  password?: string;
+  login?: string;
   createat?: string;
   updatedAt?: string;
   updatedBy?: string;

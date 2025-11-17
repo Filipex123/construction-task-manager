@@ -2,7 +2,7 @@
 
 import { usePageTitle } from '@/app/context/PageTitle.context';
 import { usuariosService } from '@/app/services/usuariosService';
-import { UnidadeMedida } from '@/app/types';
+import { Login } from '@/app/types';
 import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Loader } from '../components/Loader';
@@ -14,11 +14,11 @@ const UsuariosPage: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editingItem, setEditingItem] = useState<UnidadeMedida | null>(null);
-  const [formData, setFormData] = useState({ descricao: '', complemento: '' });
-  const [errors, setErrors] = useState({ descricao: '', complemento: '' });
+  const [editingItem, setEditingItem] = useState<Login | null>(null);
+  const [formData, setFormData] = useState({ login: '', senha: '' , nome: '', isAdmin: false});
+  const [errors, setErrors] = useState({ login: '', senha: '' , nome: '', isAdmin: false });
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
-  const [units, setUnits] = useState<UnidadeMedida[]>([]);
+  const [units, setUnits] = useState<Login[]>([]);
   const [isLoading, setIsLoading] = useState<Boolean>(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [selectedItemDelete, setSelectedItemDelete] = useState<number | null>(null);
@@ -28,7 +28,7 @@ const UsuariosPage: React.FC = () => {
     return units.filter((unit) => {
       return (
         searchTerm === '' ||
-        unit.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        unit.login?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         unit.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         unit.id === Number(searchTerm.toLowerCase())
       );
@@ -41,51 +41,48 @@ const UsuariosPage: React.FC = () => {
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   const validateForm = () => {
-    const newErrors = { descricao: '', complemento: '' };
+    const newErrors = {  login: '', senha: '' , nome: '', isAdmin: false };
 
-    if (!formData.descricao.trim()) {
-      newErrors.descricao = 'Descrição é obrigatória';
+    if (!formData.login.trim()) {
+      newErrors.login = 'Descrição é obrigatória';
     }
 
-    if (!formData.complemento.trim()) {
-      newErrors.complemento = 'Complemento é obrigatório';
+    if (!formData.nome.trim()) {
+      newErrors.nome = 'Complemento é obrigatório';
     }
 
-    // Verificar se já existe uma unidade com a mesma descrição ou complemento
+    // Verificar se já existe uma usuarios com a mesma descrição ou complemento
     const existingUnit = units.find(
-      (unit) => unit.id !== editingItem?.id && (unit.description?.toLowerCase() === formData.descricao.toLowerCase() || unit.name?.toLowerCase() === formData.complemento.toLowerCase())
+      (unit) => unit.id !== editingItem?.id && (unit.login?.toLowerCase() === formData.login.toLowerCase() || unit.name?.toLowerCase() === formData.nome.toLowerCase())
     );
 
     if (existingUnit) {
-      if (existingUnit.description?.toLowerCase() === formData.descricao.toLowerCase()) {
-        newErrors.descricao = 'Já existe uma unidade com esta descrição';
-      }
-      if (existingUnit.name?.toLowerCase() === formData.complemento.toLowerCase()) {
-        newErrors.complemento = 'Já existe uma unidade com este complemento';
+      if (existingUnit.login?.toLowerCase() === formData.login.toLowerCase()) {
+        newErrors.login = 'Já existe uma login com esta descrição';
       }
     }
 
     setErrors(newErrors);
-    return !newErrors.descricao && !newErrors.complemento;
+    return !newErrors.login && !newErrors.nome;
   };
 
-  const handleOpenModal = (unit?: UnidadeMedida) => {
+  const handleOpenModal = (unit?: Login) => {
     if (unit) {
       setEditingItem(unit);
-      setFormData({ descricao: unit.description || '', complemento: unit.name || '' });
+      setFormData({ nome: unit.name || '', login: unit.login || '', senha: unit.password || '', isAdmin: unit.isAdmin || false });
     } else {
       setEditingItem(null);
-      setFormData({ descricao: '', complemento: '' });
+      setFormData({  login: '', senha: '' , nome: '', isAdmin: false});
     }
-    setErrors({ descricao: '', complemento: '' });
+    setErrors({  login: '', senha: '' , nome: '', isAdmin: false });
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingItem(null);
-    setFormData({ descricao: '', complemento: '' });
-    setErrors({ descricao: '', complemento: '' });
+    setFormData({  login: '', senha: '' , nome: '', isAdmin: false});
+    setErrors({  login: '', senha: '' , nome: '', isAdmin: false });
   };
 
   const handleSave = async () => {
@@ -94,11 +91,17 @@ const UsuariosPage: React.FC = () => {
     try {
       if (editingItem) {
         await usuariosService.atualizar(editingItem.id!, {          
-          name: formData.complemento,
+          name: formData.nome,
+          login: formData.login,
+          password: formData.senha,
+          isAdmin: formData.isAdmin,
         });
       } else {
         await usuariosService.criar({          
-          name: formData.complemento,
+          name: formData.nome,
+          login: formData.login,
+          password: formData.senha,
+          isAdmin: formData.isAdmin,
         });
       }
 
@@ -107,7 +110,7 @@ const UsuariosPage: React.FC = () => {
       handleCloseModal();
     } catch (error) {
       console.error(error);
-      alert('Erro ao salvar unidade.');
+      alert('Erro ao salvar usuarios.');
     } finally {
       setIsLoading(false);
     }
@@ -122,7 +125,7 @@ const UsuariosPage: React.FC = () => {
         setUnits(data);
       } catch (error) {
         console.error(error);
-        alert('Erro ao excluir unidade.');
+        alert('Erro ao excluir usuarios.');
       } finally {
         setIsLoading(false);
       }
@@ -141,7 +144,7 @@ const UsuariosPage: React.FC = () => {
         setUnits(data);
       } catch (error) {
         console.error(error);
-        alert('Erro ao carregar unidades.');
+        alert('Erro ao carregar usuarios.');
       } finally {
         setIsLoading(false);
       }
@@ -180,9 +183,9 @@ const UsuariosPage: React.FC = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                    
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Complemento</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Criação</th>
+                    
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                   </tr>
                 </thead>
@@ -190,14 +193,11 @@ const UsuariosPage: React.FC = () => {
                   {paginatedData.map((unit) => (
                     <tr key={unit.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.description}</td>
+                    
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{unit.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{unit.createat}</td>
+                    
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="flex space-x-2">
-                          <button onClick={() => handleOpenModal(unit)} className="text-blue-600 hover:text-blue-900 transition-colors p-1 hover:bg-blue-50 rounded" title="Editar">
-                            <Edit className="h-4 w-4" />
-                          </button>
+                        <div className="flex space-x-2">                          
                           <button
                             onClick={() => {
                               setSelectedItemDelete(Number(unit.id));
@@ -295,7 +295,7 @@ const UsuariosPage: React.FC = () => {
           <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-900">{editingItem ? 'Editar Unidade de Medida' : 'Nova Unidade de Medida'}</h2>
+                <h2 className="text-xl font-semibold text-gray-900">{editingItem ? 'Editar usuario' : 'Novo Usuario'}</h2>
                 <button onClick={handleCloseModal} className="text-gray-400 hover:text-gray-600 transition-colors">
                   <X className="h-6 w-6" />
                 </button>
@@ -303,37 +303,71 @@ const UsuariosPage: React.FC = () => {
 
               <div className="p-6 space-y-4">
                 <div>
-                  <label htmlFor="descricao" className="block text-sm font-medium text-gray-700 mb-2">
-                    Descrição *
+                  <label htmlFor="login" className="block text-sm font-medium text-gray-700 mb-2">
+                    Login *
                   </label>
                   <input
-                    id="descricao"
+                    id="login"
                     type="text"
-                    value={formData.descricao}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, descricao: e.target.value }))}
+                    value={formData.login}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, login: e.target.value }))}
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
-                      errors.descricao ? 'border-red-300' : 'border-gray-300'
+                      errors.login ? 'border-red-300' : 'border-gray-300'
                     }`}
                     placeholder="Ex: Metro Quadrado"
                   />
-                  {errors.descricao && <p className="mt-1 text-sm text-red-600">{errors.descricao}</p>}
+                  {errors.login && <p className="mt-1 text-sm text-red-600">{errors.login}</p>}
                 </div>
 
                 <div>
-                  <label htmlFor="complemento" className="block text-sm font-medium text-gray-700 mb-2">
-                    Complemento *
+                  <label htmlFor="senha" className="block text-sm font-medium text-gray-700 mb-2">
+                    Senha *
                   </label>
                   <input
-                    id="complemento"
+                    id="senha"
                     type="text"
-                    value={formData.complemento}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, complemento: e.target.value }))}
+                    value={formData.senha}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, senha: e.target.value }))}
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
-                      errors.descricao ? 'border-red-300' : 'border-gray-300'
+                      errors.senha ? 'border-red-300' : 'border-gray-300'
                     }`}
                     placeholder="Ex: m²"
                   />
-                  {errors.descricao && <p className="mt-1 text-sm text-red-600">{errors.descricao}</p>}
+                  {errors.senha && <p className="mt-1 text-sm text-red-600">{errors.senha}</p>}
+                </div>
+                  <div>
+                  <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-2">
+                    Nome *
+                  </label>
+                  <input
+                    id="nome"
+                    type="text"
+                    value={formData.nome}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, nome: e.target.value }))}
+                    className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
+                      errors.nome ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Ex: m²"
+                  />
+                  {errors.nome && <p className="mt-1 text-sm text-red-600">{errors.nome}</p>}
+                </div>
+                  <div>
+                  <label htmlFor="complemento" className="block text-sm font-medium text-gray-700 mb-2">
+                    Admin *
+                  </label>
+                  <input
+                    id="complemento"
+                    type="checkbox"                    
+                    checked={formData.isAdmin}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, isAdmin: e.target.checked }))
+                    }
+                    className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
+                      errors.isAdmin ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Ex: m²"
+                  />
+                  {errors.isAdmin && <p className="mt-1 text-sm text-red-600">{errors.isAdmin}</p>}
                 </div>
               </div>
 
@@ -358,7 +392,7 @@ const UsuariosPage: React.FC = () => {
           setIsConfirmModalOpen(false);
         }}
         onCancel={() => setIsConfirmModalOpen(false)}
-        title={'Excluir Unidade de medida'}
+        title={'Excluir usuarios de medida'}
       />
     </>
   );
