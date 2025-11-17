@@ -59,14 +59,18 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({ summaries, totalCost, fi
               <span className="text-sm text-gray-600">Valor Filtrado:</span>
               <span className="text-md font-bold text-green-600">{formatCurrency(totalCost)}</span>
             </div>
+             {localStorage.getItem('isAdmin') === 'true' && (
             <div className="flex flex-col md:flex-row items-center md:gap-2">
               <span className="text-sm text-gray-600">Valor Pago:</span>
               <span className="text-md font-bold text-green-600">{formatCurrency(summaries?.valorPago || 0)}</span>
             </div>
+             )}
+              {localStorage.getItem('isAdmin') === 'true' && (
             <div className="flex flex-col md:flex-row items-center md:gap-2">
               <span className="text-sm text-gray-600">Valor a Pagar:</span>
               <span className="text-md font-bold text-green-600">{formatCurrency(summaries?.valorAPagar || 0)}</span>
             </div>
+              )}
           </div>
 
           {/* Status */}
