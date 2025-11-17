@@ -48,6 +48,15 @@ function Home() {
     carregarObras();
   }, []);
 
+  if (localStorage.getItem('isAdmin') !== 'true') {
+    return (
+      <div className="text-center py-12">
+        <div className="text-gray-400 text-lg mb-2">Acesso Negado</div>
+        <p className="text-gray-500">Você não tem permissão para acessar esta página.</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <DashboardSummary />

@@ -55,12 +55,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
           {/* Navigation */}
           <nav className="flex flex-col mt-8 gap-2">
             {/* Pagamento */}
-            <div className="px-4">
-              <Link href="/" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
-                <DollarSign className="w-5 h-5 flex-shrink-0" />
-                {isOpen && <span className="font-medium">Pagamento</span>}
-              </Link>
-            </div>
+            {localStorage.getItem('isAdmin') === 'true' && (
+              <div className="px-4">
+                <Link href="/" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
+                  <DollarSign className="w-5 h-5 flex-shrink-0" />
+                  {isOpen && <span className="font-medium">Pagamento</span>}
+                </Link>
+              </div>
+            )}
 
             {/* Medição */}
             <div className="px-4">
