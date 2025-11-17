@@ -88,12 +88,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
 
               {/* Subitems */}
               {isOpen && isCadastroOpen && (
-                <div className="mt-2 ml-6 flex flex-col gap-1">
-                  <Link href="/nova-obra" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
-                    <span className="text-sm">Cadastro de Obra e Local</span>
-                  </Link>
+                <div className="mt-2 ml-6 flex flex-col gap-1">     
                   <Link href="/tarefa" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro de Tarefa</span>
+                  </Link>
+                  <Link href="/nova-obra" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                    <span className="text-sm">Cadastro de Obra</span>
                   </Link>
                   <Link href="/atividades" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro de Atividades</span>

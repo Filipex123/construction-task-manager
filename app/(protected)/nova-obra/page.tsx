@@ -113,7 +113,7 @@ function LocalPage() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <LocalCard key={obra.id} obra={obra} onDelete={handleDelete} onUpdate={onUpdateModal} />
+            <LocalCard key={obra.id} obra={obra} onDelete={handleDelete} onUpdate={onUpdateModal}/>
           ))}
         </div>
       )}

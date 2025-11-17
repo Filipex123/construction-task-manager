@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Loader } from '../components/Loader';
 import { SearchBar } from '../components/SearchBar';
-import { LocalCard } from '../components/cards/LocalCard';
+import { LocalNivelCard } from '../components/cards/LocalNivelCard';
 import { SimpleModal } from '../components/modals/SimpleModal';
 
 function LocalPage() {
@@ -105,7 +105,7 @@ function LocalPage() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <LocalCard key={obra.id} obra={obra} onDelete={handleDelete} onUpdate={onUpdateModal} nivel={1}/>
+            <LocalNivelCard key={obra.id} obra={obra} onDelete={handleDelete} onUpdate={onUpdateModal} nivel={1}/>
           ))}
         </div>
       )}
