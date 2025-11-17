@@ -46,7 +46,7 @@ export const LocalNivelCard: React.FC<LocalNivelCardProps> = ({ obra, onDelete, 
 
   const handleSave = async (obraId: number, name: string) => {
     try {
-      const data = await localService.criar({ name: name, fkObra: obraId });
+      const data = await localService.criar({ name: name, fkObra: obraId, nivel:nivel });
       setLocais((prevLocais) => [...prevLocais, data]);
     } catch (error) {
       console.error('Erro ao adicionar local:', error);
@@ -56,7 +56,7 @@ export const LocalNivelCard: React.FC<LocalNivelCardProps> = ({ obra, onDelete, 
   const handleEdit = async (name: string) => {
     if (editLocation) {
       try {
-        const data = await localService.atualizar(editLocation.id!, { name: name });
+        const data = await localService.atualizar(editLocation.id!, { name: name , nivel:nivel});
         setLocais((prevLocais) => prevLocais.map((local) => (local.id === data.id ? data : local)));
         setEditLocation(null);
         setIsAddModalOpen(false);
@@ -68,7 +68,7 @@ export const LocalNivelCard: React.FC<LocalNivelCardProps> = ({ obra, onDelete, 
 
   const handleDelete = async (localId: number) => {
     try {
-      await localService.excluir(localId);
+      await localService.excluir(localId, nivel);
       setLocais((prevLocais) => prevLocais.filter((local) => local.id !== localId));
     } catch (error) {
       console.error('Erro ao excluir local:', error);

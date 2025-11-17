@@ -54,8 +54,8 @@ export const localService = {
     return await res.json();
   },
 
-  async excluir(id: number): Promise<void> {
-    const res = await fetch(`${API_URL}/${id}`, {
+  async excluir(id: number, nivel: number): Promise<void> {
+    const res = await fetch(`${API_URL}/${id}?nivel=${nivel}`, {
       method: 'DELETE',
     });
     if (!res.ok) throw new Error('Erro ao excluir local');

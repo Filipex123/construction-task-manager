@@ -66,15 +66,6 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate})
     }
   };
 
-  const handleDelete = async (localId: number) => {
-    try {
-      await localService.excluir(localId);
-      setLocais((prevLocais) => prevLocais.filter((local) => local.id !== localId));
-    } catch (error) {
-      console.error('Erro ao excluir local:', error);
-    }
-  };
-
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hover:shadow-xl transition-shadow duration-300">
       {/* Header */}
