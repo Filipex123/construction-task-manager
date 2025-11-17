@@ -13,6 +13,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
   const { isOpen, toggleSidebar } = useSidebar();
   const [isCadastroOpen, setIsCadastroOpen] = React.useState<boolean>(false);
+  const [isCadastroLocaisOpen, setIsCadastroLocaisOpen] = React.useState<boolean>(false);
 
   const router = useRouter();
 
@@ -71,7 +72,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
                 {isOpen && <span className="font-medium">Medição</span>}
               </Link>
             </div>
-
             {/* Cadastro (collapsible) */}
             <div className="px-4">
               <button
@@ -104,6 +104,39 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
                   <Link href="/unidade-medidas" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro de Unidade</span>
                   </Link>
+                </div>
+              )}
+            </div>
+
+           {/* Cadastro (collapsible) */}
+            <div className="px-4">
+              <button
+                type="button"
+                onClick={() => setIsCadastroLocaisOpen((prev) => !prev)}
+                className={`w-full flex items-center justify-between px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}
+              >
+                <span className={`flex items-center ${!isOpen ? 'lg:justify-center w-full' : 'space-x-3'}`}>
+                  <Plus className="w-5 h-5 flex-shrink-0" />
+                  {isOpen && <span className="font-medium">Cadastro de Locais</span>}
+                </span>
+                {isOpen && (isCadastroLocaisOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />)}
+              </button>
+
+              {/* Subitems */}
+              {isOpen && isCadastroLocaisOpen && (
+                <div className="mt-2 ml-6 flex flex-col gap-1">
+                  <Link href="/nivel1" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                    <span className="text-sm">Cadastro Local Nivel 1</span>
+                  </Link>
+                  <Link href="/nivel2" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                    <span className="text-sm">Cadastro Local Nivel 2</span>
+                  </Link>
+                  <Link href="/nivel3" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                    <span className="text-sm">Cadastro Local Nivel 3</span>
+                  </Link>
+                  <Link href="/nivel4" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                      <span className="text-sm">Cadastro Local Nivel 4</span>
+                  </Link>                 
                 </div>
               )}
             </div>
