@@ -11,9 +11,10 @@ interface LocalCardProps {
   obra: Obra;
   onDelete: (obraId: number) => void;
   onUpdate: (obraId: number) => void;
+  nivel: number;
 }
 
-export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }) => {
+export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate, nivel }) => { 
   const [locais, setLocais] = React.useState<Local[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [editLocation, setEditLocation] = React.useState<Local | null>({ name: '', fkObra: obra.id } as Local);
@@ -31,7 +32,7 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }
     if (!isExpanded && !hasLoadedTasks) {
       setIsLoading(true);
       try {
-        const data = await localService.listar(obra.id);
+        const data = await localService.listar(obra.id, nivel);
         setLocais(data.items || []);
         setHasLoadedTasks(true);
       } catch (error) {

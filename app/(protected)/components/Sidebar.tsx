@@ -125,16 +125,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
               {/* Subitems */}
               {isOpen && isCadastroLocaisOpen && (
                 <div className="mt-2 ml-6 flex flex-col gap-1">
-                  <Link href="/nivel1" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                  <Link href="/local-nivel1" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro Local Nivel 1</span>
                   </Link>
-                  <Link href="/nivel2" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                  <Link href="/local-nivel2" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro Local Nivel 2</span>
                   </Link>
-                  <Link href="/nivel3" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                  <Link href="/local-nivel3" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro Local Nivel 3</span>
                   </Link>
-                  <Link href="/nivel4" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
+                  <Link href="/local-nivel4" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                       <span className="text-sm">Cadastro Local Nivel 4</span>
                   </Link>                 
                 </div>
