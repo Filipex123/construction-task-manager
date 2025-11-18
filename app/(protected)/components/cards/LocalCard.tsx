@@ -1,6 +1,6 @@
 import { localService } from '@/app/services/localService';
 import { Local, Obra } from '@/app/types';
-import { Building, ChevronDown, ChevronUp, Edit3, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Building, ChevronDown, ChevronUp, Loader2, Plus } from 'lucide-react';
 import React from 'react';
 import { ConfirmModal } from '../modals/ConfirmModal';
 import { SimpleModal } from '../modals/SimpleModal';
@@ -46,7 +46,7 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate})
 
   const handleSave = async (obraId: number, name: string) => {
     try {
-      const data = await localService.criar({ name: name, fkObra: obraId });
+      const data = await localService.criar({ name: name, fkObra: obraId }, 0); // todo: corrigir esse 0
       setLocais((prevLocais) => [...prevLocais, data]);
     } catch (error) {
       console.error('Erro ao adicionar local:', error);
@@ -78,37 +78,6 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate})
             <div>
               <h3 className="text-xl font-bold">{obra.name}</h3>
               <p className="text-blue-100 text-sm">{obra.description}</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4 text-sm justify-end">
-            <div className="flex items-center space-x-4 ">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUpdate(obra.id!);
-                }}
-                className="p-2 text-gray-200 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors"
-                title="Editar"
-              >
-                <Edit3 className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsConfirmModalOpen(true);
-                }}
-                className="p-2 text-red-400 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors"
-                title="Deletar"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-
-              {hasLoadedTasks && (
-                <div className="bg-white/20 px-3 py-1 rounded-full">
-                  <span className="font-medium">{locais.length} Locais</span>
-                </div>
-              )}
             </div>
           </div>
         </div>

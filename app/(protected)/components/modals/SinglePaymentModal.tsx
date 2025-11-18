@@ -71,7 +71,7 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
                     <div className="flex items-center space-x-2">
                       <div className="flex items-center space-x-1 text-sm text-green-700">
                         <MapPin className="w-4 h-4" />
-                        <span>{tarefa.local.name}</span>
+                        <span>{tarefa.localNivel1.name + ' - ' + tarefa.localNivel2.name + ' - ' + tarefa.localNivel3.name + ' - ' + tarefa.localNivel4.name}</span>
                       </div>
                     </div>
                   </div>
@@ -122,7 +122,9 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-600 mb-1">Local</p>
-                      <p className="text-base font-semibold text-gray-900">{tarefa.local.name}</p>
+                      <p className="text-base font-semibold text-gray-900">
+                        {tarefa.localNivel1.name + ' - ' + tarefa.localNivel2.name + ' - ' + tarefa.localNivel3.name + ' - ' + tarefa.localNivel4.name}
+                      </p>
                     </div>
                   </div>
                 </div>

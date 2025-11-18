@@ -139,7 +139,7 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
                         <div className="flex items-center space-x-2 mt-1">
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <MapPin className="w-3 h-3" />
-                            <span className="truncate">{tarefa.local!.name}</span>
+                            <span className="truncate">{tarefa.localNivel1.name + ' - ' + tarefa.localNivel2.name + ' - ' + tarefa.localNivel3.name + ' - ' + tarefa.localNivel4.name}</span>
                           </div>
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <Building2 className="w-3 h-3" />

@@ -142,23 +142,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
             </div>
 
             {/* Relatorio */}
-             {localStorage.getItem('isAdmin') === 'true' && (
-            <div className="px-4">
-              <a href="/relatorios/pagamento" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
-                <ClipboardList className="w-5 h-5 flex-shrink-0" />
-                {isOpen && <span className="font-medium">Relatório</span>}
-              </a>
-            </div>
-             )}
+            {localStorage.getItem('isAdmin') === 'true' && (
+              <div className="px-4">
+                <a href="/relatorios/pagamento" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
+                  <ClipboardList className="w-5 h-5 flex-shrink-0" />
+                  {isOpen && <span className="font-medium">Relatório</span>}
+                </a>
+              </div>
+            )}
             {/* usuarios */}
-          {localStorage.getItem('isAdmin') === 'true' && (
-            <div className="px-4">
-              <a href="/usuarios" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
-                <User className="w-5 h-5 flex-shrink-0" />
-                {isOpen && <span className="font-medium">Usuários</span>}
-              </a>
-            </div>
-          )}
+            {localStorage.getItem('isAdmin') === 'true' && (
+              <div className="px-4">
+                <a href="/usuarios" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
+                  <User className="w-5 h-5 flex-shrink-0" />
+                  {isOpen && <span className="font-medium">Usuários</span>}
+                </a>
+              </div>
+            )}
           </nav>
         </div>
 

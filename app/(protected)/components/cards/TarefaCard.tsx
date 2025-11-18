@@ -99,7 +99,10 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
           quantityExecuted: 0,
           updatedBy: 'system', //TODO: ajustar usuário
           fkAtividade: task.atividade!.id!,
-          fkLocal: task.local!.id!,
+          fkLocalNivel1: task.localNivel1!.id!,
+          fkLocalNivel2: task.localNivel2!.id!,
+          fkLocalNivel3: task.localNivel3!.id!,
+          fkLocalNivel4: task.localNivel4!.id!,
           fkUnidadeMedida: task.unidadeDeMedida!.id!,
           fkEmpreiteiro: task.empreiteira!.id!,
         };
@@ -125,7 +128,10 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
           totalAmount: task.totalAmount,
           paymentStatus: task.paymentStatus,
           fkAtividade: task.atividade!.id!,
-          fkLocal: task.local!.id!,
+          fkLocalNivel1: task.localNivel1!.id!,
+          fkLocalNivel2: task.localNivel2!.id!,
+          fkLocalNivel3: task.localNivel3!.id!,
+          fkLocalNivel4: task.localNivel4!.id!,
           fkUnidadeMedida: task.unidadeDeMedida!.id!,
           fkEmpreiteiro: task.empreiteira!.id!,
         };
