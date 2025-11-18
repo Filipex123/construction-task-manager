@@ -3,9 +3,9 @@ import { LocaisNiveis, Local, PageableResponse } from '@/app/types';
 const API_URL = 'https://zernov6ywj.execute-api.us-east-1.amazonaws.com/prod/locais';
 
 export const localService = {
-  async listar(idObra?: number): Promise<PageableResponse<Local>> {
+  async listar(idObra?: number, nivel?: number): Promise<PageableResponse<Local>> {
     try {
-      const url = idObra ? `${API_URL}?idObra=${idObra}` : API_URL;
+      const url = idObra ? `${API_URL}?idObra=${idObra}&nivel=${nivel}` : API_URL;
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error('Erro ao listar local');
       return await res.json();
@@ -82,8 +82,8 @@ export const localService = {
     return await res.json();
   },
 
-  async excluir(id: number): Promise<void> {
-    const res = await fetch(`${API_URL}/${id}`, {
+  async excluir(id: number, nivel: number): Promise<void> {
+    const res = await fetch(`${API_URL}/${id}?nivel=${nivel}`, {
       method: 'DELETE',
     });
     if (!res.ok) throw new Error('Erro ao excluir local');

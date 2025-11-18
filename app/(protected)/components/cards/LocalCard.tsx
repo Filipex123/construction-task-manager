@@ -11,9 +11,10 @@ interface LocalCardProps {
   obra: Obra;
   onDelete: (obraId: number) => void;
   onUpdate: (obraId: number) => void;
+  nivel: number;
 }
 
-export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }) => {
+export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate}) => { 
   const [locais, setLocais] = React.useState<Local[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [editLocation, setEditLocation] = React.useState<Local | null>({ name: '', fkObra: obra.id } as Local);
@@ -65,24 +66,14 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }
     }
   };
 
-  const handleDelete = async (localId: number) => {
-    try {
-      await localService.excluir(localId);
-      setLocais((prevLocais) => prevLocais.filter((local) => local.id !== localId));
-    } catch (error) {
-      console.error('Erro ao excluir local:', error);
-    }
-  };
-
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hover:shadow-xl transition-shadow duration-300">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-all duration-200" onClick={handleToggleExpand}>
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 text-white cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-all duration-200" >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-3 mb-2 sm:mb-0">
             <div className="flex items-center space-x-2">
-              <Building className="w-6 h-6" />
-              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+              <Building className="w-6 h-6" />              
             </div>
             <div>
               <h3 className="text-xl font-bold">{obra.name}</h3>
@@ -91,50 +82,7 @@ export const LocalCard: React.FC<LocalCardProps> = ({ obra, onDelete, onUpdate }
           </div>
         </div>
       </div>
-
-      {/* Expandable Content */}
-      {isExpanded && (
-        <div className="animate-in slide-in-from-top-2 duration-300">
-          {/* Content when not loading */}
-          {!isLoading && (
-            <>
-              {/* Location Table */}
-              <div className="p-6">
-                <div className="pb-4">
-                  <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
-                </div>
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-semibold text-gray-800">Locais</h4>
-                  <button
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span className="hidden sm:inline">Novo Local</span>
-                    <span className="sm:hidden">Novo</span>
-                  </button>
-                </div>
-                {filteredData.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="text-gray-400 text-lg mb-2">Nenhum local encontrado</div>
-                    <p className="text-gray-500">Adicione o primeiro local desta obra</p>
-                  </div>
-                ) : (
-                  <LocalTable
-                    locais={filteredData}
-                    onEdit={(id) => {
-                      const locationToEdit = locais.find((local) => local.id === id) || null;
-                      setEditLocation(locationToEdit);
-                      setIsAddModalOpen(true);
-                    }}
-                    onDelete={handleDelete}
-                  />
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      )}
+ 
 
       <SimpleModal
         isOpen={isAddModalOpen}

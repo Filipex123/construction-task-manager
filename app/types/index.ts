@@ -54,6 +54,7 @@ export interface AddTarefaRequest {
 export interface Local {
   id?: number;
   name?: string;
+  nivel?:number;
   fkObra?: number;
   updatedAt?: string;
   updatedBy?: string;

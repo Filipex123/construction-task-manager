@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Loader } from '../components/Loader';
 import { SearchBar } from '../components/SearchBar';
-import { ObraCard } from '../components/cards/ObraCard';
+import { LocalNivelCard } from '../components/cards/LocalNivelCard';
 import { SimpleModal } from '../components/modals/SimpleModal';
 
 function LocalPage() {
@@ -68,9 +68,9 @@ function LocalPage() {
   };
 
   React.useEffect(() => {
-    setTitle('Cadastro de Obras e Locais');
-    setSubtitle('Gerenciar Obras e Locais');
-    setDescription('Controle e monitore todas os locais das suas obras');
+    setTitle('Cadastro de Locais Nivel 2');
+    setSubtitle('Gerenciar Locais Nivel 2');
+    setDescription('Controle e monitore todas os locais de nivel 2 das suas obras');
 
     const carregarObras = async () => {
       setIsLoading(true);
@@ -92,15 +92,7 @@ function LocalPage() {
       <div className="mb-6">
         <div>
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
-        </div>
-        <br />
-        <div className="flex items-center justify-end mb-4">
-          <button onClick={handleOpenModalAddObra} className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Novo Obra</span>
-            <span className="sm:hidden">Nova</span>
-          </button>
-        </div>
+        </div>        
       </div>
 
       {isLoading && <Loader message={'Carregando Obras'} />}
@@ -113,7 +105,7 @@ function LocalPage() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <LocalCard key={obra.id} obra={obra} onDelete={handleDelete} onUpdate={onUpdateModal}/>
+            <LocalNivelCard key={obra.id} obra={obra} onDelete={handleDelete} onUpdate={onUpdateModal} nivel={2}/>
           ))}
         </div>
       )}
