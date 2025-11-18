@@ -4,8 +4,8 @@ const API_URL = 'https://zernov6ywj.execute-api.us-east-1.amazonaws.com/prod/loc
 
 export const localService = {
   async listar(idObra?: number, nivel?: number): Promise<PageableResponse<Local>> {
+    const url = nivel ? `${API_URL}?idObra=${idObra}&nivel=${nivel}` : idObra ? `${API_URL}?idObra=${idObra}` : API_URL;
     try {
-      const url = idObra ? `${API_URL}?idObra=${idObra}&nivel=${nivel}` : API_URL;
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error('Erro ao listar local');
       return await res.json();

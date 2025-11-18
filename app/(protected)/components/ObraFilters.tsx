@@ -4,13 +4,16 @@ import { localService } from '@/app/services/localService';
 import { formatDateForInput } from '@/app/utils/dateUtils';
 import { ChevronDown, ChevronUp, Filter, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { Atividades, Empreiteira, Local, Tarefa, TaskIdName } from '../../types';
+import { Atividades, Empreiteira, LocaisNiveis, Tarefa, TaskIdName } from '../../types';
 import { Option, TextWithSelect } from './InputSelect';
 
 export type TarefaFilterParams = {
   paymentStatus?: string[];
   measurementStatus?: string[];
-  location?: string[];
+  locationNivel1?: string[];
+  locationNivel2?: string[];
+  locationNivel3?: string[];
+  locationNivel4?: string[];
   contractor?: string[];
   activity?: string[];
   startCreatedAt?: string;
@@ -54,15 +57,22 @@ const statusColors = {
 
 export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, isMeasure = false, obraId }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [locais, setLocais] = useState<Local[]>([]);
+  const [locais, setLocais] = useState<LocaisNiveis>();
   const [atividades, setAtividades] = useState<Atividades[]>([]);
   const [contractors, setContractors] = useState<Empreiteira[]>([]);
-
   const [loadingOptions, setLoadingOptions] = useState(false);
+
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
-  const [selectedLocal, setSelectedLocal] = useState<TaskIdName | null>(null);
+
+  // NOVOS 4 NÍVEIS DE LOCAIS
+  const [selectedLocalNivel1, setSelectedLocalNivel1] = useState<TaskIdName | null>(null);
+  const [selectedLocalNivel2, setSelectedLocalNivel2] = useState<TaskIdName | null>(null);
+  const [selectedLocalNivel3, setSelectedLocalNivel3] = useState<TaskIdName | null>(null);
+  const [selectedLocalNivel4, setSelectedLocalNivel4] = useState<TaskIdName | null>(null);
+
   const [selectedEmpreiteira, setSelectedEmpreiteira] = useState<TaskIdName | null>(null);
   const [selectedAtividade, setSelectedAtividade] = useState<TaskIdName | null>(null);
+
   const [isApplying, setIsApplying] = useState(false);
   const [dataErrors, setDataErrors] = useState({
     createdAt: '',
@@ -75,6 +85,7 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, is
     startDueDate: '',
     endDueDate: '',
   });
+
   const uniqueStatus = ['PAGO', 'PENDENTE', 'EM_ANDAMENTO', 'ATRASADO'];
   const uniqueMeasurementStatus = ['MEDIDO', 'PENDENTE', 'EM_ANDAMENTO', 'RETIDO'];
 
@@ -90,44 +101,55 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, is
     let createdAtError = '';
     let dueDateError = '';
 
-    // Validação do range de criação
     if ((values.startCreatedAt && !values.endCreatedAt) || (!values.startCreatedAt && values.endCreatedAt)) {
       createdAtError = 'Preencha as duas datas de criação (início e fim).';
     }
 
-    // Validação do range de vencimento
     if ((values.startDueDate && !values.endDueDate) || (!values.startDueDate && values.endDueDate)) {
       dueDateError = 'Preencha as duas datas de vencimento (início e fim).';
     }
 
-    setDataErrors({
-      createdAt: createdAtError,
-      dueDate: dueDateError,
-    });
+    setDataErrors({ createdAt: createdAtError, dueDate: dueDateError });
   };
 
-  const buildFiltersObject = (status: string[], local: TaskIdName | null, empreiteira: TaskIdName | null, atividade: TaskIdName | null, dates: DateRanges): TarefaFilterParams => {
+  // NOVO buildFiltersObject
+  const buildFiltersObject = (
+    status: string[],
+    localNivel1: TaskIdName | null,
+    localNivel2: TaskIdName | null,
+    localNivel3: TaskIdName | null,
+    localNivel4: TaskIdName | null,
+    empreiteira: TaskIdName | null,
+    atividade: TaskIdName | null,
+    dates: DateRanges
+  ): TarefaFilterParams => {
     return {
       ...(isMeasure ? { measurementStatus: status.length ? status : undefined } : { paymentStatus: status.length ? status : undefined }),
-      location: local ? [String(local.id)] : undefined,
+
+      locationNivel1: localNivel1 ? [String(localNivel1.id)] : undefined,
+      locationNivel2: localNivel2 ? [String(localNivel2.id)] : undefined,
+      locationNivel3: localNivel3 ? [String(localNivel3.id)] : undefined,
+      locationNivel4: localNivel4 ? [String(localNivel4.id)] : undefined,
+
       contractor: empreiteira ? [String(empreiteira.id)] : undefined,
       activity: atividade ? [String(atividade.id)] : undefined,
+
       startCreatedAt: dates.startCreatedAt || undefined,
       endCreatedAt: dates.endCreatedAt || undefined,
       startDueDate: dates.startDueDate || undefined,
       endDueDate: dates.endDueDate || undefined,
+
       page: 1,
       pageSize: 10,
     };
   };
 
   const handleApplyFilters = async () => {
-    const filters = buildFiltersObject(selectedStatus, selectedLocal, selectedEmpreiteira, selectedAtividade, dates);
+    const filters = buildFiltersObject(selectedStatus, selectedLocalNivel1, selectedLocalNivel2, selectedLocalNivel3, selectedLocalNivel4, selectedEmpreiteira, selectedAtividade, dates);
+
     try {
       setIsApplying(true);
       await onFilterClick(filters);
-    } catch (err) {
-      console.error('Erro ao aplicar filtros:', err);
     } finally {
       setIsApplying(false);
     }
@@ -139,9 +161,15 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, is
 
   const clearAllFilters = async () => {
     setSelectedStatus([]);
-    setSelectedLocal(null);
+
+    setSelectedLocalNivel1(null);
+    setSelectedLocalNivel2(null);
+    setSelectedLocalNivel3(null);
+    setSelectedLocalNivel4(null);
+
     setSelectedEmpreiteira(null);
     setSelectedAtividade(null);
+
     setDates({
       startCreatedAt: '',
       endCreatedAt: '',
@@ -149,7 +177,7 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, is
       endDueDate: '',
     });
 
-    const resetFilters = buildFiltersObject([], null, null, null, {
+    const resetFilters = buildFiltersObject([], null, null, null, null, null, null, {
       startCreatedAt: '',
       endCreatedAt: '',
       startDueDate: '',
@@ -159,36 +187,43 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, is
     try {
       setIsApplying(true);
       await onFilterClick(resetFilters);
-    } catch (err) {
-      console.error('Erro ao limpar filtros:', err);
     } finally {
       setIsApplying(false);
     }
   };
 
-  const hasActiveFilters = selectedStatus.length > 0 || selectedLocal || selectedEmpreiteira || selectedAtividade || Object.values(dates).some((v) => v.trim());
+  const hasActiveFilters =
+    selectedStatus.length > 0 ||
+    selectedLocalNivel1 ||
+    selectedLocalNivel2 ||
+    selectedLocalNivel3 ||
+    selectedLocalNivel4 ||
+    selectedEmpreiteira ||
+    selectedAtividade ||
+    Object.values(dates).some((v) => v.trim());
 
-  const activeFiltersCount = selectedStatus.length + (selectedLocal ? 1 : 0) + (selectedEmpreiteira ? 1 : 0) + (selectedAtividade ? 1 : 0) + Object.values(dates).filter((v) => v.trim()).length;
+  const activeFiltersCount =
+    selectedStatus.length +
+    (selectedLocalNivel1 ? 1 : 0) +
+    (selectedLocalNivel2 ? 1 : 0) +
+    (selectedLocalNivel3 ? 1 : 0) +
+    (selectedLocalNivel4 ? 1 : 0) +
+    (selectedEmpreiteira ? 1 : 0) +
+    (selectedAtividade ? 1 : 0) +
+    Object.values(dates).filter((v) => v.trim()).length;
 
   useEffect(() => {
     let mounted = true;
     const loadOptions = async () => {
       setLoadingOptions(true);
       try {
-        const [fLocais, fAtividades, fContractors] = await Promise.all([localService?.listar(obraId), atividadesService?.listar(), empreiteraService?.listar()]);
+        const [fLocais, fAtividades, fContractors] = await Promise.all([localService?.listarNiveis(obraId), atividadesService?.listar(), empreiteraService?.listar()]);
 
         if (!mounted) return;
 
-        const locaisArr: Local[] = fLocais.items;
-        const atividadesArr: Atividades[] = fAtividades;
-        const contractorsArr: Empreiteira[] = fContractors;
-
-        setLocais(locaisArr);
-        setAtividades(atividadesArr);
-        setContractors(contractorsArr);
-      } catch (err) {
-        console.error('Erro ao carregar opções do modal de tarefa:', err);
-        // fallback já definido via mocks
+        setLocais(fLocais);
+        setAtividades(fAtividades);
+        setContractors(fContractors);
       } finally {
         if (mounted) setLoadingOptions(false);
       }
@@ -198,12 +233,10 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, is
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [obraId]);
 
   return (
     <div className="border-b border-gray-200 bg-gray-50">
-      {/* Toggle */}
       <div className="px-6 py-3">
         <button type="button" onClick={() => setIsExpanded(!isExpanded)} className="flex items-center justify-between w-full text-left">
           <div className="flex items-center space-x-2">
@@ -257,24 +290,42 @@ export const ObraFiltersInner: React.FC<ObraFiltersProps> = ({ onFilterClick, is
             </div>
           </div>
 
-          {/* Locais */}
-          <TextWithSelect label="Local" options={locais.map((l) => ({ id: l.id, name: l.name })) as Option[]} value={selectedLocal ?? undefined} onChange={(val) => setSelectedLocal(val)} />
+          {/* LOCAIS (4 níveis novos) */}
+          <div className="grid grid-cols-1 grid-cols-2 gap-4">
+            <TextWithSelect
+              label="Local Nível 1"
+              options={locais?.nivel1.map((l) => ({ id: l.id, name: l.name })) as Option[]}
+              value={selectedLocalNivel1 ?? undefined}
+              onChange={setSelectedLocalNivel1}
+            />
+
+            <TextWithSelect
+              label="Local Nível 2"
+              options={locais?.nivel2.map((l) => ({ id: l.id, name: l.name })) as Option[]}
+              value={selectedLocalNivel2 ?? undefined}
+              onChange={setSelectedLocalNivel2}
+            />
+
+            <TextWithSelect
+              label="Local Nível 3"
+              options={locais?.nivel3.map((l) => ({ id: l.id, name: l.name })) as Option[]}
+              value={selectedLocalNivel3 ?? undefined}
+              onChange={setSelectedLocalNivel3}
+            />
+
+            <TextWithSelect
+              label="Local Nível 4"
+              options={locais?.nivel4.map((l) => ({ id: l.id, name: l.name })) as Option[]}
+              value={selectedLocalNivel4 ?? undefined}
+              onChange={setSelectedLocalNivel4}
+            />
+          </div>
 
           {/* Empreiteira */}
-          <TextWithSelect
-            label="Empreiteira"
-            options={contractors.map((l) => ({ id: l.id, name: l.name })) as Option[]}
-            value={selectedEmpreiteira ?? undefined}
-            onChange={(val) => setSelectedEmpreiteira(val)}
-          />
+          <TextWithSelect label="Empreiteira" options={contractors.map((l) => ({ id: l.id, name: l.name })) as Option[]} value={selectedEmpreiteira ?? undefined} onChange={setSelectedEmpreiteira} />
 
           {/* Atividade */}
-          <TextWithSelect
-            label="Atividade"
-            options={atividades.map((l) => ({ id: l.id, name: l.name })) as Option[]}
-            value={selectedAtividade ?? undefined}
-            onChange={(val) => setSelectedAtividade(val)}
-          />
+          <TextWithSelect label="Atividade" options={atividades.map((l) => ({ id: l.id, name: l.name })) as Option[]} value={selectedAtividade ?? undefined} onChange={setSelectedAtividade} />
 
           {/* Datas Criação */}
           <div className="flex flex-col md:flex-row gap-6">
