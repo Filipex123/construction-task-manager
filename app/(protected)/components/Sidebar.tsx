@@ -13,6 +13,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
   const { isOpen, toggleSidebar } = useSidebar();
   const [isCadastroOpen, setIsCadastroOpen] = React.useState<boolean>(false);
+  const [isCadastroLocaisOpen, setIsCadastroLocaisOpen] = React.useState<boolean>(false);
 
   const router = useRouter();
 
@@ -90,8 +91,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
               {isOpen && isCadastroOpen && (
                 <div className="mt-2 ml-6 flex flex-col gap-1">
                   <Link href="/nova-obra" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
-                    <span className="text-sm">Cadastro de Obra e Local</span>
+                    <span className="text-sm">Cadastro de Obra</span>
                   </Link>
+                  <>
+                    <div onClick={() => setIsCadastroLocaisOpen((prev) => !prev)} className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-blue-600/60 cursor-pointer">
+                      <span>{isOpen && <span className="text-sm">Cadastro de Locais</span>}</span>
+                      {isOpen && (isCadastroLocaisOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />)}
+                    </div>
+                    {isCadastroLocaisOpen && (
+                      <div className="mt-2 ml-4 flex flex-col gap-1">
+                        <Link href="/nivel-1" className="block px-1 py-1 rounded-md hover:bg-blue-600/60">
+                          <span className="text-sm">Nível 1</span>
+                        </Link>
+                        <Link href="/nivel-2" className="block px-1 py-1 rounded-md hover:bg-blue-600/60">
+                          <span className="text-sm">Nível 2</span>
+                        </Link>
+                        <Link href="/nivel-3" className="block px-1 py-1 rounded-md hover:bg-blue-600/60">
+                          <span className="text-sm">Nível 3</span>
+                        </Link>
+                        <Link href="/nivel-4" className="block px-1 py-1 rounded-md hover:bg-blue-600/60">
+                          <span className="text-sm">Nível 4</span>
+                        </Link>
+                      </div>
+                    )}
+                  </>
+
                   <Link href="/tarefa" className="block px-3 py-2 rounded-md hover:bg-blue-600/60">
                     <span className="text-sm">Cadastro de Tarefa</span>
                   </Link>
@@ -109,23 +133,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
             </div>
 
             {/* Relatorio */}
-             {localStorage.getItem('isAdmin') === 'true' && (
-            <div className="px-4">
-              <a href="/relatorios/pagamento" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
-                <ClipboardList className="w-5 h-5 flex-shrink-0" />
-                {isOpen && <span className="font-medium">Relatório</span>}
-              </a>
-            </div>
-             )}
+            {localStorage.getItem('isAdmin') === 'true' && (
+              <div className="px-4">
+                <a href="/relatorios/pagamento" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
+                  <ClipboardList className="w-5 h-5 flex-shrink-0" />
+                  {isOpen && <span className="font-medium">Relatório</span>}
+                </a>
+              </div>
+            )}
             {/* usuarios */}
-          {localStorage.getItem('isAdmin') === 'true' && (
-            <div className="px-4">
-              <a href="/usuarios" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
-                <User className="w-5 h-5 flex-shrink-0" />
-                {isOpen && <span className="font-medium">Usuários</span>}
-              </a>
-            </div>
-          )}
+            {localStorage.getItem('isAdmin') === 'true' && (
+              <div className="px-4">
+                <a href="/usuarios" className={`flex items-center space-x-3 px-3 py-3 rounded-lg bg-blue-700 text-white ${!isOpen && 'lg:justify-center lg:px-2'}`}>
+                  <User className="w-5 h-5 flex-shrink-0" />
+                  {isOpen && <span className="font-medium">Usuários</span>}
+                </a>
+              </div>
+            )}
           </nav>
         </div>
 

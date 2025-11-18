@@ -2,11 +2,10 @@
 import { usePageTitle } from '@/app/context/PageTitle.context';
 import { obraService } from '@/app/services/obraService';
 import { Obra } from '@/app/types';
-import { Plus } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Loader } from '../components/Loader';
 import { SearchBar } from '../components/SearchBar';
-import { ObraCard } from '../components/cards/ObraCard';
+import { LocalCard } from '../components/cards/LocalCard';
 import { SimpleModal } from '../components/modals/SimpleModal';
 
 function LocalPage() {
@@ -68,9 +67,9 @@ function LocalPage() {
   };
 
   React.useEffect(() => {
-    setTitle('Cadastro de Obras e Locais');
-    setSubtitle('Gerenciar Obras e Locais');
-    setDescription('Controle e monitore todas os locais das suas obras');
+    setTitle('Locais Nivel 4');
+    setSubtitle('Cadastro de Locais Nivel 4');
+    setDescription('Controle e monitore todas os locais nivel 4 das suas obras');
 
     const carregarObras = async () => {
       setIsLoading(true);
@@ -94,13 +93,6 @@ function LocalPage() {
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
         </div>
         <br />
-        <div className="flex items-center justify-end mb-4">
-          <button onClick={handleOpenModalAddObra} className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Novo Obra</span>
-            <span className="sm:hidden">Nova</span>
-          </button>
-        </div>
       </div>
 
       {isLoading && <Loader message={'Carregando Obras'} />}
@@ -113,7 +105,7 @@ function LocalPage() {
       ) : (
         <div className="space-y-6">
           {filteredObras.map((obra) => (
-            <ObraCard key={obra.id} obra={obra} onDelete={handleDelete} onUpdate={onUpdateModal} />
+            <LocalCard key={obra.id} obra={obra} onDelete={handleDelete} onUpdate={onUpdateModal} />
           ))}
         </div>
       )}

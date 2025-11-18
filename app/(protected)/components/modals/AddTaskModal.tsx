@@ -1,6 +1,6 @@
 import { Building2, DollarSign, Edit3, Hash, MapPin, Package, Plus, Wrench, X } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Atividades, Empreiteira, Local, MeasurementStatusEnum, PaymentStatusEnum, Tarefa, UnidadeMedida } from '../../../types';
+import { Atividades, Empreiteira, LocaisNiveis, Local, MeasurementStatusEnum, PaymentStatusEnum, Tarefa, UnidadeMedida } from '../../../types';
 
 import { atividadesService } from '@/app/services/atividadesService';
 import { empreiteraService } from '@/app/services/empreiteiraService';
@@ -19,7 +19,10 @@ interface AddTaskModalProps {
 }
 
 export type AddTarefaFormData = {
-  local: Local | null;
+  localNivel1: Local | null;
+  localNivel2: Local | null;
+  localNivel3: Local | null;
+  localNivel4: Local | null;
   atividade: Atividades | null;
   unidadeDeMedida: UnidadeMedida | null;
   empreiteira: Empreiteira | null;
@@ -29,14 +32,17 @@ export type AddTarefaFormData = {
 };
 
 export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAddTask, obraId, mode = 'add', initialTask = null, onUpdateTask }) => {
-  const [locais, setLocais] = useState<Local[]>([]);
+  const [locais, setLocais] = useState<LocaisNiveis>();
   const [atividades, setAtividades] = useState<Atividades[]>([]);
   const [units, setUnits] = useState<UnidadeMedida[]>([]);
   const [contractors, setContractors] = useState<Empreiteira[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
 
   const [formData, setFormData] = useState<AddTarefaFormData>({
-    local: null,
+    localNivel1: null,
+    localNivel2: null,
+    localNivel3: null,
+    localNivel4: null,
     atividade: null,
     unidadeDeMedida: null,
     empreiteira: null,
@@ -61,7 +67,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData?.local?.name?.trim()) newErrors.location = 'Local é obrigatório';
+    if (!formData?.localNivel1?.name?.trim() && !formData?.localNivel1?.name?.trim() && !formData?.localNivel3?.name?.trim() && !formData?.localNivel4?.name?.trim())
+      newErrors.location = 'Local é obrigatório';
     if (!formData?.atividade?.name?.trim()) newErrors.activity = 'Atividade é obrigatória';
     if (!formData?.quantity || formData.quantity <= 0) newErrors.quantity = 'Quantidade deve ser maior que zero';
     if (!formData?.totalAmount || formData.totalAmount <= 0) newErrors.totalAmount = 'Valor deve ser maior que zero';
@@ -72,8 +79,15 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
   };
 
   const buildSubmitTask = (): Omit<Tarefa, 'id'> => {
-    return {
-      local: { id: Number(formData.local!.id), name: formData.local!.name },
+    const restult = {
+      localNivel1: { id: Number(formData.localNivel1!.id), name: formData.localNivel1!.name },
+      localNivel2: { id: Number(formData.localNivel2!.id), name: formData.localNivel2!.name },
+      localNivel3: { id: Number(formData.localNivel3!.id), name: formData.localNivel3!.name },
+      localNivel4: { id: Number(formData.localNivel4!.id), name: formData.localNivel4!.name },
+      fkLocalNivel1: Number(formData.localNivel1!.id),
+      fkLocalNivel2: Number(formData.localNivel2!.id),
+      fkLocalNivel3: Number(formData.localNivel3!.id),
+      fkLocalNivel4: Number(formData.localNivel4!.id),
       atividade: { id: Number(formData.atividade!.id), name: formData.atividade!.name },
       unidadeDeMedida: { id: Number(formData.unidadeDeMedida!.id), name: formData.unidadeDeMedida!.name },
       empreiteira: { id: Number(formData.empreiteira!.id), name: formData.empreiteira!.name },
@@ -83,6 +97,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       measurementStatus: MeasurementStatusEnum.PENDENTE,
       quantityExecuted: 0,
     };
+
+    return restult;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -99,7 +115,10 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
   const handleClose = () => {
     setFormData({
-      local: null,
+      localNivel1: null,
+      localNivel2: null,
+      localNivel3: null,
+      localNivel4: null,
       atividade: null,
       unidadeDeMedida: null,
       empreiteira: null,
@@ -119,11 +138,16 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     const loadOptions = async () => {
       setLoadingOptions(true);
       try {
-        const [fLocais, fAtividades, fUnits, fContractors] = await Promise.all([localService?.listar(obraId), atividadesService?.listar(), unidadesService?.listar(), empreiteraService?.listar()]);
+        const [fLocais, fAtividades, fUnits, fContractors] = await Promise.all([
+          localService?.listarNiveis(obraId),
+          atividadesService?.listar(),
+          unidadesService?.listar(),
+          empreiteraService?.listar(),
+        ]);
 
         if (!mounted) return;
 
-        const locaisArr: Local[] = fLocais.items;
+        const locaisArr: LocaisNiveis | undefined = fLocais;
         const atividadesArr: Atividades[] = fAtividades;
         const unitsArr: UnidadeMedida[] = fUnits;
         const contractorsArr: Empreiteira[] = fContractors;
@@ -136,7 +160,10 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
         // set defaults / preencher se for edição
         if (mode === 'edit' && initialTask) {
           setFormData({
-            local: initialTask.local ?? locaisArr[0],
+            localNivel1: initialTask.localNivel1 || null,
+            localNivel2: initialTask.localNivel2 || null,
+            localNivel3: initialTask.localNivel1 || null,
+            localNivel4: initialTask.localNivel1 || null,
             atividade: initialTask.atividade ?? atividadesArr[0],
             unidadeDeMedida: initialTask.unidadeDeMedida ?? unitsArr[0],
             empreiteira: initialTask.empreiteira ?? contractorsArr[0],
@@ -175,7 +202,10 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     // simple deep compare
     return (
       JSON.stringify({
-        location: initialTask.local,
+        localNivel1: initialTask.localNivel1,
+        localNivel2: initialTask.localNivel2,
+        localNivel3: initialTask.localNivel3,
+        localNivel4: initialTask.localNivel4,
         activity: initialTask.atividade,
         unitOfMeasure: initialTask.unidadeDeMedida,
         contractor: initialTask.empreiteira,
@@ -184,7 +214,10 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
         paymentStatus: initialTask.paymentStatus,
       }) !==
       JSON.stringify({
-        location: formData.local,
+        localNivel1: formData.localNivel1,
+        localNivel2: formData.localNivel1,
+        localNivel3: formData.localNivel3,
+        localNivel4: formData.localNivel4,
         activity: formData.atividade,
         unitOfMeasure: formData.unidadeDeMedida,
         contractor: formData.empreiteira,
@@ -221,31 +254,114 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
           ) : (
             <>
               <div className="space-y-6">
-                {/* Local */}
-                <div>
-                  <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-                    <MapPin className="w-4 h-4" />
-                    <span>Local</span>
-                  </label>
+                <div className="grid grid-cols-1 grid-cols-2 gap-4">
+                  {/* Local 1 */}
+                  <div>
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>Nivel 1</span>
+                    </label>
 
-                  <TextWithSelect
-                    isLoading={loadingOptions}
-                    options={locais.map((l) => ({ id: l.id, name: l.name })) as Option[]}
-                    value={{
-                      id: formData.local?.id || 0,
-                      name: formData.local?.name || '',
-                    }}
-                    onChange={(value) => {
-                      if (value) {
-                        const selected = locais.find((l) => l.id === value.id) ?? value;
-                        handleInputChange('local', selected as Option & Local);
-                      } else {
-                        handleInputChange('local', null);
-                      }
-                    }}
-                    label={'Locais'}
-                  />
-                  {errors.location && <p className="text-red-600 text-sm mt-1">{errors.location}</p>}
+                    <TextWithSelect
+                      isLoading={loadingOptions}
+                      options={locais?.nivel1.map((l) => ({ id: l.id, name: l.name })) as Option[]}
+                      value={{
+                        id: formData.localNivel1?.id || 0,
+                        name: formData.localNivel1?.name || '',
+                      }}
+                      onChange={(value) => {
+                        if (value) {
+                          const selected = locais?.nivel1.find((l) => l.id === value.id) ?? value;
+                          handleInputChange('localNivel1', selected as Option & Local);
+                        } else {
+                          handleInputChange('localNivel1', null);
+                        }
+                      }}
+                    />
+
+                    {errors.location1 && <p className="text-red-600 text-sm mt-1">{errors.location1}</p>}
+                  </div>
+
+                  {/* Local 2 */}
+                  <div>
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>Nivel 2</span>
+                    </label>
+
+                    <TextWithSelect
+                      isLoading={loadingOptions}
+                      options={locais?.nivel2.map((l) => ({ id: l.id, name: l.name })) as Option[]}
+                      value={{
+                        id: formData.localNivel2?.id || 0,
+                        name: formData.localNivel2?.name || '',
+                      }}
+                      onChange={(value) => {
+                        if (value) {
+                          const selected = locais?.nivel2.find((l) => l.id === value.id) ?? value;
+                          handleInputChange('localNivel2', selected as Option & Local);
+                        } else {
+                          handleInputChange('localNivel2', null);
+                        }
+                      }}
+                    />
+
+                    {errors.location2 && <p className="text-red-600 text-sm mt-1">{errors.location2}</p>}
+                  </div>
+
+                  {/* Local 3 */}
+                  <div>
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>Nivel 3</span>
+                    </label>
+
+                    <TextWithSelect
+                      isLoading={loadingOptions}
+                      options={locais?.nivel3.map((l) => ({ id: l.id, name: l.name })) as Option[]}
+                      value={{
+                        id: formData.localNivel3?.id || 0,
+                        name: formData.localNivel3?.name || '',
+                      }}
+                      onChange={(value) => {
+                        if (value) {
+                          const selected = locais?.nivel3.find((l) => l.id === value.id) ?? value;
+                          handleInputChange('localNivel3', selected as Option & Local);
+                        } else {
+                          handleInputChange('localNivel3', null);
+                        }
+                      }}
+                    />
+
+                    {errors.location3 && <p className="text-red-600 text-sm mt-1">{errors.location3}</p>}
+                  </div>
+
+                  {/* Local 4 */}
+                  <div>
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>Nivel 4</span>
+                    </label>
+
+                    <TextWithSelect
+                      isLoading={loadingOptions}
+                      options={locais?.nivel4.map((l) => ({ id: l.id, name: l.name })) as Option[]}
+                      value={{
+                        id: formData.localNivel4?.id || 0,
+                        name: formData.localNivel4?.name || '',
+                      }}
+                      onChange={(value) => {
+                        if (value) {
+                          const selected = locais?.nivel4.find((l) => l.id === value.id) ?? value;
+                          handleInputChange('localNivel4', selected as Option & Local);
+                        } else {
+                          handleInputChange('localNivel4', null);
+                        }
+                      }}
+                    />
+
+                    {errors.location4 && <p className="text-red-600 text-sm mt-1">{errors.location4}</p>}
+                  </div>
                 </div>
 
                 {/* Atividade */}

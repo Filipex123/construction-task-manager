@@ -53,7 +53,7 @@ export const TextWithSelect: React.FC<Props> = ({ label, value, options, isLoadi
       <input
         type="text"
         className="bg-white text-black w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder={isLoading ? `Carregando ${label}...` : `Digite ou selecione ${label}...`}
+        placeholder={isLoading ? `Carregando...` : `Digite ou selecione uma opção...`}
         value={value?.name || ''}
         onChange={(e) => handleChange(e.target.value)}
         onFocus={() => {

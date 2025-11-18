@@ -133,7 +133,7 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
         <div key={tarefa.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => handleTaskClick(tarefa)}>
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
-              <h5 className="font-medium text-gray-900 text-sm mb-1">{tarefa.local.name}</h5>
+              <h5 className="font-medium text-gray-900 text-sm mb-1">{tarefa.localNivel1.name + '\n' + tarefa.localNivel2.name + '\n' + tarefa.localNivel3.name + '\n' + tarefa.localNivel4.name}</h5>
               <p className="text-gray-600 text-sm">{tarefa.atividade.name}</p>
             </div>
             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.paymentStatus]}`}>{statusLabels[tarefa.paymentStatus]}</span>
@@ -172,7 +172,7 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-1">
-                <h5 className="font-medium text-gray-900 text-sm">{tarefa.local.name}</h5>
+                <h5 className="font-medium text-gray-900 text-sm">{tarefa.localNivel1.name + '\n' + tarefa.localNivel2.name + '\n' + tarefa.localNivel3.name + '\n' + tarefa.localNivel4.name}</h5>
                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusConfig[tarefa.paymentStatus]}`}>{statusLabels[tarefa.paymentStatus]}</span>
               </div>
               <p className="text-gray-600 text-sm mb-2">{tarefa.atividade.name}</p>
@@ -217,7 +217,7 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
         <tbody className="bg-white divide-y divide-gray-200">
           {currentTarefas.map((tarefa) => (
             <tr key={tarefa.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleTaskClick(tarefa)}>
-              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.local.name}</td>
+              <td className="px-4 py-4 text-sm text-gray-900">{tarefa.localNivel1.name + '\n' + tarefa.localNivel2.name + '\n' + tarefa.localNivel3.name + '\n' + tarefa.localNivel4.name}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.atividade.name}</td>
               <td className="px-4 py-4 text-sm text-gray-500">{tarefa.unidadeDeMedida.name}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.quantity}</td>

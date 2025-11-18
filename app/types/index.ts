@@ -1,6 +1,13 @@
 export interface Tarefa {
   id: number;
-  local: Local;
+  fkLocalNivel1: number;
+  fkLocalNivel2: number;
+  fkLocalNivel3: number;
+  fkLocalNivel4: number;
+  localNivel1: Local;
+  localNivel2: Local;
+  localNivel3: Local;
+  localNivel4: Local;
   atividade: Atividades;
   unidadeDeMedida: UnidadeMedida;
   empreiteira: Empreiteira;
@@ -34,7 +41,11 @@ export interface AddTarefaRequest {
   paymentDate?: string;
   updatedBy?: string;
   fkAtividade: number;
-  fkLocal: number;
+  // fkLocal: number;
+  fkLocalNivel1: number;
+  fkLocalNivel2: number;
+  fkLocalNivel3: number;
+  fkLocalNivel4: number;
   fkUnidadeMedida: number;
   fkEmpreiteiro: number;
   medido?: boolean;
@@ -47,6 +58,13 @@ export interface Local {
   updatedAt?: string;
   updatedBy?: string;
   createdAt?: string;
+}
+
+export interface LocaisNiveis {
+  nivel1: Local[];
+  nivel2: Local[];
+  nivel3: Local[];
+  nivel4: Local[];
 }
 export interface Obra {
   id?: number;

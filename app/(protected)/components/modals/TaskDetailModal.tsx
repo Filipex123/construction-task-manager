@@ -58,7 +58,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="text-lg sm:text-xl font-bold truncate">{tarefa.atividade.name}</h2>
-                <p className="text-blue-100 text-sm truncate">{tarefa.local.name}</p>
+                <p className="text-blue-100 text-sm truncate">{tarefa.localNivel1.name + ' - ' + tarefa.localNivel2.name + ' - ' + tarefa.localNivel3.name + ' - ' + tarefa.localNivel4.name}</p>
               </div>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors ml-2">
