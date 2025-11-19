@@ -3,7 +3,7 @@
 import { usePageTitle } from '@/app/context/PageTitle.context';
 import { usuariosService } from '@/app/services/usuariosService';
 import { Login } from '@/app/types';
-import { ChevronLeft, ChevronRight, Edit, Plus, Save, Trash2, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Loader } from '../components/Loader';
 import { SearchBar } from '../components/SearchBar';
@@ -15,8 +15,8 @@ const UsuariosPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<Login | null>(null);
-  const [formData, setFormData] = useState({ login: '', senha: '' , nome: '', isAdmin: false});
-  const [errors, setErrors] = useState({ login: '', senha: '' , nome: '', isAdmin: false });
+  const [formData, setFormData] = useState({ login: '', senha: '', nome: '', isAdmin: false });
+  const [errors, setErrors] = useState({ login: '', senha: '', nome: '', isAdmin: false });
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
   const [units, setUnits] = useState<Login[]>([]);
   const [isLoading, setIsLoading] = useState<Boolean>(false);
@@ -27,10 +27,7 @@ const UsuariosPage: React.FC = () => {
   const filteredData = useMemo(() => {
     return units.filter((unit) => {
       return (
-        searchTerm === '' ||
-        unit.login?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        unit.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        unit.id === Number(searchTerm.toLowerCase())
+        searchTerm === '' || unit.login?.toLowerCase().includes(searchTerm.toLowerCase()) || unit.name?.toLowerCase().includes(searchTerm.toLowerCase()) || unit.id === Number(searchTerm.toLowerCase())
       );
     });
   }, [units, searchTerm]);
@@ -41,7 +38,7 @@ const UsuariosPage: React.FC = () => {
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   const validateForm = () => {
-    const newErrors = {  login: '', senha: '' , nome: '', isAdmin: false };
+    const newErrors = { login: '', senha: '', nome: '', isAdmin: false };
 
     if (!formData.login.trim()) {
       newErrors.login = 'Descrição é obrigatória';
@@ -52,9 +49,7 @@ const UsuariosPage: React.FC = () => {
     }
 
     // Verificar se já existe uma usuarios com a mesma descrição ou complemento
-    const existingUnit = units.find(
-      (unit) => unit.id !== editingItem?.id && (unit.login?.toLowerCase() === formData.login.toLowerCase() || unit.name?.toLowerCase() === formData.nome.toLowerCase())
-    );
+    const existingUnit = units.find((unit) => unit.id !== editingItem?.id && (unit.login?.toLowerCase() === formData.login.toLowerCase() || unit.name?.toLowerCase() === formData.nome.toLowerCase()));
 
     if (existingUnit) {
       if (existingUnit.login?.toLowerCase() === formData.login.toLowerCase()) {
@@ -72,17 +67,17 @@ const UsuariosPage: React.FC = () => {
       setFormData({ nome: unit.name || '', login: unit.login || '', senha: unit.password || '', isAdmin: unit.isAdmin || false });
     } else {
       setEditingItem(null);
-      setFormData({  login: '', senha: '' , nome: '', isAdmin: false});
+      setFormData({ login: '', senha: '', nome: '', isAdmin: false });
     }
-    setErrors({  login: '', senha: '' , nome: '', isAdmin: false });
+    setErrors({ login: '', senha: '', nome: '', isAdmin: false });
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingItem(null);
-    setFormData({  login: '', senha: '' , nome: '', isAdmin: false});
-    setErrors({  login: '', senha: '' , nome: '', isAdmin: false });
+    setFormData({ login: '', senha: '', nome: '', isAdmin: false });
+    setErrors({ login: '', senha: '', nome: '', isAdmin: false });
   };
 
   const handleSave = async () => {
@@ -90,14 +85,14 @@ const UsuariosPage: React.FC = () => {
     setIsLoading(true);
     try {
       if (editingItem) {
-        await usuariosService.atualizar(editingItem.id!, {          
+        await usuariosService.atualizar(editingItem.id!, {
           name: formData.nome,
           login: formData.login,
           password: formData.senha,
           isAdmin: formData.isAdmin,
         });
       } else {
-        await usuariosService.criar({          
+        await usuariosService.criar({
           name: formData.nome,
           login: formData.login,
           password: formData.senha,
@@ -183,9 +178,9 @@ const UsuariosPage: React.FC = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    
+
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Complemento</th>
-                    
+
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                   </tr>
                 </thead>
@@ -193,11 +188,11 @@ const UsuariosPage: React.FC = () => {
                   {paginatedData.map((unit) => (
                     <tr key={unit.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{unit.id}</td>
-                    
+
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{unit.name}</td>
-                    
+
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="flex space-x-2">                          
+                        <div className="flex space-x-2">
                           <button
                             onClick={() => {
                               setSelectedItemDelete(Number(unit.id));
@@ -335,7 +330,7 @@ const UsuariosPage: React.FC = () => {
                   />
                   {errors.senha && <p className="mt-1 text-sm text-red-600">{errors.senha}</p>}
                 </div>
-                  <div>
+                <div>
                   <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-2">
                     Nome *
                   </label>
@@ -351,11 +346,22 @@ const UsuariosPage: React.FC = () => {
                   />
                   {errors.nome && <p className="mt-1 text-sm text-red-600">{errors.nome}</p>}
                 </div>
-                  <div>
+                <div>
                   <label htmlFor="complemento" className="block text-sm font-medium text-gray-700 mb-2">
                     Admin *
                   </label>
-                  <input
+
+                  <div className="relative inline-block w-11 h-5">
+                    <input
+                      checked={formData.isAdmin}
+                      onChange={() => setFormData((prev) => ({ ...prev, isAdmin: !prev.isAdmin }))}
+                      id="switch-component"
+                      type="checkbox"
+                      className="peer appearance-none w-11 h-5 bg-slate-100 rounded-full checked:bg-slate-800 cursor-pointer transition-colors duration-300"
+                    />
+                    <label className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-6 peer-checked:border-slate-800 cursor-pointer"></label>
+                  </div>
+                  {/* <input
                     id="complemento"
                     type="checkbox"                    
                     checked={formData.isAdmin}
@@ -366,7 +372,7 @@ const UsuariosPage: React.FC = () => {
                       errors.isAdmin ? 'border-red-300' : 'border-gray-300'
                     }`}
                     placeholder="Ex: m²"
-                  />
+                  /> */}
                   {errors.isAdmin && <p className="mt-1 text-sm text-red-600">{errors.isAdmin}</p>}
                 </div>
               </div>
