@@ -65,9 +65,9 @@ export const ObraCard: React.FC<ObraCardProps> = ({ obra, onDelete, onUpdate }) 
     }
   };
 
-  const handleDelete = async (localId: number) => {
+  const handleDelete = async (localId: number, nivel: number) => {
     try {
-      await localService.excluir(localId);
+      await localService.excluir(localId, nivel);
       setLocais((prevLocais) => prevLocais.filter((local) => local.id !== localId));
     } catch (error) {
       console.error('Erro ao excluir local:', error);

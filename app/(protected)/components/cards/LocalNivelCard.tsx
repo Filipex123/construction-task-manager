@@ -46,7 +46,7 @@ export const LocalNivelCard: React.FC<LocalNivelCardProps> = ({ obra, onDelete, 
 
   const handleSave = async (obraId: number, name: string) => {
     try {
-      const data = await localService.criar({ name: name, fkObra: obraId, nivel: nivel });
+      const data = await localService.criar({ name: name, fkObra: obraId }, nivel);
       setLocais((prevLocais) => [...prevLocais, data]);
     } catch (error) {
       console.error('Erro ao adicionar local:', error);

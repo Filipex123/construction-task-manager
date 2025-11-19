@@ -5,7 +5,7 @@ import React from 'react';
 interface LocalTableProps {
   locais: Local[];
   onEdit: (localId: number) => void;
-  onDelete: (localId: number) => void;
+  onDelete: (localId: number, nivel: number) => void;
 }
 
 type MobileView = 'table' | 'cards' | 'list';
@@ -49,7 +49,7 @@ export const LocalTable: React.FC<LocalTableProps> = ({ locais, onEdit, onDelete
         <Edit3 className="w-4 h-4" />
       </button>
 
-      <button onClick={() => onDelete(local.id!)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors" title="Deletar">
+      <button onClick={() => onDelete(local.id!, local.nivel!)} className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors" title="Deletar">
         <Trash2 className="w-4 h-4" />
       </button>
     </div>
@@ -126,7 +126,7 @@ export const LocalTable: React.FC<LocalTableProps> = ({ locais, onEdit, onDelete
                     <Edit3 className="w-4 h-4" />
                   </button>
                   {onDelete && (
-                    <button onClick={() => onDelete(local.id!)} className="p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors" title="Deletar">
+                    <button onClick={() => onDelete(local.id!, local.nivel!)} className="p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors" title="Deletar">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}

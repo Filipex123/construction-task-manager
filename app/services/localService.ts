@@ -27,7 +27,9 @@ export const localService = {
 
       const niveis = await Promise.all(
         nvs.map(async (nv) => {
-          const res = await fetch(url + nv, { cache: 'no-store' });
+          const res = await fetch(url + nv);
+
+          console.log('Fetching level', nv, 'from', url + nv);
 
           if (!res.ok) throw new Error('Erro ao listar local');
           const jsonres = await res.json();
