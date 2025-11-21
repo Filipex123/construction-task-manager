@@ -78,7 +78,12 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({ summaries, totalCost, fi
             {statusList.map((status) => (
               <span key={status.label} className="flex flex-col items-center space-y-1">
                 <span className="text-xs">
-                  {filteredTarefas.filter((t) => t.measurementStatus.toUpperCase() === status.label.replace(' ', '_').toUpperCase()).length} {status.label}
+                  {
+                    filteredTarefas.filter(t => {
+                      if (!t.measurementStatus) return false;
+                      return t.measurementStatus.toUpperCase() === status.label.replace(' ', '_').toUpperCase();
+                    }).length
+                  } {status.label}
                 </span>
                 <div className={`w-full h-1 ${status.color} rounded-full`} />
               </span>

@@ -162,8 +162,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
           setFormData({
             localNivel1: initialTask.localNivel1 || null,
             localNivel2: initialTask.localNivel2 || null,
-            localNivel3: initialTask.localNivel1 || null,
-            localNivel4: initialTask.localNivel1 || null,
+            localNivel3: initialTask.localNivel3 || null,
+            localNivel4: initialTask.localNivel4 || null,
             atividade: initialTask.atividade ?? atividadesArr[0],
             unidadeDeMedida: initialTask.unidadeDeMedida ?? unitsArr[0],
             empreiteira: initialTask.empreiteira ?? contractorsArr[0],
