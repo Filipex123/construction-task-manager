@@ -2,7 +2,8 @@
 
 import { usePageTitle } from '@/app/context/PageTitle.context';
 import { usuariosService } from '@/app/services/usuariosService';
-import { Login } from '@/app/types';
+import { obraService } from '@/app/services/obraService';
+import { Login, Obra } from '@/app/types';
 import { ChevronLeft, ChevronRight, Plus, Save, Trash2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Loader } from '../components/Loader';
@@ -15,13 +16,22 @@ const UsuariosPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<Login | null>(null);
-  const [formData, setFormData] = useState({ login: '', senha: '', nome: '', isAdmin: false });
+  const [formData, setFormData] = useState({
+      login: '',
+      senha: '',
+      nome: '',
+      isAdmin: false,
+      listObras: [] as number[],
+    });
   const [errors, setErrors] = useState({ login: '', senha: '', nome: '', isAdmin: false });
   const { setTitle, setSubtitle, setDescription } = usePageTitle();
   const [units, setUnits] = useState<Login[]>([]);
   const [isLoading, setIsLoading] = useState<Boolean>(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [selectedItemDelete, setSelectedItemDelete] = useState<number | null>(null);
+  
+  const [obras, setObras] = useState<Obra[]>([]);
+  const [selectedObra, setSelectedObra] = useState<number | null>(null);
 
   // Filtrar dados
   const filteredData = useMemo(() => {
@@ -64,10 +74,10 @@ const UsuariosPage: React.FC = () => {
   const handleOpenModal = (unit?: Login) => {
     if (unit) {
       setEditingItem(unit);
-      setFormData({ nome: unit.name || '', login: unit.login || '', senha: unit.password || '', isAdmin: unit.isAdmin || false });
+      setFormData({ nome: unit.name || '', login: unit.login || '', senha: unit.password || '', isAdmin: unit.isAdmin || false , listObras: [] });
     } else {
       setEditingItem(null);
-      setFormData({ login: '', senha: '', nome: '', isAdmin: false });
+      setFormData({ login: '', senha: '', nome: '', isAdmin: false , listObras: []});
     }
     setErrors({ login: '', senha: '', nome: '', isAdmin: false });
     setShowModal(true);
@@ -76,7 +86,7 @@ const UsuariosPage: React.FC = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingItem(null);
-    setFormData({ login: '', senha: '', nome: '', isAdmin: false });
+    setFormData({ login: '', senha: '', nome: '', isAdmin: false , listObras: []});
     setErrors({ login: '', senha: '', nome: '', isAdmin: false });
   };
 
@@ -90,6 +100,7 @@ const UsuariosPage: React.FC = () => {
           login: formData.login,
           password: formData.senha,
           isAdmin: formData.isAdmin,
+          listObras: formData.listObras,
         });
       } else {
         await usuariosService.criar({
@@ -97,6 +108,7 @@ const UsuariosPage: React.FC = () => {
           login: formData.login,
           password: formData.senha,
           isAdmin: formData.isAdmin,
+          listObras: formData.listObras,
         });
       }
 
@@ -137,6 +149,11 @@ const UsuariosPage: React.FC = () => {
       try {
         const data = await usuariosService.listar();
         setUnits(data);
+
+         // aqui você vai usar a API real quando me mandar
+       const obrasData = await obraService.listarSimplificado();
+       setObras(obrasData);
+
       } catch (error) {
         console.error(error);
         alert('Erro ao carregar usuarios.');
@@ -309,7 +326,7 @@ const UsuariosPage: React.FC = () => {
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.login ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Ex: Metro Quadrado"
+                    placeholder="teste@teste.com"
                   />
                   {errors.login && <p className="mt-1 text-sm text-red-600">{errors.login}</p>}
                 </div>
@@ -320,13 +337,13 @@ const UsuariosPage: React.FC = () => {
                   </label>
                   <input
                     id="senha"
-                    type="text"
+                    type="password"
                     value={formData.senha}
                     onChange={(e) => setFormData((prev) => ({ ...prev, senha: e.target.value }))}
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.senha ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Ex: m²"
+                    placeholder="•••••••"
                   />
                   {errors.senha && <p className="mt-1 text-sm text-red-600">{errors.senha}</p>}
                 </div>
@@ -342,7 +359,7 @@ const UsuariosPage: React.FC = () => {
                     className={`text-gray-600 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
                       errors.nome ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Ex: m²"
+                    placeholder="João da Silva"
                   />
                   {errors.nome && <p className="mt-1 text-sm text-red-600">{errors.nome}</p>}
                 </div>
@@ -375,6 +392,74 @@ const UsuariosPage: React.FC = () => {
                   /> */}
                   {errors.isAdmin && <p className="mt-1 text-sm text-red-600">{errors.isAdmin}</p>}
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Obras que o usuário pode acessar
+                  </label>
+
+                  <div className="flex gap-2">
+                    <select
+                      value={selectedObra ?? ''}
+                      onChange={(e) => setSelectedObra(Number(e.target.value))}
+                      className="flex-1 px-3 py-2 border rounded-lg text-gray-600"
+                    >
+                      <option value="">Selecione uma obra</option>
+                      {obras.map((obra) => (
+                        <option key={obra.id} value={obra.id}>
+                          {obra.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    <button
+                      onClick={() => {
+                        if (selectedObra && !formData.listObras.includes(selectedObra)) {
+                          setFormData((prev) => ({
+                            ...prev,
+                            listObras: [...prev.listObras, selectedObra],
+                          }));
+                        }
+                      }}
+                      className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+
+                  {/* LISTA DE OBRAS ADICIONADAS */}
+                  <div className="mt-3 space-y-2">
+                    {formData.listObras.length === 0 && (
+                      <p className="text-gray-500 text-sm">Nenhuma obra adicionada.</p>
+                    )}
+
+                    {formData.listObras.map((id) => {
+                      const obra = obras.find((o) => o.id === id);
+                      return (
+                        <div
+                          key={id}
+                          className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded"
+                        >
+                          <span className="text-sm text-gray-700">
+                            {obra?.name || `Obra ${id}`}
+                          </span>
+
+                          <button
+                            onClick={() =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                listObras: prev.listObras.filter((x) => x !== id),
+                              }))
+                            }
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
               </div>
 
               <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200">

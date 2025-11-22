@@ -20,6 +20,33 @@ export const obraService = {
     }
   },
 
+  async listarSimplificado(): Promise<Obra[]> {
+    try {
+      const idUsuario = Number(localStorage.getItem('idUsuario'));
+      const res = await fetch(`${API_URL}?idUsuario=${idUsuario}`, { cache: 'no-store' });
+
+      if (!res.ok) throw new Error('Erro ao listar obras');
+
+      const data = await res.json();
+
+      // Caso venha no formato PageableResponse
+      if (Array.isArray(data?.content)) {
+        return data.content;
+      }
+
+      // Caso a API venha em outro formato (compatibilidade futura)
+      if (Array.isArray(data?.items)) {
+        return data.items;
+      }
+
+      // Se nada bater, garantir um array vazio
+      return [];
+    } catch (error) {
+      console.error('Erro ao listar obras:', error);
+      return [];
+    }
+  },
+
   async criar(dados: Omit<Obra, 'ID'>): Promise<Obra> {
     const idUsuario = Number(localStorage.getItem('idUsuario'));
     const res = await fetch(`${API_URL}?idUsuario=${idUsuario}`, {

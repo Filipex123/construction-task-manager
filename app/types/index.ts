@@ -103,6 +103,7 @@ export interface Login {
   createat?: string;
   updatedAt?: string;
   updatedBy?: string;
+  listObras: number[];
 }
 
 export interface Atividades {
