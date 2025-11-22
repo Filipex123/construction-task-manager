@@ -36,9 +36,13 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
     const newErrors: { quantity?: string; quantityExecuted?: string; status?: string } = {};
     const prevista = form.quantity || 0;
     const realizada = form.quantityExecuted || 0;
+    //Validation of nullable fields
     if (!form.quantity || isNaN(prevista) || prevista < 0) newErrors.quantity = 'Informe um valor válido';
     if (form.quantity === null || form.quantity === undefined || isNaN(realizada) || realizada < 0) newErrors.quantityExecuted = 'Informe um valor válido';
     if (!form.measurementStatus) newErrors.status = 'Selecione um status';
+    //Validation of business rules
+    if (form.measurementStatus === 'MEDIDO' && form.quantityExecuted > form.quantity) newErrors.status = 'Quantia medida excedida! Contate a diretoria.';
+    if (form.measurementStatus === 'MEDIDO' && form.quantityExecuted < form.quantity) newErrors.status = 'Quantia medida a baixo do esperado. Altere o status para em andamento.';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [form]);
@@ -57,11 +61,11 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
   };
 
   const handleMedir = (option: { value: string; label: string }) => {
-    if (option.value === 'MEDIDO' && initialValues?.quantity) {
-      setForm((p) => ({ ...p, measurementStatus: option.value as MeasurementStatusEnum, quantityExecuted: initialValues?.quantity }));
-    } else {
+    // if (option.value === 'MEDIDO' && initialValues?.quantity) {
+    //   setForm((p) => ({ ...p, measurementStatus: option.value as MeasurementStatusEnum, quantityExecuted: initialValues?.quantity }));
+    // } else {
       setForm((p) => ({ ...p, measurementStatus: option.value as MeasurementStatusEnum }));
-    }
+    // }
   };
 
   if (!isOpen) return null;
@@ -152,8 +156,9 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
             </button>
             <button
               type="submit"
+              disabled={errors.status !== ''}
               onClick={handleConfirm}
-              className="flex-1 px-4 py-3 rounded-lg transition-colors font-medium text-white bg-blue-600 hover:bg-blue-700 inline-flex items-center justify-center space-x-2"
+              className="flex-1 px-4 py-3 rounded-lg transition-colors font-medium text-white bg-blue-600 hover:bg-blue-700 inline-flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <CheckCircle2 className="w-5 h-5 text-white" />
               <span>Confirmar</span>

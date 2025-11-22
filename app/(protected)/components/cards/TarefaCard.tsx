@@ -109,7 +109,7 @@ export const TarefaCard: React.FC<TarefaCardProps> = ({ obra }) => {
         await tarefaService.criar(obra.id!, payload);
         await fetchTasks(filters, currentPage);
         setCurrentPage(1);
-        setIsAddModalOpen(false);
+        setEditTaskId(null);
       } catch (err) {
         console.error('Erro ao adicionar tarefa:', err);
       } finally {

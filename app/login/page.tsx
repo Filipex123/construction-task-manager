@@ -63,7 +63,7 @@ export default function LoginPage() {
       localStorage.setItem('usuarioName', data.name);
       localStorage.setItem('isAdmin', String(data.isAdmin));
 
-      router.push('/');
+      router.push('/tarefa');
     } catch (error) {
       console.error(error);
       alert('Erro ao conectar com o servidor');

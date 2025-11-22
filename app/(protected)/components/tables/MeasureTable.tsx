@@ -94,7 +94,11 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
 
   const ActionButtons = ({ tarefa }: { tarefa: Tarefa }) => (
     <div className="flex space-x-2">
-      <button onClick={() => handleMeasure(tarefa)} className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors" title="Medir">
+      <button 
+      disabled={tarefa.measurementStatus === 'MEDIDO'}
+      onClick={() => handleMeasure(tarefa)} 
+      className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
+      title="Medir">
         <Ruler className="w-4 h-4" />
       </button>
     </div>

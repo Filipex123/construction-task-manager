@@ -60,6 +60,21 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     { value: PaymentStatusEnum.ATRASADO, label: 'Atrasado', color: 'bg-red-100 text-red-800' },
   ];
 
+  const clearFields = () => {
+    setFormData({
+      localNivel1: null,
+      localNivel2: null,
+      localNivel3: null,
+      localNivel4: null,
+      atividade: null,
+      unidadeDeMedida: null,
+      empreiteira: null,  
+      quantity: 0,
+      totalAmount: 0,
+      paymentStatus: PaymentStatusEnum.EM_ANDAMENTO,
+    });
+    setErrors({});
+  }
   const handleInputChange = <K extends keyof AddTarefaFormData>(field: K, value: AddTarefaFormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field as string]) setErrors((prev) => ({ ...prev, [field as string]: '' }));
@@ -110,23 +125,11 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     } else {
       onAddTask(newTask);
     }
-    handleClose();
+    clearFields();
   };
 
   const handleClose = () => {
-    setFormData({
-      localNivel1: null,
-      localNivel2: null,
-      localNivel3: null,
-      localNivel4: null,
-      atividade: null,
-      unidadeDeMedida: null,
-      empreiteira: null,
-      quantity: 0,
-      totalAmount: 0,
-      paymentStatus: PaymentStatusEnum.EM_ANDAMENTO,
-    });
-    setErrors({});
+    clearFields();
     onClose();
   };
 
@@ -232,7 +235,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-      <div className="bg-white w-full md:w-[50vh] h-full sm:h-auto sm:max-h-[90vh] sm:max-w-4xl sm:rounded-2xl overflow-hidden">
+      <div className="bg-white w-full md:w-[50vh] h-full sm:h-auto sm:max-h-[90vh] sm:max-w-4xl sm:rounded-2xl overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-blue-50">
           <div className="flex items-center space-x-3">
