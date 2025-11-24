@@ -13,6 +13,7 @@ export interface Tarefa {
   empreiteira: Empreiteira;
   quantity: number;
   totalAmount: number;
+  totalPrice: number;
   paymentStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'PAGO' | 'ATRASADO';
   measurementStatus: 'EM_ANDAMENTO' | 'PENDENTE' | 'MEDIDO' | 'RETIDO';
   quantityExecuted: number;

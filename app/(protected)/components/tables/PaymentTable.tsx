@@ -148,7 +148,7 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
             </div>
             <div>
               <span className="text-gray-500">Valor:</span>
-              <p className="font-medium text-green-600">{formatCurrency(tarefa.totalAmount)}</p>
+              <p className="font-medium text-green-600">{formatCurrency(tarefa.totalPrice)}</p>
             </div>
           </div>
 
@@ -184,7 +184,7 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
               <span className="text-gray-500">
                 {tarefa.quantity} {tarefa.unidadeDeMedida.name}
               </span>
-              <span className="font-medium text-green-600">{formatCurrency(tarefa.totalAmount)}</span>
+              <span className="font-medium text-green-600">{formatCurrency(tarefa.totalPrice)}</span>
             </div>
             <ActionButtons tarefa={tarefa} />
           </div>
@@ -205,12 +205,13 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Local</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atividade</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unidade</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade Medida</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qtd</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qtd. Medida</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Unit</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Total</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empreiteira</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Criação</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Vencimento</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criação</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimento</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
           </tr>
@@ -224,6 +225,7 @@ export const PaymentTableInner: React.FC<PaymentTableProps> = ({ tarefas, onPay,
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.quantity}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.quantityExecuted}</td>
               <td className="px-4 py-4 text-sm font-medium text-gray-900">{formatCurrency(tarefa.totalAmount)}</td>
+              <td className="px-4 py-4 text-sm font-medium text-gray-900">{formatCurrency(tarefa.totalPrice)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.empreiteira.name}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{formatDate(tarefa.createdAt)}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{formatDate(tarefa.dueDate)}</td>

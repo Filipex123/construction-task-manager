@@ -31,19 +31,25 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
     return { id: String(val), name: String(val) };
   };
 
-  const totalValue = tarefas.reduce((sum, tarefa) => sum + (tarefa.totalAmount ?? 0), 0);
+  const totalValue = tarefas.reduce((sum, tarefa) => sum + (tarefa.totalPrice ?? 0), 0);
   const uniqueLocais = (() => {
     const map = new Map<string, IdName>();
     tarefas.forEach((t) => {
-      const pair = toIdName((t as any).location);
-      if (pair && !map.has(pair.id)) map.set(pair.id, pair);
+      const pair1 = toIdName((t as any).localNivel1);
+      if (pair1 && !map.has(pair1.id)) map.set(pair1.id, pair1);
+      const pair2 = toIdName((t as any).localNivel2);
+      if (pair2 && !map.has(pair2.id)) map.set(pair2.id, pair2);
+      const pair3 = toIdName((t as any).localNivel3);
+      if (pair3 && !map.has(pair3.id)) map.set(pair3.id, pair3);
+      const pair4 = toIdName((t as any).localNivel4);
+      if (pair4 && !map.has(pair4.id)) map.set(pair4.id, pair4);
     });
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   })();
   const uniqueEmpreiteiras = (() => {
     const map = new Map<string, IdName>();
     tarefas.forEach((t) => {
-      const pair = toIdName((t as any).contractor);
+      const pair = toIdName((t as any).empreiteira);
       if (pair && !map.has(pair.id)) map.set(pair.id, pair);
     });
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
@@ -148,7 +154,7 @@ export const BatchPaymentModal: React.FC<BatchPaymentModalProps> = ({ isOpen, on
                         </div>
                       </div>
                       <div className="ml-4 text-right">
-                        <p className="font-semibold text-green-600 text-sm">{formatCurrency(tarefa.totalAmount!)}</p>
+                        <p className="font-semibold text-green-600 text-sm">{formatCurrency(tarefa.totalPrice!)}</p>
                         <p className="text-xs text-gray-500">
                           {tarefa.quantity} {tarefa.unidadeDeMedida?.name}
                         </p>

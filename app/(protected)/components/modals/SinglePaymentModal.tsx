@@ -104,7 +104,7 @@ export const SinglePaymentModal: React.FC<SinglePaymentModalProps> = ({ isOpen, 
                   <DollarSign className="w-8 h-8" />
                   <span className="text-lg font-medium">Valor do Pagamento</span>
                 </div>
-                <p className="text-4xl font-bold">{formatCurrency(tarefa.totalAmount)}</p>
+                <p className="text-4xl font-bold">{formatCurrency(tarefa.totalPrice)}</p>
               </div>
             </section>
 

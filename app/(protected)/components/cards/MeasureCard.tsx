@@ -149,7 +149,7 @@ export const MeasureCard: React.FC<MeasureCardProps> = ({ obra, onMeasure }) => 
   });
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hover:shadow-xl transition-shadow duration-300 max-w-7xl mx-auto">
+    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hover:shadow-xl transition-shadow duration-300 mx-auto w-full">
       <HeaderComponent obra={obra} isLoading={isLoading} isExpanded={isExpanded} hasLoadedTasks={hasLoadedTasks} tarefasCount={tarefasCount} onToggle={handleToggleExpand} />
       {/* Expandable Content: manter aberto mesmo durante fetch, mostrar overlay de loading */}
       {isExpanded && (
