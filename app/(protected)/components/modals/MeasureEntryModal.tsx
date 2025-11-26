@@ -64,7 +64,7 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
     // if (option.value === 'MEDIDO' && initialValues?.quantity) {
     //   setForm((p) => ({ ...p, measurementStatus: option.value as MeasurementStatusEnum, quantityExecuted: initialValues?.quantity }));
     // } else {
-      setForm((p) => ({ ...p, measurementStatus: option.value as MeasurementStatusEnum }));
+    setForm((p) => ({ ...p, measurementStatus: option.value as MeasurementStatusEnum }));
     // }
   };
 
@@ -97,9 +97,8 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
             <input
               type="number"
               step="0.01"
-              min="0"
+              disabled
               value={form.quantity}
-              onChange={(e) => setForm((p) => ({ ...p, quantity: Number(e.target.value) }))}
               placeholder="0,00"
               className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
                 errors.quantity ? 'border-red-300 bg-red-50' : 'border-gray-300'
