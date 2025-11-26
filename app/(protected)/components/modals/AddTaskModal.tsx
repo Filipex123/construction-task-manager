@@ -68,13 +68,13 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
       localNivel4: null,
       atividade: null,
       unidadeDeMedida: null,
-      empreiteira: null,  
+      empreiteira: null,
       quantity: 0,
       totalAmount: 0,
       paymentStatus: PaymentStatusEnum.EM_ANDAMENTO,
     });
     setErrors({});
-  }
+  };
   const handleInputChange = <K extends keyof AddTarefaFormData>(field: K, value: AddTarefaFormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field as string]) setErrors((prev) => ({ ...prev, [field as string]: '' }));
@@ -93,7 +93,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onA
     return Object.keys(newErrors).length === 0;
   };
 
-  const buildSubmitTask = (): Omit<Tarefa, 'id'> => {
+  const buildSubmitTask = (): Omit<Tarefa, 'id' | 'totalPrice'> => {
     const restult = {
       localNivel1: { id: Number(formData.localNivel1!.id), name: formData.localNivel1!.name },
       localNivel2: { id: Number(formData.localNivel2!.id), name: formData.localNivel2!.name },
