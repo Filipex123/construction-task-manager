@@ -34,11 +34,9 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
 
   const isValid = useMemo(() => {
     const newErrors: { quantity?: string; quantityExecuted?: string; status?: string } = {};
-    const prevista = form.quantity || 0;
     const realizada = form.quantityExecuted || 0;
     //Validation of nullable fields
-    if (!form.quantity || isNaN(prevista) || prevista < 0) newErrors.quantity = 'Informe um valor válido';
-    if (form.quantity === null || form.quantity === undefined || isNaN(realizada) || realizada < 0) newErrors.quantityExecuted = 'Informe um valor válido';
+    if (form.quantityExecuted === null || form.quantityExecuted === undefined || isNaN(realizada) || realizada < 0) newErrors.quantityExecuted = 'Informe um valor válido';
     if (!form.measurementStatus) newErrors.status = 'Selecione um status';
     //Validation of business rules
     if (form.measurementStatus === 'MEDIDO' && form.quantityExecuted > form.quantity) newErrors.status = 'Quantia medida excedida! Contate a diretoria.';
