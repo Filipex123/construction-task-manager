@@ -1,7 +1,8 @@
+import { empreiteraService } from '@/app/services/empreiteiraService';
 import { formatDateStringtoView, formatDateStringtoViewDueDate } from '@/app/utils/dateUtils';
 import { ChevronLeft, ChevronRight, Grid, List, Ruler } from 'lucide-react';
 import React from 'react';
-import { MeasureTarefa, StatusColorMedicao, Tarefa } from '../../../types';
+import { Empreiteira, MeasureTarefa, StatusColorMedicao, Tarefa } from '../../../types';
 import { MeasureEntryModal } from '../modals/MeasureEntryModal';
 import { TaskDetailModal } from '../modals/TaskDetailModal';
 
@@ -39,6 +40,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
   const [isOpen, setIsOpen] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
   const [localTarefas, setLocalTarefas] = React.useState<Tarefa[]>(tarefas);
+  const [empreiteiras, setEmpreiteiras] = React.useState<Empreiteira[]>([]);
 
   // Atualizar tarefas locais quando props mudam
   React.useEffect(() => {
@@ -47,6 +49,12 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
 
   // Detectar se é mobile
   React.useEffect(() => {
+    const loadData = async () => {
+      const empreiteirasCarregadas = await loadEmpreiteiras();
+      setEmpreiteiras(empreiteirasCarregadas);
+    };
+    loadData();
+
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -90,6 +98,10 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
     if (selectedTask && onMeasure) {
       onMeasure(selectedTask.id, data);
     }
+  };
+
+  const loadEmpreiteiras = (): Promise<Empreiteira[]> => {
+    return empreiteraService?.listar();
   };
 
   const ActionButtons = ({ tarefa }: { tarefa: Tarefa }) => (
@@ -351,10 +363,15 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
       <TaskDetailModal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal} tarefa={selectedTask} />
 
       <MeasureEntryModal
+        contractorOptions={empreiteiras}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={handleConfirmMeasure}
-        initialValues={selectedTask ? { quantity: selectedTask.quantity, quantityExecuted: selectedTask.quantityExecuted, measurementStatus: selectedTask.measurementStatus } : null}
+        initialValues={
+          selectedTask
+            ? { quantity: selectedTask.quantity, quantityExecuted: selectedTask.quantityExecuted, measurementStatus: selectedTask.measurementStatus, fkEmpreiteiro: selectedTask.empreiteira.id! }
+            : null
+        }
       />
     </div>
   );
