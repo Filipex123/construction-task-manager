@@ -1,7 +1,8 @@
+import { empreiteraService } from '@/app/services/empreiteiraService';
 import { formatDateStringtoView, formatDateStringtoViewDueDate } from '@/app/utils/dateUtils';
 import { ChevronLeft, ChevronRight, Grid, List, Ruler } from 'lucide-react';
 import React from 'react';
-import { MeasureTarefa, StatusColorMedicao, Tarefa } from '../../../types';
+import { Empreiteira, MeasureTarefa, StatusColorMedicao, Tarefa } from '../../../types';
 import { MeasureEntryModal } from '../modals/MeasureEntryModal';
 import { TaskDetailModal } from '../modals/TaskDetailModal';
 
@@ -39,6 +40,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
   const [isOpen, setIsOpen] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
   const [localTarefas, setLocalTarefas] = React.useState<Tarefa[]>(tarefas);
+  const [empreiteiras, setEmpreiteiras] = React.useState<Empreiteira[]>([]);
 
   // Atualizar tarefas locais quando props mudam
   React.useEffect(() => {
@@ -47,6 +49,12 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
 
   // Detectar se é mobile
   React.useEffect(() => {
+    const loadData = async () => {
+      const empreiteirasCarregadas = await loadEmpreiteiras();
+      setEmpreiteiras(empreiteirasCarregadas);
+    };
+    loadData();
+
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -56,9 +64,6 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
 
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
-
-  // const itemsPerPage = isMobile ? 5 : 10;
-  let currentTarefas = localTarefas;
 
   const handlePageChange = (page: number) => {
     onPageChange(page);
@@ -92,6 +97,10 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
     }
   };
 
+  const loadEmpreiteiras = (): Promise<Empreiteira[]> => {
+    return empreiteraService?.listar();
+  };
+
   const ActionButtons = ({ tarefa }: { tarefa: Tarefa }) => (
     <div className="flex space-x-2">
       <button
@@ -107,7 +116,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
 
   const CardView = () => (
     <div className="grid gap-4 sm:grid-cols-2">
-      {currentTarefas.map((tarefa) => (
+      {localTarefas.map((tarefa) => (
         <div key={tarefa.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => handleTaskClick(tarefa)}>
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
@@ -145,7 +154,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
 
   const ListView = () => (
     <div className="space-y-3">
-      {currentTarefas.map((tarefa) => (
+      {localTarefas.map((tarefa) => (
         <div key={tarefa.id} className="bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => handleTaskClick(tarefa)}>
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
@@ -206,7 +215,7 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {currentTarefas.map((tarefa) => (
+          {localTarefas.map((tarefa) => (
             <tr key={tarefa.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleTaskClick(tarefa)}>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.localNivel1.name + '\n' + tarefa.localNivel2.name + '\n' + tarefa.localNivel3.name + '\n' + tarefa.localNivel4.name}</td>
               <td className="px-4 py-4 text-sm text-gray-900">{tarefa.atividade.name}</td>
@@ -351,10 +360,23 @@ export const MeasureTableInner: React.FC<MeasureTableProps> = ({ tarefas, onMeas
       <TaskDetailModal isOpen={isDetailModalOpen} onClose={handleCloseDetailModal} tarefa={selectedTask} />
 
       <MeasureEntryModal
+        contractorOptions={empreiteiras}
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+          setSelectedTask(null);
+        }}
         onConfirm={handleConfirmMeasure}
-        initialValues={selectedTask ? { quantity: selectedTask.quantity, quantityExecuted: selectedTask.quantityExecuted, measurementStatus: selectedTask.measurementStatus } : null}
+        initialValues={
+          selectedTask
+            ? {
+                quantity: selectedTask.quantity,
+                quantityExecuted: selectedTask.quantityExecuted,
+                measurementStatus: selectedTask.measurementStatus,
+                fkEmpreiteiro: selectedTask.empreiteira.id!,
+              }
+            : null
+        }
       />
     </div>
   );
@@ -387,6 +409,7 @@ const areEqual = (prev: MeasureTableProps, next: MeasureTableProps) => {
     if (p.measurementStatus !== n.measurementStatus) return false;
     if (p.quantityExecuted !== n.quantityExecuted) return false;
     if (p.quantity !== n.quantity) return false;
+    if (p.empreiteira.id !== n.empreiteira.id) return false;
   }
 
   // compare basic pagination props

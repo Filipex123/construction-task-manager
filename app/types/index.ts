@@ -29,6 +29,7 @@ export interface MeasureTarefa {
   quantityExecuted: number;
   quantity: number;
   measurementStatus: 'MEDIDO' | 'PENDENTE' | 'EM_ANDAMENTO' | 'RETIDO';
+  fkEmpreiteiro: number;
   updatedBy?: string;
 }
 
@@ -55,7 +56,7 @@ export interface AddTarefaRequest {
 export interface Local {
   id?: number;
   name?: string;
-  nivel?:number;
+  nivel?: number;
   fkObra?: number;
   updatedAt?: string;
   updatedBy?: string;

@@ -1,5 +1,5 @@
-import { MeasurementStatusEnum, MeasureTarefa } from '@/app/types';
-import { CheckCircle2, Hash, Ruler, X } from 'lucide-react';
+import { Empreiteira, MeasurementStatusEnum, MeasureTarefa } from '@/app/types';
+import { Building2, CheckCircle2, Hash, Ruler, X } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 
 interface MeasureEntryModalProps {
@@ -7,10 +7,11 @@ interface MeasureEntryModalProps {
   onClose: () => void;
   onConfirm: (data: MeasureTarefa) => void;
   initialValues?: MeasureTarefa | null;
+  contractorOptions?: Empreiteira[];
 }
 
-export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, onClose, onConfirm, initialValues = null }) => {
-  const [form, setForm] = useState<MeasureTarefa>({ quantity: 0, quantityExecuted: 0, measurementStatus: MeasurementStatusEnum.PENDENTE });
+export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, onClose, onConfirm, initialValues = null, contractorOptions: constructorOptions = [] }) => {
+  const [form, setForm] = useState<MeasureTarefa>({ quantity: 0, quantityExecuted: 0, measurementStatus: MeasurementStatusEnum.PENDENTE, fkEmpreiteiro: 0 });
   const [errors, setErrors] = useState<{ quantity?: string; quantityExecuted?: string; status?: string }>({});
   const title = initialValues ? 'Editar Medição' : 'Nova Medição';
 
@@ -26,6 +27,7 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
         quantity: initialValues?.quantity != null ? Number(initialValues.quantity) : 0,
         quantityExecuted: initialValues?.quantityExecuted != null ? Number(initialValues.quantityExecuted) : 0,
         measurementStatus: initialValues?.measurementStatus ?? MeasurementStatusEnum.PENDENTE,
+        fkEmpreiteiro: initialValues?.fkEmpreiteiro ?? 0,
         updatedBy: initialValues?.updatedBy ?? undefined,
       });
       setErrors({});
@@ -53,6 +55,7 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
       quantity: form.quantity,
       quantityExecuted: form.quantityExecuted,
       measurementStatus: form.measurementStatus,
+      fkEmpreiteiro: form.fkEmpreiteiro,
       updatedBy: form.updatedBy,
     });
     onClose();
@@ -124,6 +127,32 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
               }`}
             />
             {errors.quantityExecuted && <p className="text-red-600 text-sm mt-1">{errors.quantityExecuted}</p>}
+          </div>
+
+          {/* Empreiteira */}
+          <div>
+            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
+              <Building2 className="w-4 h-4" />
+              <span>Empreiteira</span>
+            </label>
+            <select
+              value={form.fkEmpreiteiro}
+              onChange={(e) => {
+                const selected = constructorOptions.find((c) => String(c.id) === e.target.value)?.id ?? form.fkEmpreiteiro;
+                setForm((p) => ({ ...p, fkEmpreiteiro: selected }));
+              }}
+              className={`w-full text-gray-900 px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all border-gray-300`}
+            >
+              <option value="" className="text-gray-500">
+                Selecione uma empreiteira
+              </option>
+              {constructorOptions.map((c) => (
+                <option key={c.id} value={c.id} className="text-gray-900">
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            {/* {errors.contractor && <p className="text-red-600 text-sm mt-1">{errors.contractor}</p>} */}
           </div>
 
           {/* Status */}
