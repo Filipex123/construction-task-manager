@@ -13,10 +13,11 @@ type Props = {
     id: number;
     name: string;
   };
+  placeholder?: string;
   onChange: (newValue: { id: number; name: string } | null) => void;
 };
 
-export const TextWithSelect: React.FC<Props> = ({ label, value, options, isLoading = false, onChange }) => {
+export const TextWithSelect: React.FC<Props> = ({ label, value, options, isLoading = false, onChange, placeholder }) => {
   const [filteredOptions, setFilteredOptions] = useState<Option[]>([]);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,7 +54,7 @@ export const TextWithSelect: React.FC<Props> = ({ label, value, options, isLoadi
       <input
         type="text"
         className="bg-white text-black w-full rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder={isLoading ? `Carregando...` : `Digite ou selecione uma opção...`}
+        placeholder={isLoading ? `Carregando...` : placeholder || `Digite ou selecione uma opção...`}
         value={value?.name || ''}
         onChange={(e) => handleChange(e.target.value)}
         onFocus={() => {
