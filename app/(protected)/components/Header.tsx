@@ -1,6 +1,6 @@
-import React from 'react';
-import { Menu, Bell, User } from 'lucide-react';
 import { useSidebar } from '@/app/context/Sidebar.context';
+import { Menu } from 'lucide-react';
+import React from 'react';
 
 interface HeaderProps {
   title?: string;
@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({ title = '' }) => {
           <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
         </div>
 
-        <div className="flex items-center space-x-3">
+        {/* <div className="flex items-center space-x-3">
           <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative">
             <Bell className="w-5 h-5 text-gray-600" />
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({ title = '' }) => {
             <User className="w-5 h-5 text-gray-600" />
             <span className="text-sm font-medium text-gray-700">Admin</span>
           </div>
-        </div>
+        </div> */}
       </div>
     </header>
   );
