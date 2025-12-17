@@ -131,8 +131,20 @@ const PaymentReport: React.FC = () => {
   };
 
   const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+    const iframe = document.createElement('iframe');
+
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+
+    document.body.appendChild(iframe);
+
+    const iframeWindow = iframe.contentWindow;
+    const iframeDoc = iframeWindow?.document;
+    if (!iframeDoc) return;
 
     /* =========================
      * Agrupar por Empreiteira
@@ -167,193 +179,191 @@ const PaymentReport: React.FC = () => {
     const totalValorGeral = filteredData.reduce((sum, i) => sum + i.totalPrice, 0);
     const totalEmpreiteiras = Object.keys(groupedByEmpreiteira).length;
 
-    /* =========================
-     * Render tabela por empreiteira
-     * ========================= */
     const renderEmpreiteira = (empreiteiraNome: string, items: Tarefa[]) => {
       const totalQuantidade = items.reduce((sum, i) => sum + i.quantity, 0);
       const totalValor = items.reduce((sum, i) => sum + i.totalPrice, 0);
 
       return `
-          <section class="empreiteira-section">
-            <h2>${empreiteiraNome}</h2>
+      <section class="empreiteira-section">
+        <h2>${empreiteiraNome}</h2>
 
-            <table>
-              <thead>
-                <tr>
-                  <th>Local</th>
-                  <th>Atividade</th>
-                  <th>Unidade</th>
-                  <th>Quantidade</th>
-                  <th>Valor Unitário</th>
-                  <th>Valor Total</th>
-                  <th>Data de Medição</th>
-                  <th>Data Vencimento</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${items
-                  .map(
-                    (item) => `
-                  <tr>
-                    <td>
-                      ${[item.localNivel1?.name, item.localNivel2?.name, item.localNivel3?.name, item.localNivel4?.name].filter(Boolean).join(' / ')}
-                    </td>
-                    <td>${item.atividade.name}</td>
-                    <td>${item.unidadeDeMedida.name}</td>
-                    <td>${item.quantity.toLocaleString('pt-BR')}</td>
-                    <td>${formatCurrency(item.totalAmount)}</td>
-                    <td>${formatCurrency(item.totalPrice)}</td>
-                    <td>${formatDate(item.measurementDate!)}</td>
-                    <td>${formatDate(item.dueDate!)}</td>
-                  </tr>
-                `
-                  )
-                  .join('')}
-              </tbody>
-            </table>
+        <table>
+          <thead>
+            <tr>
+              <th>Local</th>
+              <th>Atividade</th>
+              <th>Unidade</th>
+              <th>Quantidade</th>
+              <th>Valor Unitário</th>
+              <th>Valor Total</th>
+              <th>Data de Medição</th>
+              <th>Data Vencimento</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items
+              .map(
+                (item) => `
+              <tr>
+                <td>${[item.localNivel1?.name, item.localNivel2?.name, item.localNivel3?.name, item.localNivel4?.name].filter(Boolean).join(' / ')}</td>
+                <td>${item.atividade.name}</td>
+                <td>${item.unidadeDeMedida.name}</td>
+                <td>${item.quantity.toLocaleString('pt-BR')}</td>
+                <td>${formatCurrency(item.totalAmount)}</td>
+                <td>${formatCurrency(item.totalPrice)}</td>
+                <td>${formatDate(item.measurementDate!)}</td>
+                <td>${formatDate(item.dueDate!)}</td>
+              </tr>
+            `
+              )
+              .join('')}
+          </tbody>
+        </table>
 
-            <div class="totals">
-              <p><strong>Total de Quantidade:</strong> ${totalQuantidade.toLocaleString('pt-BR')}</p>
-              <p><strong>Valor Total da Empreiteira:</strong> ${formatCurrency(totalValor)}</p>
-              <p><strong>Total de Registros:</strong> ${items.length}</p>
-            </div>
-          </section>
-        `;
+        <div class="totals">
+          <p><strong>Total de Quantidade:</strong> ${totalQuantidade.toLocaleString('pt-BR')}</p>
+          <p><strong>Valor Total da Empreiteira:</strong> ${formatCurrency(totalValor)}</p>
+          <p><strong>Total de Registros:</strong> ${items.length}</p>
+        </div>
+      </section>
+    `;
     };
 
     /* =========================
-     * HTML final
+     * HTML FINAL — IGUAL AO SEU
      * ========================= */
     const printContent = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Relatório de Medição</title>
-            <style>
-              body {
-                font-family: Arial, sans-serif;
-                margin: 20px;
-                color: #333;
-              }
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Relatório de Medição</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+          }
 
-              h1 {
-                text-align: center;
-                margin-bottom: 10px;
-              }
+          h1 {
+            text-align: center;
+            margin-bottom: 10px;
+          }
 
-              .header {
-                text-align: center;
-                margin-bottom: 30px;
-                border-bottom: 2px solid #333;
-                padding-bottom: 15px;
-              }
+          .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+          }
 
-              .empreiteira-section {
-                margin-top: 40px;
-                page-break-inside: avoid;
-              }
+          .empreiteira-section {
+            margin-top: 40px;
+            page-break-inside: avoid;
+          }
 
-              .empreiteira-section h2 {
-                border-bottom: 2px solid #444;
-                padding-bottom: 5px;
-                margin-bottom: 15px;
-              }
+          .empreiteira-section h2 {
+            border-bottom: 2px solid #444;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+          }
 
-              table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 12px;
-              }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+          }
 
-              th, td {
-                border: 1px solid #ddd;
-                padding: 6px;
-                vertical-align: top;
-              }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            vertical-align: top;
+          }
 
-              th {
-                background-color: #f2f2f2;
-              }
+          th {
+            background-color: #f2f2f2;
+          }
 
-              tr:nth-child(even) {
-                background-color: #fafafa;
-              }
+          tr:nth-child(even) {
+            background-color: #fafafa;
+          }
 
-              .totals {
-                margin-top: 10px;
-                padding: 10px;
-                background-color: #f5faff;
-                border-radius: 4px;
-              }
+          .totals {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f5faff;
+            border-radius: 4px;
+          }
 
-              .totals p {
-                margin: 4px 0;
-                font-weight: bold;
-              }
+          .totals p {
+            margin: 4px 0;
+            font-weight: bold;
+          }
 
-              .resumo-geral {
-                margin-top: 50px;
-                padding: 15px;
-                background-color: #e3f2fd;
-                border-top: 2px solid #333;
-              }
+          .resumo-geral {
+            margin-top: 50px;
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-top: 2px solid #333;
+          }
 
-              .footer {
-                margin-top: 40px;
-                text-align: center;
-                font-size: 11px;
-                color: #666;
-              }
+          .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+          }
 
-              @media print {
-                body {
-                  margin: 0;
-                }
+          @media print {
+            body {
+              margin: 0;
+            }
 
-                .empreiteira-section {
-                  page-break-after: always;
-                }
+            .empreiteira-section {
+              page-break-after: always;
+            }
 
-                .resumo-geral {
-                  page-break-before: always;
-                }
-              }
-            </style>
-          </head>
+            .resumo-geral {
+              page-break-before: always;
+            }
+          }
+        </style>
+      </head>
 
-          <body>
-            <div class="header">
-              <h1>Relatório de Medição</h1>
-              <p>Data de geração: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
-              <p>Total de Registros: ${filteredData.length}</p>
-            </div>
+      <body>
+        <div class="header">
+          <h1>Relatório de Medição</h1>
+          <p>Data de geração: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+          <p>Total de Registros: ${filteredData.length}</p>
+        </div>
 
-            ${Object.values(groupedByEmpreiteira)
-              .map((group) => renderEmpreiteira(group.empreiteiraNome, group.items))
-              .join('')}
+        ${Object.values(groupedByEmpreiteira)
+          .map((group) => renderEmpreiteira(group.empreiteiraNome, group.items))
+          .join('')}
 
-            <div class="resumo-geral">
-              <h2>Resumo Geral</h2>
-              <p>Total Geral de Quantidade: ${totalQuantidadeGeral.toLocaleString('pt-BR')}</p>
-              <p>Valor Total Geral: ${formatCurrency(totalValorGeral)}</p>
-              <p>Total de Empreiteiras: ${totalEmpreiteiras}</p>
-            </div>
+        <div class="resumo-geral">
+          <h2>Resumo Geral</h2>
+          <p>Total Geral de Quantidade: ${totalQuantidadeGeral.toLocaleString('pt-BR')}</p>
+          <p>Valor Total Geral: ${formatCurrency(totalValorGeral)}</p>
+          <p>Total de Empreiteiras: ${totalEmpreiteiras}</p>
+        </div>
 
-            <div class="footer">
-              Relatório gerado automaticamente pelo sistema em ${new Date().toLocaleString('pt-BR')}
-            </div>
-          </body>
-        </html>
-      `;
+        <div class="footer">
+          Relatório gerado automaticamente pelo sistema em ${new Date().toLocaleString('pt-BR')}
+        </div>
+      </body>
+    </html>
+  `;
 
-    printWindow.document.write(printContent);
-    printWindow.document.close();
+    iframeDoc.open();
+    iframeDoc.write(printContent);
+    iframeDoc.close();
 
-    printWindow.onload = () => {
-      printWindow.print();
-      printWindow.close();
-    };
+    iframeWindow.focus();
+    iframeWindow.print();
+
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 1000);
   };
 
   React.useEffect(() => {
