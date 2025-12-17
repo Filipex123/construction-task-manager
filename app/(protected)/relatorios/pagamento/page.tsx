@@ -54,6 +54,8 @@ const PaymentReport: React.FC = () => {
     empreiteira: '',
     dataInicio: '',
     dataFim: '',
+    dataInicioVencimento: '',
+    dataFimVencimento: '',
   });
 
   // Filtrar dados
@@ -70,11 +72,19 @@ const PaymentReport: React.FC = () => {
       let matchesDataFim = true;
 
       if (filters.dataInicio) {
-        matchesDataInicio = new Date(item.paymentDate!) >= new Date(filters.dataInicio);
+        matchesDataInicio = new Date(item.measurementDate!) >= new Date(filters.dataInicio);
       }
 
       if (filters.dataFim) {
-        matchesDataFim = new Date(item.dueDate!) <= new Date(filters.dataFim);
+        matchesDataFim = new Date(item.measurementDate!) <= new Date(filters.dataFim);
+      }
+      
+      if (filters.dataInicioVencimento) {
+        matchesDataInicio = new Date(item.dueDate!) >= new Date(filters.dataInicioVencimento);
+      }
+      
+      if (filters.dataFimVencimento) {
+        matchesDataInicio = new Date(item.dueDate!) >= new Date(filters.dataInicioVencimento);
       }
 
       return matchesSearch && matchesLocal && matchesAtividade && matchesEmpreiteira && matchesDataInicio && matchesDataFim;
@@ -98,6 +108,8 @@ const PaymentReport: React.FC = () => {
       empreiteira: '',
       dataInicio: '',
       dataFim: '',
+      dataInicioVencimento: '',
+      dataFimVencimento: '',
     });
     setSearchTerm('');
     setCurrentPage(1);
@@ -171,7 +183,7 @@ const PaymentReport: React.FC = () => {
                   <th>Quantidade</th>
                   <th>Valor Unitário</th>
                   <th>Valor Total</th>
-                  <th>Data Criação</th>
+                  <th>Data de Medição</th>
                   <th>Data Vencimento</th>
                 </tr>
               </thead>
@@ -195,7 +207,7 @@ const PaymentReport: React.FC = () => {
                     <td>${item.quantity.toLocaleString('pt-BR')}</td>
                     <td>${formatCurrency(item.totalAmount)}</td>
                     <td>${formatCurrency(item.totalPrice)}</td>
-                    <td>${formatDate(item.createdAt!)}</td>
+                    <td>${formatDate(item.measurementDate!)}</td>
                     <td>${formatDate(item.dueDate!)}</td>
                   </tr>
                 `
@@ -442,7 +454,7 @@ const PaymentReport: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Data Início</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data Início - Medição</label>
               <input
                 type="date"
                 value={filters.dataInicio}
@@ -451,7 +463,7 @@ const PaymentReport: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Data Fim</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data Fim - Medição</label>
               <input
                 type="date"
                 value={filters.dataFim}
@@ -495,7 +507,7 @@ const PaymentReport: React.FC = () => {
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Unitário</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Total</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empreiteira</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Criação</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Medição</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Vencimento</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         </tr>
@@ -512,7 +524,7 @@ const PaymentReport: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{formatCurrency(item.totalAmount)}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{formatCurrency(item.totalPrice)}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.empreiteira.name}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(item.createdAt!)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(item.measurementDate!)}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(item.dueDate!)}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.paymentStatus}</td>
                           </tr>
