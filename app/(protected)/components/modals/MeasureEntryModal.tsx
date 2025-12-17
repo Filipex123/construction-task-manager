@@ -17,7 +17,7 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
 
   const statusOptions = [
     { value: 'MEDIDO', label: 'Medido' },
-    { value: 'EM_ANDAMENTO', label: 'Em Andamento' },
+    // { value: 'EM_ANDAMENTO', label: 'Em Andamento' },
     { value: 'RETIDO', label: 'Retido' },
   ];
 
@@ -36,13 +36,12 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
 
   const isValid = useMemo(() => {
     const newErrors: { quantity?: string; quantityExecuted?: string; status?: string } = {};
-    const realizada = form.quantityExecuted || 0;
     //Validation of nullable fields
-    if (form.quantityExecuted === null || form.quantityExecuted === undefined || isNaN(realizada) || realizada < 0) newErrors.quantityExecuted = 'Informe um valor válido';
+    // if (form.quantityExecuted === null || form.quantityExecuted === undefined || isNaN(realizada) || realizada < 0) newErrors.quantityExecuted = 'Informe um valor válido';
     if (!form.measurementStatus) newErrors.status = 'Selecione um status';
     //Validation of business rules
-    if (form.measurementStatus === 'MEDIDO' && form.quantityExecuted > form.quantity) newErrors.status = 'Quantia medida excedida! Contate a diretoria.';
-    if (form.measurementStatus === 'MEDIDO' && form.quantityExecuted < form.quantity) newErrors.status = 'Quantia medida a baixo do esperado. Altere o status para em andamento.';
+    // if (form.measurementStatus === 'MEDIDO' && form.quantityExecuted > form.quantity) newErrors.status = 'Quantia medida excedida! Contate a diretoria.';
+    // if (form.measurementStatus === 'MEDIDO' && form.quantityExecuted < form.quantity) newErrors.status = 'Quantia medida a baixo do esperado. Altere o status para em andamento.';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [form]);
@@ -53,7 +52,7 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
 
     onConfirm({
       quantity: form.quantity,
-      quantityExecuted: form.quantityExecuted,
+      quantityExecuted: form.measurementStatus === MeasurementStatusEnum.MEDIDO ? form.quantity : 0,
       measurementStatus: form.measurementStatus,
       fkEmpreiteiro: form.fkEmpreiteiro,
       updatedBy: form.updatedBy,
@@ -108,27 +107,6 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
             {errors.quantity && <p className="text-red-600 text-sm mt-1">{errors.quantity}</p>}
           </div>
 
-          {/* Medida Realizada */}
-          <div>
-            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
-              <Hash className="w-4 h-4" />
-              <span>Medida Realizada</span>
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              defaultValue={undefined}
-              value={form.quantityExecuted}
-              onChange={(e) => setForm((p) => ({ ...p, quantityExecuted: Number(e.target.value) }))}
-              placeholder="0,00"
-              className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-500 text-gray-900 ${
-                errors.quantityExecuted ? 'border-red-300 bg-red-50' : 'border-gray-300'
-              }`}
-            />
-            {errors.quantityExecuted && <p className="text-red-600 text-sm mt-1">{errors.quantityExecuted}</p>}
-          </div>
-
           {/* Empreiteira */}
           <div>
             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-2">
@@ -158,7 +136,7 @@ export const MeasureEntryModal: React.FC<MeasureEntryModalProps> = ({ isOpen, on
           {/* Status */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">Status</label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {statusOptions.map((option) => (
                 <button
                   key={option.value}
