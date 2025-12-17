@@ -130,11 +130,12 @@ const PaymentReport: React.FC = () => {
           }
         >
       >((acc, item) => {
-        const id = item.empreiteira.id;
+        const id = item.empreiteira?.id ?? -1;
+        const nome = item.empreiteira?.name ?? 'Sem empreiteira';
 
         if (!acc[id]) {
           acc[id] = {
-            empreiteiraNome: item.empreiteira.name,
+            empreiteiraNome: nome,
             items: [],
           };
         }
