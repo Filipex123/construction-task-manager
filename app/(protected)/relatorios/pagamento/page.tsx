@@ -5,20 +5,20 @@ import { tarefaService } from '@/app/services/tarefaService';
 import { Obra, Tarefa } from '@/app/types';
 import { ChevronLeft, ChevronRight, Loader2, Printer, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
-import { Option, TextWithSelect } from '../../components/InputSelect';
+import { Option } from '../../components/InputSelect';
 import { MultiFilterSelect } from '../../components/MultiFilterSelect';
+import { SingleFilterSelect } from '../../components/SingleFilterSelect';
 
 const DEFAULT_OBRA = { id: 0, name: '' } as Obra;
 
 const PaymentReport: React.FC = () => {
-  const { obras, isLoading: isLoadingObra } = useObras();
+  const { obras } = useObras();
 
   const { setTitle, setSubtitle } = usePageTitle();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [filteredTasks, setFilteredTasks] = useState<Tarefa[]>([]);
   const [selectedObra, setSelectedObra] = useState<Obra>(DEFAULT_OBRA);
@@ -371,14 +371,10 @@ const PaymentReport: React.FC = () => {
 
         <div className="flex flex-col gap-3 w-full md:flex-row md:items-center md:gap-4 md:max-w-md">
           <div className="w-full">
-            <TextWithSelect
-              placeholder="Selecione uma obra para o relatório"
-              isLoading={isLoadingObra}
+            <SingleFilterSelect
               options={obras?.map((o) => ({ id: o.id, name: o.name })) as Option[]}
-              value={{
-                id: selectedObra?.id || 0,
-                name: selectedObra?.name || '',
-              }}
+              value={selectedObra.id !== 0 ? { id: selectedObra.id!, name: selectedObra.name! } : null}
+              placeholder="Selecione uma obra"
               onChange={(value) => {
                 if (value) {
                   const selected = obras?.find((l) => l.id === value.id) ?? value;
