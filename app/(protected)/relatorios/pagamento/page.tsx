@@ -1,25 +1,28 @@
 'use client';
+import { useObras } from '@/app/context/Obras.context';
 import { usePageTitle } from '@/app/context/PageTitle.context';
-import { obraService } from '@/app/services/obraService';
 import { tarefaService } from '@/app/services/tarefaService';
 import { Obra, Tarefa } from '@/app/types';
 import { ChevronLeft, ChevronRight, Filter, Loader2, Printer, Search } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Option, TextWithSelect } from '../../components/InputSelect';
+import { MultiFilterSelect } from '../../components/MultiFilterSelect';
 
 const DEFAULT_OBRA = { id: 0, name: '' } as Obra;
 
 const PaymentReport: React.FC = () => {
+  const { obras, isLoading: isLoadingObra } = useObras();
+
+  const { setTitle, setSubtitle } = usePageTitle();
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const { setTitle, setSubtitle } = usePageTitle();
   const [showFilters, setShowFilters] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingObra, setIsLoadingObra] = useState(false);
   const [filteredTasks, setFilteredTasks] = useState<Tarefa[]>([]);
   const [selectedObra, setSelectedObra] = useState<Obra>(DEFAULT_OBRA);
-  const [obras, setObras] = useState<Obra[]>([]);
+  const [empreiteiraOptions, setEmpreiteiraOptions] = useState<Option[]>([]);
 
   const fetchTasks = async () => {
     setIsLoading(true);
@@ -27,6 +30,19 @@ const PaymentReport: React.FC = () => {
       if (selectedObra.id !== 0) {
         const data = await tarefaService.listar(selectedObra.id!, { paymentStatus: ['PENDENTE'] }, false);
         setFilteredTasks(Array.isArray(data.items) ? data.items : []);
+        const empreiteiraOptionsUnique: Option[] = Array.from(
+          new Map(
+            data.items.map((task) => [
+              task.empreiteira.id,
+              {
+                id: task.empreiteira.id,
+                name: task.empreiteira.name?.toString() || '',
+              } as Option,
+            ])
+          ).values()
+        );
+
+        setEmpreiteiraOptions(empreiteiraOptionsUnique);
       }
     } catch (error) {
       console.error('Erro ao carregar tarefas:', error);
@@ -35,23 +51,11 @@ const PaymentReport: React.FC = () => {
     }
   };
 
-  const fetchObra = async () => {
-    setIsLoadingObra(true);
-    try {
-      const dataObras = await obraService.listar();
-      setObras(dataObras.items || []);
-    } catch (error) {
-      console.error('Erro ao carregar obras:', error);
-    } finally {
-      setIsLoadingObra(false);
-    }
-  };
-
   // Filtros
   const [filters, setFilters] = useState({
     local: '',
     atividade: '',
-    empreiteira: '',
+    empreiteiras: [] as Option[],
     dataInicio: '',
     dataFim: '',
     dataInicioVencimento: '',
@@ -66,7 +70,7 @@ const PaymentReport: React.FC = () => {
       const concatenedLocais = item.localNivel1.name + ' ' + (item.localNivel2 ? item.localNivel2.name + ' ' : '') + (item.localNivel3 ? item.localNivel3.name : '');
       const matchesLocal = filters.local === '' || concatenedLocais.includes(filters.local);
       const matchesAtividade = filters.atividade === '' || item.atividade.name?.includes(filters.atividade);
-      const matchesEmpreiteira = filters.empreiteira === '' || item.empreiteira.name?.includes(filters.empreiteira);
+      const matchesEmpreiteira = filters.empreiteiras.length === 0 || filters.empreiteiras.some((e) => e.id === item.empreiteira.id);
 
       let matchesDataInicio = true;
       let matchesDataFim = true;
@@ -78,11 +82,11 @@ const PaymentReport: React.FC = () => {
       if (filters.dataFim) {
         matchesDataFim = new Date(item.measurementDate!) <= new Date(filters.dataFim);
       }
-      
+
       if (filters.dataInicioVencimento) {
         matchesDataInicio = new Date(item.dueDate!) >= new Date(filters.dataInicioVencimento);
       }
-      
+
       if (filters.dataFimVencimento) {
         matchesDataInicio = new Date(item.dueDate!) >= new Date(filters.dataInicioVencimento);
       }
@@ -105,7 +109,7 @@ const PaymentReport: React.FC = () => {
     setFilters({
       local: '',
       atividade: '',
-      empreiteira: '',
+      empreiteiras: [],
       dataInicio: '',
       dataFim: '',
       dataInicioVencimento: '',
@@ -127,50 +131,50 @@ const PaymentReport: React.FC = () => {
   };
 
   const handlePrint = () => {
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) return;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
 
-      /* =========================
-      * Agrupar por Empreiteira
-      * ========================= */
-      const groupedByEmpreiteira = filteredData.reduce<
-        Record<
-          number,
-          {
-            empreiteiraNome: string;
-            items: Tarefa[];
-          }
-        >
-      >((acc, item) => {
-        const id = item.empreiteira?.id ?? -1;
-        const nome = item.empreiteira?.name ?? 'Sem empreiteira';
-
-        if (!acc[id]) {
-          acc[id] = {
-            empreiteiraNome: nome,
-            items: [],
-          };
+    /* =========================
+     * Agrupar por Empreiteira
+     * ========================= */
+    const groupedByEmpreiteira = filteredData.reduce<
+      Record<
+        number,
+        {
+          empreiteiraNome: string;
+          items: Tarefa[];
         }
+      >
+    >((acc, item) => {
+      const id = item.empreiteira?.id ?? -1;
+      const nome = item.empreiteira?.name ?? 'Sem empreiteira';
 
-        acc[id].items.push(item);
-        return acc;
-      }, {});
+      if (!acc[id]) {
+        acc[id] = {
+          empreiteiraNome: nome,
+          items: [],
+        };
+      }
 
-      /* =========================
-      * Totais Gerais
-      * ========================= */
-      const totalQuantidadeGeral = filteredData.reduce((sum, i) => sum + i.quantity, 0);
-      const totalValorGeral = filteredData.reduce((sum, i) => sum + i.totalPrice, 0);
-      const totalEmpreiteiras = Object.keys(groupedByEmpreiteira).length;
+      acc[id].items.push(item);
+      return acc;
+    }, {});
 
-      /* =========================
-      * Render tabela por empreiteira
-      * ========================= */
-      const renderEmpreiteira = (empreiteiraNome: string, items: Tarefa[]) => {
-        const totalQuantidade = items.reduce((sum, i) => sum + i.quantity, 0);
-        const totalValor = items.reduce((sum, i) => sum + i.totalPrice, 0);
+    /* =========================
+     * Totais Gerais
+     * ========================= */
+    const totalQuantidadeGeral = filteredData.reduce((sum, i) => sum + i.quantity, 0);
+    const totalValorGeral = filteredData.reduce((sum, i) => sum + i.totalPrice, 0);
+    const totalEmpreiteiras = Object.keys(groupedByEmpreiteira).length;
 
-        return `
+    /* =========================
+     * Render tabela por empreiteira
+     * ========================= */
+    const renderEmpreiteira = (empreiteiraNome: string, items: Tarefa[]) => {
+      const totalQuantidade = items.reduce((sum, i) => sum + i.quantity, 0);
+      const totalValor = items.reduce((sum, i) => sum + i.totalPrice, 0);
+
+      return `
           <section class="empreiteira-section">
             <h2>${empreiteiraNome}</h2>
 
@@ -193,14 +197,7 @@ const PaymentReport: React.FC = () => {
                     (item) => `
                   <tr>
                     <td>
-                      ${[
-                        item.localNivel1?.name,
-                        item.localNivel2?.name,
-                        item.localNivel3?.name,
-                        item.localNivel4?.name,
-                      ]
-                        .filter(Boolean)
-                        .join(' / ')}
+                      ${[item.localNivel1?.name, item.localNivel2?.name, item.localNivel3?.name, item.localNivel4?.name].filter(Boolean).join(' / ')}
                     </td>
                     <td>${item.atividade.name}</td>
                     <td>${item.unidadeDeMedida.name}</td>
@@ -223,12 +220,12 @@ const PaymentReport: React.FC = () => {
             </div>
           </section>
         `;
-      };
+    };
 
-      /* =========================
-      * HTML final
-      * ========================= */
-      const printContent = `
+    /* =========================
+     * HTML final
+     * ========================= */
+    const printContent = `
         <!DOCTYPE html>
         <html>
           <head>
@@ -350,19 +347,17 @@ const PaymentReport: React.FC = () => {
         </html>
       `;
 
-      printWindow.document.write(printContent);
-      printWindow.document.close();
+    printWindow.document.write(printContent);
+    printWindow.document.close();
 
-      printWindow.onload = () => {
-        printWindow.print();
-        printWindow.close();
-      };
+    printWindow.onload = () => {
+      printWindow.print();
+      printWindow.close();
     };
-
+  };
 
   React.useEffect(() => {
-    setTitle('Relatórios');    
-    fetchObra();
+    setTitle('Relatórios');
   }, []);
 
   React.useEffect(() => {
@@ -429,7 +424,7 @@ const PaymentReport: React.FC = () => {
                 type="text"
                 value={filters.local}
                 onChange={(e) => handleFilterChange('local', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 placeholder="Filtrar por local"
               />
             </div>
@@ -439,18 +434,22 @@ const PaymentReport: React.FC = () => {
                 type="text"
                 value={filters.atividade}
                 onChange={(e) => handleFilterChange('atividade', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full text-black px-3 py-2 border border-gray-300 rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 placeholder="Filtrar por atividade"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Empreiteira</label>
-              <input
-                type="text"
-                value={filters.empreiteira}
-                onChange={(e) => handleFilterChange('empreiteira', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Filtrar por empreiteira"
+              <MultiFilterSelect
+                options={empreiteiraOptions}
+                value={filters.empreiteiras}
+                placeholder="Selecione empreiteiras"
+                onChange={(values) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    empreiteiras: values,
+                  }))
+                }
               />
             </div>
             <div>
@@ -459,7 +458,7 @@ const PaymentReport: React.FC = () => {
                 type="date"
                 value={filters.dataInicio}
                 onChange={(e) => handleFilterChange('dataInicio', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full text-black/50 px-3 py-2 border border-gray-300 rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
             <div>
@@ -468,7 +467,7 @@ const PaymentReport: React.FC = () => {
                 type="date"
                 value={filters.dataFim}
                 onChange={(e) => handleFilterChange('dataFim', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full text-black/50 px-3 py-2 border border-gray-300 rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
             <div className="lg:col-span-5 flex justify-end">
