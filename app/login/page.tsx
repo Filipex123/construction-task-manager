@@ -77,8 +77,8 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <div className="mx-auto h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-              <Image src="/favicon.ico" alt="Logo" width={24} height={24} />
+            <div className="mx-auto h-16 w-16 bg-white rounded-full flex items-center justify-center mb-4">
+              <Image src="/new-construtora-icon.png" alt="Logo" width={64} height={64} />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Bem-vindo de volta</h2>
             <p className="text-gray-600">Entre na sua conta para continuar</p>

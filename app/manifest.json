@@ -1,14 +1,14 @@
 {
-  "name": "Vital Gestão - Medição",
-  "short_name": "Vital App - Medição",
+  "name": "Build Hub - Medição",
+  "short_name": "Build Hub",
   "description": "App para controle de medição das atividades das obras de construção civil",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#000000",
   "icons": [
     {
-      "src": "logo_construtora-vital.png",
-      "sizes": "240x240",
+      "src": "/new-construtora-icon.png",
+      "sizes": "64x64",
       "type": "image/png"
     }
   ],

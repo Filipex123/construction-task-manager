@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 /**
  * Esse componente é responsável por proteger as rotas internas.
@@ -13,11 +13,11 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    const logged = localStorage.getItem("logged");
+    const logged = localStorage.getItem('logged');
 
     // se não estiver logado, redireciona para /login
     if (!logged) {
-      router.replace("/login");
+      router.replace('/login');
     } else {
       setIsChecking(false);
     }
@@ -26,8 +26,8 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   // Enquanto verifica o login, mostra uma tela de carregamento
   if (isChecking) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-50 text-gray-600 text-lg">
-        Verificando acesso...
+      <div className="flex h-screen items-center justify-center bg-white">
+        <img src="/logo-build-hub.png" className="w-100 h-40 animate-pulse" />
       </div>
     );
   }

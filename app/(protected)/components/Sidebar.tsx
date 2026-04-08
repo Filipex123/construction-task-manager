@@ -43,10 +43,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ userName, userEmail }) => {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-slate-700">
             <div className={`flex items-center space-x-3 ${!isOpen && 'lg:justify-center'}`}>
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Image src="/favicon.ico" alt="Logo" width={24} height={24} />
+              <div className="bg-white rounded-lg">
+                <Image src="/new-construtora-icon.png" alt="Logo" width={40} height={40} />
               </div>
-              {isOpen && <h1 className="text-xl font-bold">Vital Gestão - Medição</h1>}
+              {isOpen && <h1 className="text-xl font-bold pl-2">Build Hub</h1>}
             </div>
             <button onClick={toggleSidebar} className="p-1 rounded hover:bg-slate-700 transition-colors lg:hidden">
               <X className="w-6 h-6" />

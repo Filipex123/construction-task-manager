@@ -30,7 +30,7 @@ const EmpreiteiraPage: React.FC = () => {
         searchTerm === '' ||
         contractor.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contractor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contractor.id === Number(searchTerm.toLowerCase())
+        contractor.id === Number(searchTerm.toLowerCase()),
     );
   }, [contractors, searchTerm]);
 
@@ -52,7 +52,7 @@ const EmpreiteiraPage: React.FC = () => {
 
     // Verificar se já existe uma unidade com a mesma descrição ou complemento
     const existingUnit = contractors.find(
-      (unit) => unit.id !== editingItem?.id && (unit.description?.toLowerCase() === formData.descricao.toLowerCase() || unit.name?.toLowerCase() === formData.nome.toLowerCase())
+      (unit) => unit.id !== editingItem?.id && (unit.description?.toLowerCase() === formData.descricao.toLowerCase() || unit.name?.toLowerCase() === formData.nome.toLowerCase()),
     );
 
     if (existingUnit) {
