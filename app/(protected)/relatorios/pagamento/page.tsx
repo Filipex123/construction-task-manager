@@ -10,6 +10,12 @@ import { MultiFilterSelect } from '../../components/MultiFilterSelect';
 import { SingleFilterSelect } from '../../components/SingleFilterSelect';
 
 const DEFAULT_OBRA = { id: 0, name: '' } as Obra;
+const PAYMENT_STATUS_OPTIONS: { id: number; name: string; value: Tarefa['paymentStatus'] }[] = [
+  { id: 1, name: 'Em andamento', value: 'EM_ANDAMENTO' },
+  { id: 2, name: 'Pendente', value: 'PENDENTE' },
+  { id: 3, name: 'Pago', value: 'PAGO' },
+  { id: 4, name: 'Atrasado', value: 'ATRASADO' },
+];
 
 const PaymentReport: React.FC = () => {
   const { obras } = useObras();
@@ -28,7 +34,7 @@ const PaymentReport: React.FC = () => {
     setIsLoading(true);
     try {
       if (selectedObra.id !== 0) {
-        const data = await tarefaService.listar(selectedObra.id!, { paymentStatus: ['PENDENTE'] }, false);
+        const data = await tarefaService.listar(selectedObra.id!, { paymentStatus: ['PENDENTE', 'ATRASADO'] }, false);
         setFilteredTasks(Array.isArray(data.items) ? data.items : []);
         const empreiteiraOptionsUnique: Option[] = Array.from(
           new Map(
@@ -38,8 +44,8 @@ const PaymentReport: React.FC = () => {
                 id: task.empreiteira.id,
                 name: task.empreiteira.name?.toString() || '',
               } as Option,
-            ])
-          ).values()
+            ]),
+          ).values(),
         );
 
         setEmpreiteiraOptions(empreiteiraOptionsUnique);
@@ -56,6 +62,7 @@ const PaymentReport: React.FC = () => {
     local: '',
     atividade: '',
     empreiteiras: [] as Option[],
+    paymentStatus: '' as '' | Tarefa['paymentStatus'],
     dataInicio: '',
     dataFim: '',
     dataInicioVencimento: '',
@@ -71,6 +78,7 @@ const PaymentReport: React.FC = () => {
       const matchesLocal = filters.local === '' || concatenedLocais.includes(filters.local);
       const matchesAtividade = filters.atividade === '' || item.atividade.name?.includes(filters.atividade);
       const matchesEmpreiteira = filters.empreiteiras.length === 0 || filters.empreiteiras.some((e) => e.id === item.empreiteira.id);
+      const matchesPaymentStatus = filters.paymentStatus === '' || item.paymentStatus === filters.paymentStatus;
 
       let matchesDataInicio = true;
       let matchesDataFim = true;
@@ -91,11 +99,12 @@ const PaymentReport: React.FC = () => {
         matchesDataInicio = new Date(item.dueDate!) >= new Date(filters.dataInicioVencimento);
       }
 
-      return matchesSearch && matchesLocal && matchesAtividade && matchesEmpreiteira && matchesDataInicio && matchesDataFim;
+      return matchesSearch && matchesLocal && matchesAtividade && matchesEmpreiteira && matchesPaymentStatus && matchesDataInicio && matchesDataFim;
     });
   }, [filteredTasks, searchTerm, filters]);
 
   // Paginação
+  const selectedPaymentStatusOption = PAYMENT_STATUS_OPTIONS.find((status) => status.value === filters.paymentStatus);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
@@ -110,6 +119,7 @@ const PaymentReport: React.FC = () => {
       local: '',
       atividade: '',
       empreiteiras: [],
+      paymentStatus: '',
       dataInicio: '',
       dataFim: '',
       dataInicioVencimento: '',
@@ -214,7 +224,7 @@ const PaymentReport: React.FC = () => {
                 <td>${formatDate(item.measurementDate!)}</td>
                 <td>${formatDate(item.dueDate!)}</td>
               </tr>
-            `
+            `,
               )
               .join('')}
           </tbody>
@@ -404,7 +414,7 @@ const PaymentReport: React.FC = () => {
       {/* Filtros e Busca */}
       <div className="bg-white rounded-lg shadow-md">
         {true && (
-          <div className="bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4 bg-gray-50 rounded-lg">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Local</label>
               <input
@@ -430,7 +440,7 @@ const PaymentReport: React.FC = () => {
               <MultiFilterSelect
                 options={empreiteiraOptions}
                 value={filters.empreiteiras}
-                placeholder="Selecione empreiteiras"
+                placeholder="Filtrar empreiteiras"
                 onChange={(values) =>
                   setFilters((prev) => ({
                     ...prev,
@@ -457,7 +467,22 @@ const PaymentReport: React.FC = () => {
                 className="w-full text-black/50 px-3 py-2 border border-gray-300 rounded-lg border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
-            <div className="lg:col-span-5 flex justify-end">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status de Pagamento</label>
+              <SingleFilterSelect
+                options={PAYMENT_STATUS_OPTIONS.map((status) => ({ id: status.id, name: status.name }))}
+                value={selectedPaymentStatusOption ? { id: selectedPaymentStatusOption.id, name: selectedPaymentStatusOption.name } : null}
+                placeholder="Filtrar status"
+                onChange={(value) => {
+                  const selectedStatus = PAYMENT_STATUS_OPTIONS.find((status) => status.id === value?.id)?.value ?? '';
+                  setFilters((prev) => ({
+                    ...prev,
+                    paymentStatus: selectedStatus,
+                  }));
+                }}
+              />
+            </div>
+            <div className="lg:col-span-6 flex justify-end">
               <button onClick={clearFilters} className="flex flex-row px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 transition-colors rounded-lg">
                 <X className="w-5 h-5 text-gray-400 mr-2" />
                 Limpar Filtros
